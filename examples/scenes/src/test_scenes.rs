@@ -54,19 +54,19 @@ macro_rules! scene {
 }
 
 export_scenes!(
-  funky_paths(funky_paths),
+  // funky_paths(funky_paths),
   stroke_styles(impls::stroke_styles(Affine::IDENTITY), "stroke_styles", false),
-  stroke_styles_non_uniform(impls::stroke_styles(Affine::scale_non_uniform(1.2, 0.7)), "stroke_styles (non-uniform scale)", false),
-  stroke_styles_skew(impls::stroke_styles(Affine::skew(1., 0.)), "stroke_styles (skew)", false),
-  tricky_strokes(tricky_strokes),
-  gradient_extend(gradient_extend),
-  brush_transform(brush_transform: animated),
-  robust_paths(robust_paths),
-  base_color_test(base_color_test: animated),
-  many_draw_objects(many_draw_objects),
-  blurred_rounded_rect(blurred_rounded_rect),
-  image_extend_modes_bilinear(impls::image_extend_modes(ImageQuality::Medium), "image_extend_modes (bilinear)", false),
-  image_extend_modes_nearest_neighbor(impls::image_extend_modes(ImageQuality::Low), "image_extend_modes (nearest neighbor)", false),
+  // stroke_styles_non_uniform(impls::stroke_styles(Affine::scale_non_uniform(1.2, 0.7)), "stroke_styles (non-uniform scale)", false),
+  // stroke_styles_skew(impls::stroke_styles(Affine::skew(1., 0.)), "stroke_styles (skew)", false),
+  // tricky_strokes(tricky_strokes),
+  // gradient_extend(gradient_extend),
+  // brush_transform(brush_transform: animated),
+  // robust_paths(robust_paths),
+  // base_color_test(base_color_test: animated),
+  // many_draw_objects(many_draw_objects),
+  // blurred_rounded_rect(blurred_rounded_rect),
+  // image_extend_modes_bilinear(impls::image_extend_modes(ImageQuality::Medium), "image_extend_modes (bilinear)", false),
+  // image_extend_modes_nearest_neighbor(impls::image_extend_modes(ImageQuality::Low), "image_extend_modes (nearest neighbor)", false),
 );
 
 /// Implementations for the test scenes.
