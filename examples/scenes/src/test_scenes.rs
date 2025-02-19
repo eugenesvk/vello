@@ -1,37 +1,19 @@
 #![cfg_attr(not(debug_assertions),allow(non_snake_case,non_upper_case_globals,non_camel_case_types))]
 #![cfg_attr(    debug_assertions ,allow(non_snake_case,non_upper_case_globals,non_camel_case_types,unused_imports,unused_mut,unused_variables,dead_code,unused_assignments,unused_macros))]
-
 use crate::{ExampleScene, SceneConfig, SceneSet};
-use vello::{
-  kurbo::{Affine, Cap},
-  peniko::ImageQuality,
-};
-
-/// All of the test scenes supported by Vello.
-pub fn test_scenes() -> SceneSet {test_scenes_inner()}
-
-/// A macro which exports each passed scene indivudally
-///
-/// This is used to avoid having to repeatedly define a
+use vello::{kurbo::{Affine, Cap},peniko::ImageQuality,};
+pub fn test_scenes() -> SceneSet {test_scenes_inner()} /// All of the test scenes supported by Vello.
+/// A macro which exports each passed scene indivudally This is used to avoid having to repeatedly define a
 macro_rules! export_scenes {
   ($($scene_name: ident($($scene: tt)+)),*$(,)?) => {
     pub fn test_scenes_inner() -> SceneSet {
-      let scenes = vec![
-        $($scene_name()),+
-      ];
+      let scenes = vec![$($scene_name()),+];
       SceneSet { scenes }
     }
-
-    $(
-      pub fn $scene_name() -> ExampleScene {
-        scene!($($scene)+)
-      }
-    )+
+    $(pub fn $scene_name() -> ExampleScene {scene!($($scene)+)})+
   };
 }
-
-/// A helper to create a shorthand name for a single scene.
-/// Used in `export_scenes`.
+/// A helper to create a shorthand name for a single scene. Used in `export_scenes`.
 macro_rules! scene {
   ($func:expr, $name: expr, $animated: literal) => {
     ExampleScene {
@@ -43,22 +25,13 @@ macro_rules! scene {
     }
   };
 }
-
-export_scenes!(
-  stroke_styles(impls::stroke_styles(Affine::IDENTITY), "stroke_styles", false),
-);
-
-/// Implementations for the test scenes.
-/// In a module because the exported [`ExampleScene`] creation functions use the same names.
+export_scenes!(stroke_styles(impls::stroke_styles(Affine::IDENTITY), "stroke_styles", false),);
+/// Implementations for the test scenes. In a module because the exported [`ExampleScene`] creation functions use the same names.
 mod impls {
-
   use std::sync::Arc;
-
   use crate::SceneParams;
   use kurbo::RoundedRect;
-  use vello::kurbo::{
-    Affine, BezPath, Cap, Circle, Join, PathEl, Point, Rect, Shape, Stroke, Vec2,
-  };
+  use vello::kurbo::{Affine, BezPath, Cap, Circle, Join, PathEl, Point, Rect, Shape, Stroke, Vec2,};
   use vello::peniko::color::{palette, AlphaColor, Lch};
   use vello::peniko::*;
   use vello::*;
