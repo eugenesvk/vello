@@ -106,11 +106,7 @@ mod impls {
       let mut color_idx = 0;
       for start in cap_styles {
         for end in cap_styles {
-          params.text.add(
-            scene,
-            None,
-            12.,
-            None,
+          params.text.add(scene,None,12.,None,
             Affine::translate((0., y)) * t,
             &format!("Start cap: {:?}, End cap: {:?}", start, end),
           );
@@ -131,11 +127,7 @@ mod impls {
       y = 0.;
       for start in cap_styles {
         for end in cap_styles {
-          params.text.add(
-            scene,
-            None,
-            12.,
-            None,
+          params.text.add(scene,None,12.,None,
             Affine::translate((0., y)) * t,
             &format!("Dashing - Start cap: {:?}, End cap: {:?}", start, end),
           );
@@ -160,11 +152,7 @@ mod impls {
       y = 0.;
       for cap in cap_styles {
         for join in join_styles {
-          params.text.add(
-            scene,
-            None,
-            12.,
-            None,
+          params.text.add(scene,None,12.,None,
             Affine::translate((0., y)) * t,
             &format!("Caps: {:?}, Joins: {:?}", cap, join),
           );
@@ -185,11 +173,7 @@ mod impls {
       y_max = y_max.max(y);
       y = 0.;
       for ml in miter_limits {
-        params.text.add(
-          scene,
-          None,
-          12.,
-          None,
+        params.text.add(scene,None,12.,None,
           Affine::translate((0., y)) * t,
           &format!("Miter limit: {}", ml),
         );
@@ -209,11 +193,7 @@ mod impls {
 
       // Closed paths
       for (i, join) in join_styles.iter().enumerate() {
-        params.text.add(
-          scene,
-          None,
-          12.,
-          None,
+        params.text.add(scene,None,12.,None,
           Affine::translate((0., y)) * t,
           &format!("Closed path with join: {:?}", join),
         );
@@ -233,8 +213,7 @@ mod impls {
       }
       y_max = y_max.max(y);
       // The closed_strokes has a maximum x of 400, `t` has a scale of `2.`
-      // Give 50px of padding to account for `transform`
-      let x_max = t.translation().x + 400. * 2. + 50.;
+      let x_max = t.translation().x + 400. * 2. + 50.; // Give 50px of padding to account for `transform`
       params.resolution = Some((x_max, y_max).into());
     }
   }
