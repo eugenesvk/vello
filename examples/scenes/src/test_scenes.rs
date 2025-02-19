@@ -46,32 +46,12 @@ mod impls {
         Color::from_rgb8(150, 195, 160),
       ];
       let simple_stroke = [MoveTo((0., 0.).into()), LineTo((100., 0.).into())];
-      let join_stroke = [
-        MoveTo (( 0. , 0.).into()),
+      let join_stroke = [ MoveTo (( 0. , 0.).into()),
         CurveTo((20. , 0.).into(), (42.5, 5.).into(), ( 50., 25.).into()),
         CurveTo((57.5, 5.).into(), (80. , 0.).into(), (100.,  0.).into()),
       ];
-      let miter_stroke = [
-        MoveTo((0., 0.).into()),
-        LineTo((90., 16.).into()),
-        LineTo((0., 31.).into()),
-        LineTo((90., 46.).into()),
-      ];
-      let closed_strokes = [
-        MoveTo((0., 0.).into()),
-        LineTo((90., 21.).into()),
-        LineTo((0., 42.).into()),
-        ClosePath,
-        MoveTo((200., 0.).into()),
-        CurveTo((100., 72.).into(), (300., 72.).into(), (200., 0.).into()),
-        ClosePath,
-        MoveTo((290., 0.).into()),
-        CurveTo((200., 72.).into(), (400., 72.).into(), (310., 0.).into()),
-        ClosePath,
-      ];
-      let cap_styles = [Cap::Butt, Cap::Square, Cap::Round];
+      let cap_styles  = [Cap::Butt  , Cap::Square, Cap::Round ];
       let join_styles = [Join::Bevel, Join::Miter, Join::Round];
-      let miter_limits = [4., 6., 0.1, 10.];
 
       // Simple strokes with cap combinations
       let t = Affine::translate((60., 40.)) * Affine::scale(2.);
