@@ -45,7 +45,6 @@ mod impls {
         Color::from_rgb8(201, 147, 206),
         Color::from_rgb8(150, 195, 160),
       ];
-      let simple_stroke = [MoveTo((0., 0.).into()), LineTo((100., 0.).into())];
       let join_stroke = [ MoveTo (( 0. , 0.).into()),
         CurveTo((20. , 0.).into(), (42.5, 5.).into(), ( 50., 25.).into()),
         CurveTo((57.5, 5.).into(), (80. , 0.).into(), (100.,  0.).into()),
@@ -53,33 +52,24 @@ mod impls {
       let cap_styles  = [Cap::Butt  , Cap::Square, Cap::Round ];
       let join_styles = [Join::Bevel, Join::Miter, Join::Round];
 
-      // Simple strokes with cap combinations
-      let t = Affine::translate((60., 40.)) * Affine::scale(2.);
-      let mut y = 0.;
-      let mut color_idx = 0;
-
-      let mut y_max: f64 = y;
       // Cap and join combinations
-      let t = Affine::translate((550., 0.)) * t;
+      let mut y = 0.;
+      let mut y_max: f64 = y;
+      let mut color_idx = 0;
+      let t = Affine::translate((60., 40.)) * Affine::scale(2.);
       y_max = y_max.max(y);
       y = 0.;
-      for cap in cap_styles {
-        for join in join_styles {
-          params.text.add(scene,None,12.,None,
-            Affine::translate((0., y)) * t,
-            &format!("Caps: {:?}, Joins: {:?}", cap, join),
-          );
-          scene.stroke(
-            &Stroke::new(20.).with_caps(cap).with_join(join),
-            Affine::translate((0., y + 30.)) * t * transform,
-            colors[color_idx],
-            None,
-            &join_stroke,
-          );
-          y += 185.;
-          color_idx = (color_idx + 1) % colors.len();
-        }
-      }
+      for cap  in cap_styles  {
+      for join in join_styles {
+        params.text.add(scene,None,12.,None                          , Affine::translate((0., y      )) * t,
+          &format!("Caps: {:?}, Joins: {:?}", cap, join),);
+        scene.stroke(&Stroke::new(20.).with_caps(cap).with_join(join), Affine::translate((0., y + 30.)) * t * transform,
+          colors[color_idx],None,
+          &join_stroke,
+        );
+        y += 185.;
+        color_idx = (color_idx + 1) % colors.len();
+      }}
     }
   }
 }
