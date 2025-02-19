@@ -104,48 +104,8 @@ mod impls {
       let t = Affine::translate((60., 40.)) * Affine::scale(2.);
       let mut y = 0.;
       let mut color_idx = 0;
-      for start in cap_styles {
-        for end in cap_styles {
-          params.text.add(scene,None,12.,None,
-            Affine::translate((0., y)) * t,
-            &format!("Start cap: {:?}, End cap: {:?}", start, end),
-          );
-          scene.stroke(
-            &Stroke::new(20.).with_start_cap(start).with_end_cap(end),
-            Affine::translate((0., y + 30.)) * t * transform,
-            colors[color_idx],
-            None,
-            &simple_stroke,
-          );
-          y += 180.;
-          color_idx = (color_idx + 1) % colors.len();
-        }
-      }
-      // Dashed strokes with cap combinations
-      let t = Affine::translate((450., 0.)) * t;
-      let mut y_max = y;
-      y = 0.;
-      for start in cap_styles {
-        for end in cap_styles {
-          params.text.add(scene,None,12.,None,
-            Affine::translate((0., y)) * t,
-            &format!("Dashing - Start cap: {:?}, End cap: {:?}", start, end),
-          );
-          scene.stroke(
-            &Stroke::new(20.)
-              .with_start_cap(start)
-              .with_end_cap(end)
-              .with_dashes(0., [10.0, 21.0]),
-            Affine::translate((0., y + 30.)) * t * transform,
-            colors[color_idx],
-            None,
-            &simple_stroke,
-          );
-          y += 180.;
-          color_idx = (color_idx + 1) % colors.len();
-        }
-      }
 
+      let mut y_max: f64 = y;
       // Cap and join combinations
       let t = Affine::translate((550., 0.)) * t;
       y_max = y_max.max(y);
@@ -167,54 +127,6 @@ mod impls {
           color_idx = (color_idx + 1) % colors.len();
         }
       }
-
-      // Miter limit
-      let t = Affine::translate((500., 0.)) * t;
-      y_max = y_max.max(y);
-      y = 0.;
-      for ml in miter_limits {
-        params.text.add(scene,None,12.,None,
-          Affine::translate((0., y)) * t,
-          &format!("Miter limit: {}", ml),
-        );
-        scene.stroke(
-          &Stroke::new(10.)
-            .with_caps(Cap::Butt)
-            .with_join(Join::Miter)
-            .with_miter_limit(ml),
-          Affine::translate((0., y + 30.)) * t * transform,
-          colors[color_idx],
-          None,
-          &miter_stroke,
-        );
-        y += 180.;
-        color_idx = (color_idx + 1) % colors.len();
-      }
-
-      // Closed paths
-      for (i, join) in join_styles.iter().enumerate() {
-        params.text.add(scene,None,12.,None,
-          Affine::translate((0., y)) * t,
-          &format!("Closed path with join: {:?}", join),
-        );
-        // The cap style is not important since a closed path shouldn't have any caps.
-        scene.stroke(
-          &Stroke::new(10.)
-            .with_caps(cap_styles[i])
-            .with_join(*join)
-            .with_miter_limit(5.),
-          Affine::translate((0., y + 30.)) * t * transform,
-          colors[color_idx],
-          None,
-          &closed_strokes,
-        );
-        y += 180.;
-        color_idx = (color_idx + 1) % colors.len();
-      }
-      y_max = y_max.max(y);
-      // The closed_strokes has a maximum x of 400, `t` has a scale of `2.`
-      let x_max = t.translation().x + 400. * 2. + 50.; // Give 50px of padding to account for `transform`
-      params.resolution = Some((x_max, y_max).into());
     }
   }
 }
