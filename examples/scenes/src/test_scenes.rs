@@ -74,9 +74,9 @@ mod impls {
       ];
       let simple_stroke = [MoveTo((0., 0.).into()), LineTo((100., 0.).into())];
       let join_stroke = [
-        MoveTo((0., 0.).into()),
-        CurveTo((20., 0.).into(), (42.5, 5.).into(), (50., 25.).into()),
-        CurveTo((57.5, 5.).into(), (80., 0.).into(), (100., 0.).into()),
+        MoveTo (( 0. , 0.).into()),
+        CurveTo((20. , 0.).into(), (42.5, 5.).into(), ( 50., 25.).into()),
+        CurveTo((57.5, 5.).into(), (80. , 0.).into(), (100.,  0.).into()),
       ];
       let miter_stroke = [
         MoveTo((0., 0.).into()),
