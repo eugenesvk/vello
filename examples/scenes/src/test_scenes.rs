@@ -88,21 +88,17 @@ export_scenes!(
 /// Implementations for the test scenes.
 /// In a module because the exported [`ExampleScene`] creation functions use the same names.
 mod impls {
-  use std::f64::consts::{FRAC_1_SQRT_2, PI};
+
   use std::sync::Arc;
 
   use crate::SceneParams;
   use kurbo::RoundedRect;
-  use rand::Rng;
-  use rand::{rngs::StdRng, SeedableRng};
   use vello::kurbo::{
-    Affine, BezPath, Cap, Circle, Ellipse, Join, PathEl, Point, Rect, Shape, Stroke, Vec2,
+    Affine, BezPath, Cap, Circle, Join, PathEl, Point, Rect, Shape, Stroke, Vec2,
   };
   use vello::peniko::color::{palette, AlphaColor, Lch};
   use vello::peniko::*;
   use vello::*;
-
-  const FLOWER_IMAGE: &[u8] = include_bytes!("../../assets/splash-flower.jpg");
 
   pub(super) fn funky_paths(scene: &mut Scene, _: &mut SceneParams<'_>) {
     use PathEl::*;
@@ -645,38 +641,6 @@ mod impls {
     for _ in 0..N {
       scene.pop_layer();
     }
-  }
-
-  pub(super) fn render_alpha_test(scene: &mut Scene) {
-    // Alpha compositing tests.
-    scene.fill(
-      Fill::NonZero,
-      Affine::IDENTITY,
-      palette::css::RED,
-      None,
-      &make_diamond(1024.0, 100.0),
-    );
-    scene.fill(
-      Fill::NonZero,
-      Affine::IDENTITY,
-      palette::css::LIME.with_alpha(0.5),
-      None,
-      &make_diamond(1024.0, 125.0),
-    );
-    scene.push_layer(
-      Mix::Clip,
-      1.0,
-      Affine::IDENTITY,
-      &make_diamond(1024.0, 150.0),
-    );
-    scene.fill(
-      Fill::NonZero,
-      Affine::IDENTITY,
-      palette::css::BLUE.with_alpha(0.5),
-      None,
-      &make_diamond(1024.0, 175.0),
-    );
-    scene.pop_layer();
   }
 
   pub(super) fn robust_paths(scene: &mut Scene, _: &mut SceneParams<'_>) {
