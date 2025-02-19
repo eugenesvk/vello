@@ -16,7 +16,6 @@
 )]
 
 mod images;
-mod mmark;
 mod pico_svg;
 mod simple_text;
 mod svg;
