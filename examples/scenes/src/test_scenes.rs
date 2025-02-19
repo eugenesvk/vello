@@ -47,9 +47,12 @@ mod impls {
       ];
       let join_stroke = [ MoveTo (( 0. , 0.).into()),
         CurveTo((20. , 0.).into(), (42.5, 5.).into(), ( 50., 25.).into()),
-        CurveTo((57.5, 5.).into(), (80. , 0.).into(), (100.,  0.).into()),
-      ];
-      let cap_styles  = [Cap::Butt  , Cap::Square, Cap::Round ];
+        CurveTo((57.5, 5.).into(), (80. , 0.).into(), (100.,  0.).into()),];
+      let stroke1     = [ MoveTo (( 0. , 0.).into()),
+        CurveTo((20. , 0.).into(), (42.5, 5.).into(), ( 50., 25.).into()),];
+      let stroke2     = [ MoveTo (                   ( 50., 25.).into()),
+        CurveTo((57.5, 5.).into(), (80. , 0.).into(), (100.,  0.).into()),];
+      let cap_styles  = [Cap::Butt  , Cap::Round ]; //Cap::Square,
       let join_styles = [Join::Bevel, Join::Miter, Join::Round];
 
       // Cap and join combinations
@@ -63,10 +66,12 @@ mod impls {
       for join in join_styles {
         params.text.add(scene,None,12.,None                          , Affine::translate((0., y      )) * t,
           &format!("Caps: {:?}, Joins: {:?}", cap, join),);
-        scene.stroke(&Stroke::new(20.).with_caps(cap).with_join(join), Affine::translate((0., y + 30.)) * t * transform,
-          colors[color_idx],None,
-          &join_stroke,
-        );
+        scene.stroke(&Stroke::new(10.).with_caps(cap).with_join(join), Affine::translate((0., y + 30.)) * t * transform,colors[color_idx],None,
+          &join_stroke);
+        scene.stroke(&Stroke::new(10.).with_caps(cap).with_join(join), Affine::translate((300., y + 30.)) * t * transform,colors[color_idx],None,
+          &stroke1);
+        scene.stroke(&Stroke::new(20.).with_caps(cap).with_join(join), Affine::translate((300., y + 30.)) * t * transform,colors[color_idx],None,
+          &stroke2);
         y += 185.;
         color_idx = (color_idx + 1) % colors.len();
       }}
