@@ -36,6 +36,8 @@ mod impls {
   use vello::peniko::*;
   use vello::*;
 
+  fn get_stroke(width:f64) -> Stroke {Stroke::new(width).with_start_cap(Cap::Butt).with_end_cap(Cap::Butt).with_join(Join::Bevel)}
+
   pub(super) fn stroke_styles(transform: Affine) -> impl FnMut(&mut Scene, &mut SceneParams<'_>) {
     use PathEl::*;
     move |scene, params| {
@@ -135,6 +137,7 @@ mod impls {
         let cw = if i > skip_beg	{w1 + sign1 * w_step * rex
         } else                  	{w1px}; //println!("wG:  {cw:.0}");
         let stroke_c = Stroke::new(cw).with_start_cap(Cap::Butt).with_end_cap(Cap::Butt);
+        let stroke_c = get_stroke(cw);
         scene.stroke(&stroke_c, Affine::IDENTITY, &grad1, None, &c,);
       }
 
@@ -144,10 +147,10 @@ mod impls {
         let c = CircleSegment::new((cx,cy), r0,r0   ,  rad0,precision_radps);
         let cw = if i < skip_end	{wavg + sign2 * w_step * r
         } else                  	{w2px};  //println!("wR:  {cw:.0}");
-        let stroke_c = Stroke::new(cw).with_start_cap(Cap::Butt).with_end_cap(Cap::Butt);
+        let stroke_c = get_stroke(cw);
         scene.stroke(&stroke_c, Affine::IDENTITY, &grad2, None, &c,);
       }
-      let pstr = Stroke::new(1.); // starting point bigger than the ending, angle to differentiate two curves
+      let pstr = get_stroke(1.); // starting point bigger than the ending, angle to differentiate two curves
       let g1beg = Ellipse::new(grad1_p0, ( 2.,15.+5.),  33.0_f64.to_radians());scene.stroke(&pstr,Affine::IDENTITY, &col_beg, None, &g1beg,);
       let g1end = Ellipse::new(grad1_p1, ( 2.,15.+0.),  33.0_f64.to_radians());scene.stroke(&pstr,Affine::IDENTITY, &col_end, None, &g1end,);
       let g2beg = Ellipse::new(grad2_p0, ( 2.,15.+5.), -66.0_f64.to_radians());scene.stroke(&pstr,Affine::IDENTITY, &col_beg, None, &g2beg,);
