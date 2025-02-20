@@ -136,7 +136,6 @@ mod impls {
         let c = CircleSegment::new((cx,cy), r0,r0   ,  rad0,precision_radps);
         let cw = if i > skip_beg	{w1 + sign1 * w_step * rex
         } else                  	{w1px}; //println!("wG:  {cw:.0}");
-        let stroke_c = Stroke::new(cw).with_start_cap(Cap::Butt).with_end_cap(Cap::Butt);
         let stroke_c = get_stroke(cw);
         scene.stroke(&stroke_c, Affine::IDENTITY, &grad1, None, &c,);
       }
