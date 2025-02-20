@@ -95,8 +95,9 @@ mod impls {
       let skip_beg    	= steps - skip_end; //324
       // Line width
       let w1:f64 = 20.; let w2:f64 =  4.; let wavg = (w1 + w2) / 2.; // 12
+      let w_delta_avg = (w2 - w1).abs() / 2.;
       let w1px = (w1 * dpi).round() / dpi; let w2px = (w2 * dpi).round() / dpi;
-      let w_step = ((w2 - w1).abs() / 2.) / steps_delta; //12/2/45 0.13 to reach average
+      let w_step = w_delta_avg / steps_delta; //12/2/45 0.13 to reach average
 
       // todo2: check overlaps, maybe add tiny degree fractions?
       // ((w1 + sign1 * w_step * r) * dpi).round() / dpi; //transition shouldn't be pixel-stepped!
@@ -130,17 +131,32 @@ mod impls {
       let grad2_p1 = ( cx + r0*f64::cos((r2beg + deg_delta).to_radians())     , cy + r0*f64::sin((r2beg + deg_delta).to_radians()) );
       let grad2 = Gradient::new_linear(grad2_p0, grad2_p1).with_stops([col_avg    ,col_end]);
 
+      // Draw pre-gradwidth segment separately without the extra iterator
+      let c = CircleSegment::new((cx,cy), r0,r0   ,  r1beg_rad,skip_beg_rad);
+      let stroke_c = get_stroke(w1px);
+      scene.stroke(&stroke_c, Affine::IDENTITY, &col_beg, None, &c,);
+
+      let steps_left_f = deg_delta / precision_degps;
+      let steps_left   = steps_left_f as i32;
+      let w_step_left:f64 = w_delta_avg / f64::from(steps_left); //to reach average
+
       let sign1 = if w1 > wavg {-1.} else if w1 < wavg {1.} else {0.}; //(to avg) ↓ if bigger, ↑ if smaller
-      for i in 0..steps { let r = f64::from(i); let rex = f64::from(i-skip_beg);
-        let rad0 = (r1beg + r * precision_degps).to_radians();
+      for i in 0..steps_left { let r = f64::from(i);
+        let rad0 = (skip_beg_deg + r * precision_degps).to_radians();
         let c = CircleSegment::new((cx,cy), r0,r0   ,  rad0,precision_radps);
         //                          center  rout/in    ∠start ∠sweep
         // if i == 0 {println!("\n\n———————————————————————————————")};
-        // println!("i={} r={:.1} r1beg={:.1} r*prec={:.1} beg={:.1} end={:.1}",i,r,r1beg,r * precision_degps,r1beg + r * precision_degps, r1beg + r * precision_degps + precision_degps);
-        let cw = if rad0 > skip_beg_rad	{w1 + sign1 * w_step * rex
-        } else                         	{w1px}; //println!("wG:  {cw:.0}");
+        // println!("i={i}/{steps_left}  r={r:.1} r1beg={r1beg:.1} r*prec={:.1} deg={skip_beg_deg:.1} beg={:.1} end={:.1}",r * precision_degps
+        //   ,       skip_beg_deg + r * precision_degps, skip_beg_deg + r * precision_degps + precision_degps);
+        let cw = w1 + sign1 * r * w_step_left;
         let stroke_c = get_stroke(cw);
         scene.stroke(&stroke_c, Affine::IDENTITY, &grad1, None, &c,);
+      } // ↓ in case step int conversion missed the last sliver
+      let rad0_last = (skip_beg_deg + f64::from(steps_left) * precision_degps).to_radians();
+      if rad0_last < r1end_rad {println!("end={} step_last={}",r1end,rad0_last);
+        let c = CircleSegment::new((cx,cy), r0,r0   ,  rad0_last,r1end_rad);
+        let stroke_c = get_stroke(w_delta_avg);
+        scene.stroke(&stroke_c, Affine::IDENTITY, &grad1, None, &c,); // use col_avg? though grad should cover
       }
 
       let sign2 = if w2 > wavg { 1.} else if w2 < wavg {-1.} else {0.}; //(from avg) ↑ if bigger, ↓ if smaller
