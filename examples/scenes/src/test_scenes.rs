@@ -101,7 +101,6 @@ mod impls {
       let w_step = w_delta_avg / steps_delta; //12/2/45 0.13 to reach average
 
       // ((w1 + sign1 * w_step * r) * dpi).round() / dpi; //transition shouldn't be pixel-stepped!
-      // convert to relative coords so that changing arcs propagate,  not 180 hardcoded
       // todo3: test with dashes (unlikely to work? needs a different logic?)
         // combine vertical line with 1/2 circle
         // add dashed strokes
