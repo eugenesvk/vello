@@ -99,15 +99,18 @@ mod impls {
       // todo2: check overlaps, maybe add tiny degree fractions?
       // ((w1 + sign1 * w_step * r) * dpi).round() / dpi; //transition shouldn't be pixel-stepped!
       // todo1: make the main 1st/last segment constructed in one go, no need to break into steps
-      // todo2: check overlaps, maybe add tiny degree fractions?
+      // convert to relative coords so that changing arcs propagate,  not 180 hardcoded
       // todo3: test with dashes (unlikely to work? needs a different logic?)
-      // todo4: add gradient
-        // add same logic that gradient only starts later: so need to adjust it's point coordinates
-        // make gradients also end an an average mixed color instead of stark
-        //
-        // NewColor = sqrt((R1^2+R2^2)/2), sqrt((G1^2+G2^2)/2), sqrt((B1^2+B2^2)/2)
-        // ↑ likely bad result, use colorspace?
-
+        // combine vertical line with 1/2 circle
+        // add dashed strokes
+        // split by path
+        // change stroke width in the last segments if they are covered by the 1/2 circle
+          // how to calculate a match? check if we can draw a semicircle and check if overlap
+        // draw previous line
+        // draw splits with a different width and gradient
+      // + add gradient
+        // + add same logic that gradient only starts later: so need to adjust its point coordinates
+        // + make gradients also end an an average mixed color instead of stark
       let col_beg = css::LIME;
       let col_end = css::RED;
       let col_avg = col_beg.lerp(col_end,0.5,Default::default());
@@ -146,21 +149,6 @@ mod impls {
       let g1end = Ellipse::new(grad1_p1, ( 2.,15.+0.),  33.0_f64.to_radians());scene.stroke(&pstr,Affine::IDENTITY, &col_end, None, &g1end,);
       let g2beg = Ellipse::new(grad2_p0, ( 2.,15.+5.), -66.0_f64.to_radians());scene.stroke(&pstr,Affine::IDENTITY, &col_beg, None, &g2beg,);
       let g2end = Ellipse::new(grad2_p1, ( 2.,15.+0.), -66.0_f64.to_radians());scene.stroke(&pstr,Affine::IDENTITY, &col_end, None, &g2end,);
-
-
-      // let cx = 900.; let cy = 200.; let r0 = 100.;
-      // let grad1_p0 = (cx+(r0- 10.) , cy+ 0.);
-      // let grad1_p1 = (cx-(r0-120.) , cy+140.);
-      // let grad1 = Gradient::new_linear(grad1_p0, grad1_p1).with_stops([col_beg,col_end]);
-      // let pstr = Stroke::new(1.);
-      // let p0c = Circle ::new(grad1_p0,5.);scene.stroke(&pstr,Affine::IDENTITY, &col_beg    , None, &p0c,);
-      // let p1c = Circle ::new(grad1_p1,5.);scene.stroke(&pstr,Affine::IDENTITY, &col_end, None, &p1c,);
-      // let c = CircleSegment::new((cx,cy), r0,r0   ,  0.0_f64.to_radians(),180.0_f64.to_radians());
-      // let stroke_c = Stroke::new(w2).with_start_cap(Cap::Butt).with_end_cap(Cap::Butt);
-      // scene.stroke(&stroke_c, Affine::IDENTITY, &grad1, None, &c,);
-      // // scene.stroke(&stroke_c, Affine::IDENTITY, &col_end, None, &c,);
-
-
 
     }
   }
