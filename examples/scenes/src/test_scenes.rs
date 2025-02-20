@@ -31,10 +31,11 @@ mod impls {
   use std::sync::Arc;
   use crate::SceneParams;
   use kurbo::RoundedRect;
-  use vello::kurbo::{Affine, BezPath, Cap, Circle,CircleSegment,Ellipse, Join, PathEl, Point, Rect, Shape, Stroke, Vec2,};
+  use vello::kurbo::{Affine, BezPath, Cap, Circle,CircleSegment,Ellipse,Line,Join, PathEl, Point, Rect, Shape, Stroke, Vec2,};
   use vello::peniko::color::{palette, AlphaColor, Lch, palette::css};
   use vello::peniko::*;
   use vello::*;
+  use std::f64::consts as f64c;
 
   fn get_stroke(width:f64) -> Stroke {Stroke::new(width).with_start_cap(Cap::Butt).with_end_cap(Cap::Butt).with_join(Join::Bevel)}
 
