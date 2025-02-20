@@ -159,7 +159,8 @@ mod impls {
 
       // Draw pos-gradwidth segment separately without the extra iterator
       let c = CircleSegment::new((cx,cy), r0,r0   ,  r2beg_rad + rad_delta, skip_beg_rad);
-      let stroke_c = get_stroke(w2px);
+      // let stroke_c = get_stroke(w2px);
+      let stroke_c = get_stroke(w2px).with_dashes(5.,[9.,14.]);
       // scene.stroke(&stroke_c, Affine::IDENTITY, &col_end, None, &c,);
       scene.stroke(&stroke_c, Affine::IDENTITY, &css::WHEAT, None, &c,); // for testing
 
