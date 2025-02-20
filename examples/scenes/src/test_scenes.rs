@@ -81,15 +81,22 @@ mod impls {
       let w1px = (w1 * dpi).round() / dpi; let w2px = (w2 * dpi).round() / dpi;
       let w_step = w_delta_avg / steps_delta; //12/2/45 0.13 to reach average
 
+      // TODO: change all circle segments to .outer_arc() otherwise we're drawing 2! lines
       // ((w1 + sign1 * w_step * r) * dpi).round() / dpi; //transition shouldn't be pixel-stepped!
       // todo3: test with dashes (unlikely to work? needs a different logic?)
-        // combine vertical line with 1/2 circle
-        // add dashed strokes
-        // split by path
-        // change stroke width in the last segments if they are covered by the 1/2 circle
-          // how to calculate a match? check if we can draw a semicircle and check if overlap
-        // draw previous line
-        // draw splits with a different width and gradient
+        // Approach1:
+          // calculate dashed sequence [1,2,1,4] length in radians (1+2+1+4=8px == 1 rad at radius X)
+          // for each iterated gradwidht tiny segment, get remainder of divis by this iter length
+          // then determine, which sublength this short line belongs to (2nd: from 1/8 to (1+3)/8)
+          // then if this is an odd "dash" segment, draw, if not, skip
+        // Approach2: failed
+          // combine vertical line with 1/2 circle
+          // add dashed strokes
+          // split by path
+          // change stroke width in the last segments if they are covered by the 1/2 circle
+            // not possible???? how to calculate a match? check if we can draw a semicircle and check if overlap
+          // draw previous line
+          // draw splits with a different width and gradient
       let gap:f64 = 0.; // doesn't seem to 0.0001 affect anything with corrected ending style to Bevel
       let r1beg:f64 = 0.           	; let r1beg_rad = r1beg.to_radians(); //→
       let r1end = r1beg + arc_len_f	; let r1end_rad = r1end.to_radians();
