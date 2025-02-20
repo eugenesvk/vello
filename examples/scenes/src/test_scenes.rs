@@ -115,7 +115,7 @@ mod impls {
       let grad2 = Gradient::new_linear(grad2_p0, grad2_p1).with_stops([col_avg    ,col_end]);
 
       // Draw pre-gradwidth segment separately without the extra iterator
-      let c = CircleSegment::new((cx,cy), r0,r0   ,  r1beg_rad,skip_beg_rad);
+      let c = CircleSegment::new((cx,cy), r0,r0   ,  r1beg_rad,skip_beg_rad).outer_arc();
       let stroke_c = get_stroke(w1px);
       // scene.stroke(&stroke_c, Affine::IDENTITY, &col_beg, None, &c,);
       scene.stroke(&stroke_c, Affine::IDENTITY, &css::ORANGE, None, &c,); // for testing
@@ -127,7 +127,7 @@ mod impls {
       let sign1 = if w1 > wavg {-1.} else if w1 < wavg {1.} else {0.}; //(to avg) ↓ if bigger, ↑ if smaller
       for i in 0..steps_left { let r = f64::from(i);
         let rad0 = (skip_beg_deg + r * precision_degps).to_radians();
-        let c = CircleSegment::new((cx,cy), r0,r0   ,  rad0,precision_radps);
+        let c = CircleSegment::new((cx,cy), r0,r0   ,  rad0,precision_radps).outer_arc();
         //                          center  rout/in    ∠start ∠sweep
         // if i == 0 {println!("\n\n———————————————————————————————")};
         // println!("i={i}/{steps_left}  r={r:.1} r1beg={r1beg:.1} r*prec={:.1} deg={skip_beg_deg:.1} beg={:.1} end={:.1}",r * precision_degps
@@ -138,7 +138,7 @@ mod impls {
       } // ↓ in case step int conversion missed the last sliver
       let rad0_last = (skip_beg_deg + f64::from(steps_left) * precision_degps).to_radians();
       if rad0_last < r1end_rad { //println!("{rad0_last:.4}<{r1end_rad:.4} step_last {:.1}°<{:.1}° end",rad0_last.to_degrees(),r1end);
-        let c = CircleSegment::new((cx,cy), r0,r0   ,  rad0_last,r1end_rad - rad0_last);
+        let c = CircleSegment::new((cx,cy), r0,r0   ,  rad0_last,r1end_rad - rad0_last).outer_arc();
         let stroke_c = get_stroke(w_delta_avg);
         // scene.stroke(&stroke_c, Affine::IDENTITY, &grad1, None, &c,); // use col_avg? though grad should cover
         scene.stroke(&stroke_c, Affine::IDENTITY, &css::ORANGE, None, &c,); // for testing
@@ -146,16 +146,16 @@ mod impls {
 
 
       // Draw pos-gradwidth segment separately without the extra iterator
-      let c = CircleSegment::new((cx,cy), r0,r0   ,  r2beg_rad + rad_delta, skip_beg_rad);
+      let c = CircleSegment::new((cx,cy), r0,r0   ,  r2beg_rad + rad_delta, skip_beg_rad).outer_arc();
       // let stroke_c = get_stroke(w2px);
-      let stroke_c = get_stroke(w2px).with_dashes(5.,[9.,14.]);
+      let stroke_c = get_stroke(w2px).with_dashes(0.,[10.,10.]);
       // scene.stroke(&stroke_c, Affine::IDENTITY, &col_end, None, &c,);
       scene.stroke(&stroke_c, Affine::IDENTITY, &css::WHEAT, None, &c,); // for testing
 
       let sign2 = if w2 > wavg { 1.} else if w2 < wavg {-1.} else {0.}; //(from avg) ↑ if bigger, ↓ if smaller
       for i in 0..steps_left { let r = f64::from(i);
         let rad0 = (r2beg + r * precision_degps).to_radians();
-        let c = CircleSegment::new((cx,cy), r0,r0   ,  rad0,precision_radps);
+        let c = CircleSegment::new((cx,cy), r0,r0   ,  rad0,precision_radps).outer_arc();
         //                          center  rout/in    ∠start ∠sweep
         // if i == 0 {println!("\n\n———————————————————————————————")};
         // println!("i={i}/{steps_left}  r={r:.1} r1beg={r1beg:.1} r*prec={:.1} deg={r2beg:.1} beg={:.1} end={:.1}",r * precision_degps
