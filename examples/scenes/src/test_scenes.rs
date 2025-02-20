@@ -134,6 +134,7 @@ mod impls {
       for i in 0..steps { let r = f64::from(i); let rex = f64::from(i-skip_beg);
         let rad0 = (r1beg + r * precision_degps).to_radians();
         let c = CircleSegment::new((cx,cy), r0,r0   ,  rad0,precision_radps);
+        //                          center  rout/in    ∠start ∠sweep
         let cw = if rad0 > skip_beg_rad	{w1 + sign1 * w_step * rex
         } else                         	{w1px}; //println!("wG:  {cw:.0}");
         let stroke_c = get_stroke(cw);
@@ -144,6 +145,7 @@ mod impls {
       for i in 0..steps { let r = f64::from(i);
         let rad0 = (r2beg + r * precision_degps).to_radians();
         let c = CircleSegment::new((cx,cy), r0,r0   ,  rad0,precision_radps);
+        //                          center  rout/in    ∠start ∠sweep
         let cw = if i < skip_end	{wavg + sign2 * w_step * r
         } else                  	{w2px};  //println!("wR:  {cw:.0}");
         let stroke_c = get_stroke(cw);
