@@ -75,22 +75,28 @@ mod impls {
         y += 185.;
         color_idx = (color_idx + 1) % colors.len();
       }}
-      let degrees = 180; let degrees_f = f64::from(degrees);
-      let steps   = 360; let steps_f   = f64::from(steps  );
-      let deg_per_step = degrees_f / steps_f; let rad_per_step = deg_per_step.to_radians();
-
       let dpi = 1.5;
+      // Position
+      let cx = 900.; let cy = 200.; let r0 = 100.;
+      // Size
+      let arc_len = 180; let arc_len_f = f64::from(arc_len);
+      let precision_degps:f64 = 0.5; let precision_radps = precision_degps.to_radians();
+      let steps_f = arc_len_f / precision_degps; //360
+      let steps   = steps_f as i32;
+      // Gradient / size convergence bounds
       let f_delta = 1./10.; // start changing width for the first/last quarter only
-      let deg_delta   = degrees_f * f_delta; //18°
-      let steps_delta = steps_f * f_delta; //36
-      let skip_end = steps_delta as i32; //36
-      let skip_beg = steps - skip_end; //324
+      let deg_delta  	= arc_len_f * f_delta; //18°
+      let steps_delta	= steps_f   * f_delta; //36
+      let skip_end   	= steps_delta as i32; //36
+      let skip_beg   	= steps - skip_end; //324
+      // Line width
       let w1:f64 = 20.; let w2:f64 =  4.; let wavg = (w1 + w2) / 2.; // 12
       let w1px = (w1 * dpi).round() / dpi; let w2px = (w2 * dpi).round() / dpi;
       let w_step = ((w2 - w1).abs() / 2.) / steps_delta; //12/2/45 0.13 to reach average
-      let r0a = 0. ; let r1a = r0a + degrees_f;
-      let r0b = r1a; let r1b = r1a + degrees_f;
-      let sign1 = if w1 > wavg {-1.} else if w1 < wavg {1.} else {0.}; //(to avg) ↓ if bigger, ↑ if smaller
+
+      let r1beg = 0. /*→*/	; let r2beg = r1beg + arc_len_f;
+      let r1end = r2beg   	; let r2end = r2beg + arc_len_f;
+      // todo2: check overlaps, maybe add tiny degree fractions?
       // ((w1 + sign1 * w_step * r) * dpi).round() / dpi; //transition shouldn't be pixel-stepped!
       // todo1: make the main 1st/last segment constructed in one go, no need to break into steps
       // todo2: check overlaps, maybe add tiny degree fractions?
@@ -106,21 +112,20 @@ mod impls {
       let col_end = css::RED;
       let col_avg = col_beg.lerp(col_end,0.5,Default::default());
 
-      let cx = 900.; let cy = 200.; let r0 = 100.;
-      // let grad1_p0 = (cx+(r0) , cy); //cx+cos(degrees_f - deg_delta)
-      // let grad1_p1 = (cx-(r0) , cy); //cy-sin(angle)
-      let grad1_p0 = (cx + r0*f64::cos((degrees_f - deg_delta).to_radians()) , cy + r0*f64::sin((degrees_f - deg_delta).to_radians()));
-      let grad1_p1 = (cx - r0                                                , cy );
-      // println!("grad1_p0={grad1_p0:?}");
+      let grad1_p0 = ( cx + r0*f64::cos((arc_len_f - deg_delta).to_radians()) , cy + r0*f64::sin((arc_len_f - deg_delta).to_radians()));
+      let grad1_p1 = ( cx + r0*f64::cos( r1end                 .to_radians()) , cy + r0*f64::sin( r1end                   .to_radians()));
       let grad1 = Gradient::new_linear(grad1_p0, grad1_p1).with_stops([col_beg    ,col_avg]);
 
-      let grad2_p0 = (cx - r0                                                , cy );
-      let grad2_p1 = (cx - r0*f64::cos(             deg_delta .to_radians()) , cy - r0*f64::sin(             deg_delta .to_radians()));
+      let grad2_p0 = ( cx + r0*f64::cos( r2beg             .to_radians())     , cy + r0*f64::sin( r2beg             .to_radians()) );
+      let grad2_p1 = ( cx + r0*f64::cos((r2beg + deg_delta).to_radians())     , cy + r0*f64::sin((r2beg + deg_delta).to_radians()) );
+      // let grad2_p0 = (cx - r0                                                , cy );
+      // let grad2_p1 = (cx - r0*f64::cos(             deg_delta .to_radians()) , cy - r0*f64::sin(             deg_delta .to_radians()));
       let grad2 = Gradient::new_linear(grad2_p0, grad2_p1).with_stops([col_avg    ,col_end]);
 
+      let sign1 = if w1 > wavg {-1.} else if w1 < wavg {1.} else {0.}; //(to avg) ↓ if bigger, ↑ if smaller
       for i in 0..=steps { let r = f64::from(i); let rex = f64::from(i-skip_beg);
-        let rad0 = (r0a + r * deg_per_step).to_radians();
-        let c = CircleSegment::new((cx,cy), r0,r0   ,  rad0,rad_per_step);
+        let rad0 = (r1beg + r * precision_degps).to_radians();
+        let c = CircleSegment::new((cx,cy), r0,r0   ,  rad0,precision_radps);
         let cw = if i > skip_beg	{w1 + sign1 * w_step * rex
         } else                  	{w1px}; //println!("wG:  {cw:.0}");
         let stroke_c = Stroke::new(cw).with_start_cap(Cap::Butt).with_end_cap(Cap::Butt);
@@ -129,18 +134,18 @@ mod impls {
 
       let sign2 = if w2 > wavg { 1.} else if w2 < wavg {-1.} else {0.}; //(from avg) ↑ if bigger, ↓ if smaller
       for i in 0..=steps { let r = f64::from(i);
-        let rad0 = (r0b + r * deg_per_step).to_radians();
-        let c = CircleSegment::new((cx,cy), r0,r0   ,  rad0,rad_per_step);
+        let rad0 = (r1end + r * precision_degps).to_radians();
+        let c = CircleSegment::new((cx,cy), r0,r0   ,  rad0,precision_radps);
         let cw = if i < skip_end	{wavg + sign2 * w_step * r
         } else                  	{w2px};  //println!("wR:  {cw:.0}");
         let stroke_c = Stroke::new(cw).with_start_cap(Cap::Butt).with_end_cap(Cap::Butt);
         scene.stroke(&stroke_c, Affine::IDENTITY, &grad2, None, &c,);
       }
       let pstr = Stroke::new(1.); // starting point bigger than the ending, angle to differentiate two curves
-      let g1b = Ellipse::new(grad1_p0, ( 2.,15.+5.),  33.0_f64.to_radians());scene.stroke(&pstr,Affine::IDENTITY, &col_beg    , None, &g1b,);
-      let g1e = Ellipse::new(grad1_p1, ( 2.,15.+0.),  33.0_f64.to_radians());scene.stroke(&pstr,Affine::IDENTITY, &col_end, None, &g1e,);
-      let g2b = Ellipse::new(grad2_p0, ( 2.,15.+5.), -66.0_f64.to_radians());scene.stroke(&pstr,Affine::IDENTITY, &col_beg, None, &g2b,);
-      let g2e = Ellipse::new(grad2_p1, ( 2.,15.+0.), -66.0_f64.to_radians());scene.stroke(&pstr,Affine::IDENTITY, &col_end, None, &g2e,);
+      let g1beg = Ellipse::new(grad1_p0, ( 2.,15.+5.),  33.0_f64.to_radians());scene.stroke(&pstr,Affine::IDENTITY, &col_beg, None, &g1beg,);
+      let g1end = Ellipse::new(grad1_p1, ( 2.,15.+0.),  33.0_f64.to_radians());scene.stroke(&pstr,Affine::IDENTITY, &col_end, None, &g1end,);
+      let g2beg = Ellipse::new(grad2_p0, ( 2.,15.+5.), -66.0_f64.to_radians());scene.stroke(&pstr,Affine::IDENTITY, &col_beg, None, &g2beg,);
+      let g2end = Ellipse::new(grad2_p1, ( 2.,15.+0.), -66.0_f64.to_radians());scene.stroke(&pstr,Affine::IDENTITY, &col_end, None, &g2end,);
 
 
       // let cx = 900.; let cy = 200.; let r0 = 100.;
