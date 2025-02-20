@@ -160,7 +160,8 @@ mod impls {
       // Draw pos-gradwidth segment separately without the extra iterator
       let c = CircleSegment::new((cx,cy), r0,r0   ,  r2beg_rad + rad_delta, skip_beg_rad);
       let stroke_c = get_stroke(w2px);
-      scene.stroke(&stroke_c, Affine::IDENTITY, &col_end, None, &c,);
+      // scene.stroke(&stroke_c, Affine::IDENTITY, &col_end, None, &c,);
+      scene.stroke(&stroke_c, Affine::IDENTITY, &css::WHEAT, None, &c,); // for testing
 
       let sign2 = if w2 > wavg { 1.} else if w2 < wavg {-1.} else {0.}; //(from avg) ↑ if bigger, ↓ if smaller
       for i in 0..steps_left { let r = f64::from(i);
@@ -178,7 +179,8 @@ mod impls {
       if rad0_last < skip_beg_rad {println!("end={} step_last={}",skip_beg_deg,rad0_last);
         let c = CircleSegment::new((cx,cy), r0,r0   ,  rad0_last,skip_beg_rad);
         let stroke_c = get_stroke(w2px);
-        scene.stroke(&stroke_c, Affine::IDENTITY, &grad2, None, &c,); // use col_avg? though grad should cover
+        // scene.stroke(&stroke_c, Affine::IDENTITY, &grad2, None, &c,); // use col_avg? though grad should cover
+        scene.stroke(&stroke_c, Affine::IDENTITY, &css::WHEAT, None, &c,); // for testing
       }
 
       // Draw debug circles showing where each gradient begins/ends
