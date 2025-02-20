@@ -86,7 +86,7 @@ mod impls {
       let steps_f = arc_len_f / precision_degps; //360
       let steps   = steps_f as i32;
       // Gradient / size convergence bounds
-      let f_delta = 1./10.; // start changing width for the first/last quarter only
+      let f_delta = 0.337; // start changing width for the first/last quarter only
       let deg_delta   	= arc_len_f *       f_delta; //18°
       let rad_delta   	= deg_delta.to_radians();
       let skip_beg_deg	= arc_len_f * (1. - f_delta);
@@ -149,8 +149,8 @@ mod impls {
         scene.stroke(&stroke_c, Affine::IDENTITY, &grad1, None, &c,);
       } // ↓ in case step int conversion missed the last sliver
       let rad0_last = (skip_beg_deg + f64::from(steps_left) * precision_degps).to_radians();
-      if rad0_last < r1end_rad {println!("end={} step_last={}",r1end,rad0_last);
-        let c = CircleSegment::new((cx,cy), r0,r0   ,  rad0_last,r1end_rad);
+      if rad0_last < r1end_rad { //println!("{rad0_last:.4}<{r1end_rad:.4} step_last {:.1}°<{:.1}° end",rad0_last.to_degrees(),r1end);
+        let c = CircleSegment::new((cx,cy), r0,r0   ,  rad0_last,r1end_rad - rad0_last);
         let stroke_c = get_stroke(w_delta_avg);
         // scene.stroke(&stroke_c, Affine::IDENTITY, &grad1, None, &c,); // use col_avg? though grad should cover
         scene.stroke(&stroke_c, Affine::IDENTITY, &css::ORANGE, None, &c,); // for testing
@@ -176,8 +176,8 @@ mod impls {
         scene.stroke(&stroke_c, Affine::IDENTITY, &grad2, None, &c,);
       } // ↓ in case step int conversion missed the last sliver
       let rad0_last = (r2beg + f64::from(steps_left) * precision_degps).to_radians();
-      if rad0_last < skip_beg_rad {println!("end={} step_last={}",skip_beg_deg,rad0_last);
-        let c = CircleSegment::new((cx,cy), r0,r0   ,  rad0_last,skip_beg_rad);
+      if rad0_last < skip_beg_rad { //println!("{rad0_last:.4} < {skip_beg_rad:.4} step_last {:.1}°<{:.1}° end",rad0_last.to_degrees(),skip_beg_deg);
+        let c = CircleSegment::new((cx,cy), r0,r0   ,  rad0_last,skip_beg_rad - rad0_last);
         let stroke_c = get_stroke(w2px);
         // scene.stroke(&stroke_c, Affine::IDENTITY, &grad2, None, &c,); // use col_avg? though grad should cover
         scene.stroke(&stroke_c, Affine::IDENTITY, &css::WHEAT, None, &c,); // for testing
