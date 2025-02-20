@@ -57,26 +57,6 @@ mod impls {
       let cap_styles  = [Cap::Butt  , Cap::Round ]; //Cap::Square,
       let join_styles = [Join::Bevel, Join::Miter, Join::Round];
 
-      // Cap and join combinations
-      let mut y = 0.;
-      let mut y_max: f64 = y;
-      let mut color_idx = 0;
-      let t = Affine::translate((60., 40.)) * Affine::scale(2.);
-      y_max = y_max.max(y);
-      y = 0.;
-      for cap  in cap_styles  {
-      for join in join_styles {
-        params.text.add(scene,None,12.,None                          , Affine::translate((0., y      )) * t,
-          &format!("Caps: {:?}, Joins: {:?}", cap, join),);
-        scene.stroke(&Stroke::new(10.).with_caps(cap).with_join(join), Affine::translate((0., y + 30.)) * t * transform,colors[color_idx],None,
-          &join_stroke);
-        scene.stroke(&Stroke::new(10.).with_caps(cap).with_join(join), Affine::translate((300., y + 30.)) * t * transform,colors[color_idx],None,
-          &stroke1);
-        scene.stroke(&Stroke::new(20.).with_caps(cap).with_join(join), Affine::translate((300., y + 30.)) * t * transform,colors[color_idx],None,
-          &stroke2);
-        y += 185.;
-        color_idx = (color_idx + 1) % colors.len();
-      }}
       let dpi = 1.5;
       // Position
       let cx = 900.; let cy = 200.; let r0 = 100.;
