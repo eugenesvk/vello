@@ -37,7 +37,8 @@ mod impls {
   use vello::*;
   use std::f64::consts as f64c;
 
-  fn get_stroke(width:f64) -> Stroke {Stroke::new(width).with_start_cap(Cap::Butt).with_end_cap(Cap::Butt).with_join(Join::Bevel)}
+  fn get_stroke    (width:f64) -> Stroke {Stroke::new(width).with_start_cap(Cap::Butt).with_end_cap(Cap::Round).with_join(Join::Bevel)}
+  fn get_stroke_end(width:f64) -> Stroke {Stroke::new(width).with_start_cap(Cap::Butt).with_end_cap(Cap::Butt ).with_join(Join::Bevel)}
 
   pub(super) fn stroke_styles(transform: Affine) -> impl FnMut(&mut Scene, &mut SceneParams<'_>) {
     use PathEl::*;
@@ -82,6 +83,7 @@ mod impls {
       let w_step = w_delta_avg / steps_delta; //12/2/45 0.13 to reach average
 
       // TODO: change all circle segments to .outer_arc() otherwise we're drawing 2! lines
+        // but this introduces strange artifacts :(( joins are visible, changing ending to round fixes it, but i want sharp ends!
       // ((w1 + sign1 * w_step * r) * dpi).round() / dpi; //transition shouldn't be pixel-stepped!
       // todo3: test with dashes (unlikely to work? needs a different logic?)
         // Approach1:
@@ -116,7 +118,7 @@ mod impls {
 
       // Draw pre-gradwidth segment separately without the extra iterator
       let c = CircleSegment::new((cx,cy), r0,0.   ,  r1beg_rad,skip_beg_rad).outer_arc();
-      let stroke_c = get_stroke(w1px);
+      let stroke_c = get_stroke_end(w1px);
       // scene.stroke(&stroke_c, Affine::IDENTITY, &col_beg, None, &c,);
       scene.stroke(&stroke_c, Affine::IDENTITY, &css::ORANGE, None, &c,); // for testing
 
@@ -133,13 +135,14 @@ mod impls {
         // println!("i={i}/{steps_left}  r={r:.1} r1beg={r1beg:.1} r*prec={:.1} deg={skip_beg_deg:.1} beg={:.1} end={:.1}",r * precision_degps
         //   ,       skip_beg_deg + r * precision_degps, skip_beg_deg + r * precision_degps + precision_degps);
         let cw = w1 + sign1 * r * w_step_left;
-        let stroke_c = get_stroke(cw);
+        let stroke_c = if i >=  (steps_left - 2) {get_stroke_end(cw) //last steps no round ends
+        } else {get_stroke(cw)}; // round ends to fix the outer arc artifacts when joining in rectangles without curves
         scene.stroke(&stroke_c, Affine::IDENTITY, &grad1, None, &c,);
       } // ↓ in case step int conversion missed the last sliver
       let rad0_last = (skip_beg_deg + f64::from(steps_left) * precision_degps).to_radians();
       if rad0_last < r1end_rad { //println!("{rad0_last:.4}<{r1end_rad:.4} step_last {:.1}°<{:.1}° end",rad0_last.to_degrees(),r1end);
         let c = CircleSegment::new((cx,cy), r0,0.   ,  rad0_last,r1end_rad - rad0_last).outer_arc();
-        let stroke_c = get_stroke(w_delta_avg);
+        let stroke_c = get_stroke_end(w_delta_avg);
         // scene.stroke(&stroke_c, Affine::IDENTITY, &grad1, None, &c,); // use col_avg? though grad should cover
         scene.stroke(&stroke_c, Affine::IDENTITY, &css::ORANGE, None, &c,); // for testing
       }
@@ -147,8 +150,8 @@ mod impls {
 
       // Draw pos-gradwidth segment separately without the extra iterator
       let c = CircleSegment::new((cx,cy), r0,0.   ,  r2beg_rad + rad_delta, skip_beg_rad).outer_arc();
-      // let stroke_c = get_stroke(w2px);
-      let stroke_c = get_stroke(w2px).with_dashes(0.,[10.,10.]);
+      // let stroke_c = get_stroke_end(w2px);
+      let stroke_c = get_stroke_end(w2px).with_dashes(0.,[10.,10.]);
       // scene.stroke(&stroke_c, Affine::IDENTITY, &col_end, None, &c,);
       scene.stroke(&stroke_c, Affine::IDENTITY, &css::WHEAT, None, &c,); // for testing
 
@@ -161,19 +164,20 @@ mod impls {
         // println!("i={i}/{steps_left}  r={r:.1} r1beg={r1beg:.1} r*prec={:.1} deg={r2beg:.1} beg={:.1} end={:.1}",r * precision_degps
         //   ,       r2beg + r * precision_degps, r2beg + r * precision_degps + precision_degps);
         let cw = wavg + sign2 * r * w_step_left;
-        let stroke_c = get_stroke(cw);
+        let stroke_c = if i >=  (steps_left - 2) {get_stroke_end(cw) //last steps no round ends
+        } else {get_stroke(cw)}; // round ends to fix the outer arc artifacts
         scene.stroke(&stroke_c, Affine::IDENTITY, &grad2, None, &c,);
       } // ↓ in case step int conversion missed the last sliver
       let rad0_last = (r2beg + f64::from(steps_left) * precision_degps).to_radians();
       if rad0_last < skip_beg_rad { //println!("{rad0_last:.4} < {skip_beg_rad:.4} step_last {:.1}°<{:.1}° end",rad0_last.to_degrees(),skip_beg_deg);
         let c = CircleSegment::new((cx,cy), r0,0.   ,  rad0_last,skip_beg_rad - rad0_last).outer_arc();
-        let stroke_c = get_stroke(w2px);
+        let stroke_c = get_stroke_end(w2px);
         // scene.stroke(&stroke_c, Affine::IDENTITY, &grad2, None, &c,); // use col_avg? though grad should cover
         scene.stroke(&stroke_c, Affine::IDENTITY, &css::WHEAT, None, &c,); // for testing
       }
 
       // Draw debug circles showing where each gradient begins/ends
-      let pstr = get_stroke(1.); // starting point bigger than the ending, angle to differentiate two curves
+      let pstr = get_stroke_end(1.); // starting point bigger than the ending, angle to differentiate two curves
       let g1beg = Ellipse::new(grad1_p0, ( 2.,15.+5.),  33.0_f64.to_radians());scene.stroke(&pstr,Affine::IDENTITY, &col_beg, None, &g1beg,);
       let g1end = Ellipse::new(grad1_p1, ( 2.,15.+0.),  33.0_f64.to_radians());scene.stroke(&pstr,Affine::IDENTITY, &col_end, None, &g1end,);
       let g2beg = Ellipse::new(grad2_p0, ( 2.,15.+5.),  99.0_f64.to_radians());scene.stroke(&pstr,Affine::IDENTITY, &col_beg, None, &g2beg,);
