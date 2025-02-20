@@ -98,8 +98,6 @@ mod impls {
       let w1px = (w1 * dpi).round() / dpi; let w2px = (w2 * dpi).round() / dpi;
       let w_step = ((w2 - w1).abs() / 2.) / steps_delta; //12/2/45 0.13 to reach average
 
-      let r1beg = 0. /*→*/	; let r2beg = r1beg + arc_len_f;
-      let r1end = r2beg   	; let r2end = r2beg + arc_len_f;
       // todo2: check overlaps, maybe add tiny degree fractions?
       // ((w1 + sign1 * w_step * r) * dpi).round() / dpi; //transition shouldn't be pixel-stepped!
       // todo1: make the main 1st/last segment constructed in one go, no need to break into steps
