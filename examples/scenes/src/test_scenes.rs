@@ -131,7 +131,7 @@ mod impls {
       let grad2 = Gradient::new_linear(grad2_p0, grad2_p1).with_stops([col_avg    ,col_end]);
 
       let sign1 = if w1 > wavg {-1.} else if w1 < wavg {1.} else {0.}; //(to avg) ↓ if bigger, ↑ if smaller
-      for i in 0..=steps { let r = f64::from(i); let rex = f64::from(i-skip_beg);
+      for i in 0..steps { let r = f64::from(i); let rex = f64::from(i-skip_beg);
         let rad0 = (r1beg + r * precision_degps).to_radians();
         let c = CircleSegment::new((cx,cy), r0,r0   ,  rad0,precision_radps);
         let cw = if i > skip_beg	{w1 + sign1 * w_step * rex
@@ -142,7 +142,7 @@ mod impls {
       }
 
       let sign2 = if w2 > wavg { 1.} else if w2 < wavg {-1.} else {0.}; //(from avg) ↑ if bigger, ↓ if smaller
-      for i in 0..=steps { let r = f64::from(i);
+      for i in 0..steps { let r = f64::from(i);
         let rad0 = (r2beg + r * precision_degps).to_radians();
         let c = CircleSegment::new((cx,cy), r0,r0   ,  rad0,precision_radps);
         let cw = if i < skip_end	{wavg + sign2 * w_step * r
