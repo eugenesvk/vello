@@ -111,18 +111,21 @@ mod impls {
       // + add gradient
         // + add same logic that gradient only starts later: so need to adjust its point coordinates
         // + make gradients also end an an average mixed color instead of stark
+      let gap = 10.0001;
+      let r1beg = 0. ;//→
+      let r1end = r1beg + arc_len_f;
+      let r2beg = r1end + gap;
+      let r2end = r2beg + arc_len_f;
       let col_beg = css::LIME;
       let col_end = css::RED;
       let col_avg = col_beg.lerp(col_end,0.5,Default::default());
 
-      let grad1_p0 = ( cx + r0*f64::cos((arc_len_f - deg_delta).to_radians()) , cy + r0*f64::sin((arc_len_f - deg_delta).to_radians()));
-      let grad1_p1 = ( cx + r0*f64::cos( r1end                 .to_radians()) , cy + r0*f64::sin( r1end                   .to_radians()));
+      let grad1_p0 = ( cx + r0*f64::cos( skip_beg_deg.to_radians()) , cy + r0*f64::sin(skip_beg_deg.to_radians()));
+      let grad1_p1 = ( cx + r0*f64::cos( r1end       .to_radians()) , cy + r0*f64::sin(r1end       .to_radians()));
       let grad1 = Gradient::new_linear(grad1_p0, grad1_p1).with_stops([col_beg    ,col_avg]);
 
       let grad2_p0 = ( cx + r0*f64::cos( r2beg             .to_radians())     , cy + r0*f64::sin( r2beg             .to_radians()) );
       let grad2_p1 = ( cx + r0*f64::cos((r2beg + deg_delta).to_radians())     , cy + r0*f64::sin((r2beg + deg_delta).to_radians()) );
-      // let grad2_p0 = (cx - r0                                                , cy );
-      // let grad2_p1 = (cx - r0*f64::cos(             deg_delta .to_radians()) , cy - r0*f64::sin(             deg_delta .to_radians()));
       let grad2 = Gradient::new_linear(grad2_p0, grad2_p1).with_stops([col_avg    ,col_end]);
 
       let sign1 = if w1 > wavg {-1.} else if w1 < wavg {1.} else {0.}; //(to avg) ↓ if bigger, ↑ if smaller
