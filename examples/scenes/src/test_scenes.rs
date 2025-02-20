@@ -88,6 +88,7 @@ mod impls {
       // Gradient / size convergence bounds
       let f_delta = 1./10.; // start changing width for the first/last quarter only
       let deg_delta   	= arc_len_f *       f_delta; //18°
+      let rad_delta   	= deg_delta.to_radians();
       let skip_beg_deg	= arc_len_f * (1. - f_delta);
       let skip_beg_rad	= skip_beg_deg.to_radians();
       let steps_delta 	= steps_f   * f_delta; //36
@@ -114,8 +115,8 @@ mod impls {
       // + add gradient
         // + add same logic that gradient only starts later: so need to adjust its point coordinates
         // + make gradients also end an an average mixed color instead of stark
-      let gap = 0.; // doesn't seem to 0.0001 affect anything with corrected ending style to Bevel
-      let r1beg = 0.               	; let r1beg_rad = r1beg.to_radians(); //→
+      let gap:f64 = 0.; // doesn't seem to 0.0001 affect anything with corrected ending style to Bevel
+      let r1beg:f64 = 0.           	; let r1beg_rad = r1beg.to_radians(); //→
       let r1end = r1beg + arc_len_f	; let r1end_rad = r1end.to_radians();
       let r2beg = r1end + gap      	; let r2beg_rad = r2beg.to_radians();
       let r2end = r2beg + arc_len_f	; let r2end_rad = r2end.to_radians();
