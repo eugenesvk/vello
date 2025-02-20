@@ -159,18 +159,32 @@ mod impls {
         scene.stroke(&stroke_c, Affine::IDENTITY, &grad1, None, &c,); // use col_avg? though grad should cover
       }
 
+
+      // Draw pos-gradwidth segment separately without the extra iterator
+      let c = CircleSegment::new((cx,cy), r0,r0   ,  r2beg_rad + rad_delta, skip_beg_rad);
+      let stroke_c = get_stroke(w2px);
+      scene.stroke(&stroke_c, Affine::IDENTITY, &col_end, None, &c,);
+
       let sign2 = if w2 > wavg { 1.} else if w2 < wavg {-1.} else {0.}; //(from avg) ↑ if bigger, ↓ if smaller
-      for i in 0..steps { let r = f64::from(i);
+      for i in 0..steps_left { let r = f64::from(i);
         let rad0 = (r2beg + r * precision_degps).to_radians();
         let c = CircleSegment::new((cx,cy), r0,r0   ,  rad0,precision_radps);
         //                          center  rout/in    ∠start ∠sweep
         // if i == 0 {println!("\n\n———————————————————————————————")};
-        // println!("beg={:.1} end={:.1}",r2beg + r * precision_degps, r2beg + r * precision_degps + precision_degps);
-        let cw = if i < skip_end	{wavg + sign2 * w_step * r
-        } else                  	{w2px};  //println!("wR:  {cw:.0}");
+        // println!("i={i}/{steps_left}  r={r:.1} r1beg={r1beg:.1} r*prec={:.1} deg={r2beg:.1} beg={:.1} end={:.1}",r * precision_degps
+        //   ,       r2beg + r * precision_degps, r2beg + r * precision_degps + precision_degps);
+        let cw = wavg + sign2 * r * w_step_left;
         let stroke_c = get_stroke(cw);
         scene.stroke(&stroke_c, Affine::IDENTITY, &grad2, None, &c,);
+      } // ↓ in case step int conversion missed the last sliver
+      let rad0_last = (r2beg + f64::from(steps_left) * precision_degps).to_radians();
+      if rad0_last < skip_beg_rad {println!("end={} step_last={}",skip_beg_deg,rad0_last);
+        let c = CircleSegment::new((cx,cy), r0,r0   ,  rad0_last,skip_beg_rad);
+        let stroke_c = get_stroke(w2px);
+        scene.stroke(&stroke_c, Affine::IDENTITY, &grad2, None, &c,); // use col_avg? though grad should cover
       }
+
+      // Draw debug circles showing where each gradient begins/ends
       let pstr = get_stroke(1.); // starting point bigger than the ending, angle to differentiate two curves
       let g1beg = Ellipse::new(grad1_p0, ( 2.,15.+5.),  33.0_f64.to_radians());scene.stroke(&pstr,Affine::IDENTITY, &col_beg, None, &g1beg,);
       let g1end = Ellipse::new(grad1_p1, ( 2.,15.+0.),  33.0_f64.to_radians());scene.stroke(&pstr,Affine::IDENTITY, &col_end, None, &g1end,);
