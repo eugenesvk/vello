@@ -135,6 +135,8 @@ mod impls {
         let rad0 = (r1beg + r * precision_degps).to_radians();
         let c = CircleSegment::new((cx,cy), r0,r0   ,  rad0,precision_radps);
         //                          center  rout/in    ∠start ∠sweep
+        // if i == 0 {println!("\n\n———————————————————————————————")};
+        // println!("i={} r={:.1} r1beg={:.1} r*prec={:.1} beg={:.1} end={:.1}",i,r,r1beg,r * precision_degps,r1beg + r * precision_degps, r1beg + r * precision_degps + precision_degps);
         let cw = if rad0 > skip_beg_rad	{w1 + sign1 * w_step * rex
         } else                         	{w1px}; //println!("wG:  {cw:.0}");
         let stroke_c = get_stroke(cw);
@@ -146,6 +148,8 @@ mod impls {
         let rad0 = (r2beg + r * precision_degps).to_radians();
         let c = CircleSegment::new((cx,cy), r0,r0   ,  rad0,precision_radps);
         //                          center  rout/in    ∠start ∠sweep
+        // if i == 0 {println!("\n\n———————————————————————————————")};
+        // println!("beg={:.1} end={:.1}",r2beg + r * precision_degps, r2beg + r * precision_degps + precision_degps);
         let cw = if i < skip_end	{wavg + sign2 * w_step * r
         } else                  	{w2px};  //println!("wR:  {cw:.0}");
         let stroke_c = get_stroke(cw);
