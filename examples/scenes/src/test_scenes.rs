@@ -129,7 +129,8 @@ mod impls {
       // Draw pre-gradwidth segment separately without the extra iterator
       let c = CircleSegment::new((cx,cy), r0,r0   ,  r1beg_rad,skip_beg_rad);
       let stroke_c = get_stroke(w1px);
-      scene.stroke(&stroke_c, Affine::IDENTITY, &col_beg, None, &c,);
+      // scene.stroke(&stroke_c, Affine::IDENTITY, &col_beg, None, &c,);
+      scene.stroke(&stroke_c, Affine::IDENTITY, &css::ORANGE, None, &c,); // for testing
 
       let steps_left_f = deg_delta / precision_degps;
       let steps_left   = steps_left_f as i32;
@@ -151,7 +152,8 @@ mod impls {
       if rad0_last < r1end_rad {println!("end={} step_last={}",r1end,rad0_last);
         let c = CircleSegment::new((cx,cy), r0,r0   ,  rad0_last,r1end_rad);
         let stroke_c = get_stroke(w_delta_avg);
-        scene.stroke(&stroke_c, Affine::IDENTITY, &grad1, None, &c,); // use col_avg? though grad should cover
+        // scene.stroke(&stroke_c, Affine::IDENTITY, &grad1, None, &c,); // use col_avg? though grad should cover
+        scene.stroke(&stroke_c, Affine::IDENTITY, &css::ORANGE, None, &c,); // for testing
       }
 
 
