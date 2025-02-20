@@ -113,7 +113,7 @@ mod impls {
       // + add gradient
         // + add same logic that gradient only starts later: so need to adjust its point coordinates
         // + make gradients also end an an average mixed color instead of stark
-      let gap = 10.0001;
+      let gap = 0.; // doesn't seem to 0.0001 affect anything with corrected ending style to Bevel
       let r1beg = 0. ;//→
       let r1end = r1beg + arc_len_f;
       let r2beg = r1end + gap;
