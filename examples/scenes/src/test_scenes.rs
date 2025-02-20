@@ -87,10 +87,12 @@ mod impls {
       let steps   = steps_f as i32;
       // Gradient / size convergence bounds
       let f_delta = 1./10.; // start changing width for the first/last quarter only
-      let deg_delta  	= arc_len_f * f_delta; //18°
-      let steps_delta	= steps_f   * f_delta; //36
-      let skip_end   	= steps_delta as i32; //36
-      let skip_beg   	= steps - skip_end; //324
+      let deg_delta   	= arc_len_f *       f_delta; //18°
+      let skip_beg_deg	= arc_len_f * (1. - f_delta);
+      let skip_beg_rad	= skip_beg_deg.to_radians();
+      let steps_delta 	= steps_f   * f_delta; //36
+      let skip_end    	= steps_delta as i32; //36
+      let skip_beg    	= steps - skip_end; //324
       // Line width
       let w1:f64 = 20.; let w2:f64 =  4.; let wavg = (w1 + w2) / 2.; // 12
       let w1px = (w1 * dpi).round() / dpi; let w2px = (w2 * dpi).round() / dpi;
@@ -122,8 +124,8 @@ mod impls {
       let col_end = css::RED;
       let col_avg = col_beg.lerp(col_end,0.5,Default::default());
 
-      let grad1_p0 = ( cx + r0*f64::cos( skip_beg_deg.to_radians()) , cy + r0*f64::sin(skip_beg_deg.to_radians()));
-      let grad1_p1 = ( cx + r0*f64::cos( r1end       .to_radians()) , cy + r0*f64::sin(r1end       .to_radians()));
+      let grad1_p0 = ( cx + r0*f64::cos( skip_beg_rad      ) , cy + r0*f64::sin(skip_beg_rad      ));
+      let grad1_p1 = ( cx + r0*f64::cos( r1end.to_radians()) , cy + r0*f64::sin(r1end.to_radians()));
       let grad1 = Gradient::new_linear(grad1_p0, grad1_p1).with_stops([col_beg    ,col_avg]);
 
       let grad2_p0 = ( cx + r0*f64::cos( r2beg             .to_radians())     , cy + r0*f64::sin( r2beg             .to_radians()) );
@@ -134,8 +136,8 @@ mod impls {
       for i in 0..steps { let r = f64::from(i); let rex = f64::from(i-skip_beg);
         let rad0 = (r1beg + r * precision_degps).to_radians();
         let c = CircleSegment::new((cx,cy), r0,r0   ,  rad0,precision_radps);
-        let cw = if i > skip_beg	{w1 + sign1 * w_step * rex
-        } else                  	{w1px}; //println!("wG:  {cw:.0}");
+        let cw = if rad0 > skip_beg_rad	{w1 + sign1 * w_step * rex
+        } else                         	{w1px}; //println!("wG:  {cw:.0}");
         let stroke_c = get_stroke(cw);
         scene.stroke(&stroke_c, Affine::IDENTITY, &grad1, None, &c,);
       }
