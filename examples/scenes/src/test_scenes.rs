@@ -100,9 +100,7 @@ mod impls {
       let w1px = (w1 * dpi).round() / dpi; let w2px = (w2 * dpi).round() / dpi;
       let w_step = w_delta_avg / steps_delta; //12/2/45 0.13 to reach average
 
-      // todo2: check overlaps, maybe add tiny degree fractions?
       // ((w1 + sign1 * w_step * r) * dpi).round() / dpi; //transition shouldn't be pixel-stepped!
-      // todo1: make the main 1st/last segment constructed in one go, no need to break into steps
       // convert to relative coords so that changing arcs propagate,  not 180 hardcoded
       // todo3: test with dashes (unlikely to work? needs a different logic?)
         // combine vertical line with 1/2 circle
@@ -112,9 +110,6 @@ mod impls {
           // how to calculate a match? check if we can draw a semicircle and check if overlap
         // draw previous line
         // draw splits with a different width and gradient
-      // + add gradient
-        // + add same logic that gradient only starts later: so need to adjust its point coordinates
-        // + make gradients also end an an average mixed color instead of stark
       let gap:f64 = 0.; // doesn't seem to 0.0001 affect anything with corrected ending style to Bevel
       let r1beg:f64 = 0.           	; let r1beg_rad = r1beg.to_radians(); //→
       let r1end = r1beg + arc_len_f	; let r1end_rad = r1end.to_radians();
