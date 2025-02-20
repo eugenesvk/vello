@@ -137,7 +137,7 @@ mod impls {
 
       let sign2 = if w2 > wavg { 1.} else if w2 < wavg {-1.} else {0.}; //(from avg) ↑ if bigger, ↓ if smaller
       for i in 0..=steps { let r = f64::from(i);
-        let rad0 = (r1end + r * precision_degps).to_radians();
+        let rad0 = (r2beg + r * precision_degps).to_radians();
         let c = CircleSegment::new((cx,cy), r0,r0   ,  rad0,precision_radps);
         let cw = if i < skip_end	{wavg + sign2 * w_step * r
         } else                  	{w2px};  //println!("wR:  {cw:.0}");
