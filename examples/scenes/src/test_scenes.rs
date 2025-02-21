@@ -246,12 +246,6 @@ mod impls {
           d_beg += dash_i;
           is_drawn = !is_drawn;
         }
-        // println!("i={i}/{steps_left}  r={r:.1} r1beg={r1beg:.1} r*prec={:.1} deg={r2beg:.1} beg={:.1} end={:.1}",r * precision_degps
-        //   ,       r2beg + r * precision_degps, r2beg + r * precision_degps + precision_degps);
-        let cw = wavg + sign2 * r * w_step_left;
-        let stroke_c = if i >=  (steps_left - 2) {get_stroke_end(cw) //last steps no round ends
-        } else {get_stroke(cw)}; // round ends to fix the outer arc artifacts
-        scene.stroke(&stroke_c, Affine::IDENTITY, &grad2, None, &c,);
       } // ↓ in case step int conversion missed the last sliver
       let rad0_last = (r2beg + f64::from(steps_left) * precision_degps).to_radians();
       if rad0_last < skip_beg_rad { //println!("{rad0_last:.4} < {skip_beg_rad:.4} step_last {:.1}°<{:.1}° end",rad0_last.to_degrees(),skip_beg_deg);
