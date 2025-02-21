@@ -243,21 +243,7 @@ mod impls {
       // scene.stroke(&stroke_c, Affine::IDENTITY, &col_end, None, &c,);
       scene.stroke(&stroke_c, Affine::IDENTITY, &css::WHEAT, None, &c,); // for testing
 
-      let l = Line::new((100.,40.), (1100.,50.));
-      let stroke_c = get_stroke_end(w2px).with_dashes(0.,[ 1.,2.]);
-      scene.stroke(&stroke_c, Affine::IDENTITY, &css::WHEAT, None, &l,); // for testing
-      let l = Line::new((100.,50.), (1100.,50.));
-      let stroke_c = get_stroke_end(w2px).with_dashes(0.,[10.,10.]);
-      scene.stroke(&stroke_c, Affine::IDENTITY, &css::WHEAT, None, &l,); // for testing
-      let l = Line::new((100.,60.), (1100.,60.));
-      let stroke_c = get_stroke_end(w2px).with_dashes(0.,[10.,20.]);
-      scene.stroke(&stroke_c, Affine::IDENTITY, &css::WHEAT, None, &l,); // for testing
-      let l = Line::new((100.,70.), (1100.,70.));
-      let stroke_c = get_stroke_end(w2px).with_dashes(0.,[10.,50.]);
-      scene.stroke(&stroke_c, Affine::IDENTITY, &css::WHEAT, None, &l,); // for testing
-      let l = Line::new((100.,80.), (1100.,80.));
-      let stroke_c = get_stroke_end(w2px).with_dashes(0.,[10.,110.]);
-      scene.stroke(&stroke_c, Affine::IDENTITY, &css::WHEAT, None, &l,); // for testing
+
       let sign2 = if w2 > wavg { 1.} else if w2 < wavg {-1.} else {0.}; //(from avg) ↑ if bigger, ↓ if smaller
       for i in 0..steps_left { let r = f64::from(i);
         let rad0 = (r2beg + r * precision_degps).to_radians();
