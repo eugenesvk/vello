@@ -209,6 +209,7 @@ mod impls {
 
         let seg_off = dash_off_rad % dash_iter_len_rad;
         let seg_beg = (dash_off_rad + seg0) % dash_iter_len_rad;// cut off arc that fit into the previous dash set, so this is our segment beginning in the coordinate system of a dash set (set's begin = 0)
+        let seg_count = (dash_off_rad + seg0).div_euclid(dash_iter_len_rad) + 1.;
         let seg_end = seg_beg + precision_radps;
         let mut is_drawn = true;
         let mut d_beg = 0.; // length up to the beginning of this dash = ∑ of all previous dash lens
@@ -219,7 +220,12 @@ mod impls {
         //         ↑↑  ↑ draw, overlaps with   active
         //           ↑↑  skip, overlaps with inactive
         if i == 0 {println!("\n\n—————————————————————————————————————————————————————————————————————————————————")};
+        let mut j = 0;
+        let mut draw_started = false;
+        // if seg_count == 1. {
         for dash_i in &dash_iter_rad {
+          j += 1;
+          // if is_drawn && j == 3 {
           if is_drawn { // ignore inactive dashes
             let d_end = d_beg + dash_i;
             let draw_beg = d_beg.max(seg_beg).min(d_end); // start at dash begin, → to segment begin, but not past dash end
@@ -228,24 +234,26 @@ mod impls {
             // if rad0      <=       d_end
               // &&    seg_end >= d_beg  { // our segment overlaps with this dash
             println!(
-              "{}abs {: >4.1}° → {: >4.1}° Δ{: >3.1}° off {: >3.1}°¦{: >3.1}°\
+              "{}{:} {:} abs {: >4.1}° → {: >4.1}° Δ{: >3.1}° off {: >3.1}°¦{: >3.1}°\
               │ rel {: >4.1}° → {: >4.1}° Δ{: >3.1}°\
               │ dash {: >4.1}° → {: >4.1}° Δ{: >4.1}°\
               │ draw {: >4.1}° → {: >4.1}° ⇒ {: >3.1}° "
-              ,if draw_len>0.{"✓ "}else{"  "}
+              ,if draw_len>0.{"✓ "}else{"  "}, seg_count, j
               ,rad0    .to_degrees(),rad1    .to_degrees(),(rad1-rad0).to_degrees(), dash_off_deg, seg_off
               ,seg_beg .to_degrees(),seg_end .to_degrees(),(seg_end - seg_beg).to_degrees()
               ,d_beg   .to_degrees(),d_end   .to_degrees(),dash_i.to_degrees()
               ,draw_beg.to_degrees(),draw_end.to_degrees(),draw_len.to_degrees()
               );
-            if draw_len > 0. {
-              let c = CircleSegment::new((cx,cy), r0,r0   ,rad0,draw_len);
+            if draw_len > 0.00001 { // draw 1st from segment's end to attach to the next drawing
+              let c = if draw_started   {CircleSegment::new((cx,cy), r0,r0   ,rad0         ,draw_len)
+              } else {draw_started=true; CircleSegment::new((cx,cy), r0,r0   ,rad1-draw_len,draw_len)};
               scene.stroke(&stroke_c, Affine::IDENTITY, &grad2, None, &c,);
-            }
+            } else {draw_started=false;}
           } //else {println!("   inactive ({: >4.1}°)",dash_i.to_degrees());}
           d_beg += dash_i;
           is_drawn = !is_drawn;
         }
+        // }
       } // ↓ in case step int conversion missed the last sliver
       let rad0_last = (r2beg + f64::from(steps_left) * precision_degps).to_radians();
       if rad0_last < skip_beg_rad { //println!("{rad0_last:.4} < {skip_beg_rad:.4} step_last {:.1}°<{:.1}° end",rad0_last.to_degrees(),skip_beg_deg);
