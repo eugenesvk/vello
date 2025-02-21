@@ -62,10 +62,10 @@ mod impls {
 
       let dpi = 1.5;
       // Position
-      let cx = 900.; let cy = 200.; let r0 = 100.;
+      let cx = 900.; let cy = 200.; let r0 = 95.5; //600 circum len 300 half
       // Size
       let arc_len = 180; let arc_len_f = f64::from(arc_len);
-      let precision_degps:f64 = 0.5; let precision_radps = precision_degps.to_radians();
+      let precision_degps:f64 = 0.5; let precision_radps = precision_degps.to_radians(); //0.00873
       let steps_f = arc_len_f / precision_degps; //360
       let steps   = steps_f as i32;
       // Gradient / size convergence bounds
@@ -85,6 +85,7 @@ mod impls {
 
       // TODO: change all circle segments to .outer_arc() otherwise we're drawing 2! lines
         // but this introduces strange artifacts :(( joins are visible, changing ending to round fixes it, but i want sharp ends!
+        // ask how to fix them?
       // ((w1 + sign1 * w_step * r) * dpi).round() / dpi; //transition shouldn't be pixel-stepped!
       // todo3: test with dashes (unlikely to work? needs a different logic?)
         // Approach1:
