@@ -148,6 +148,94 @@ mod impls {
       }
 
 
+      // BUG investigateion copy with a different stroke, end, no curves to illustrate a bug
+      for i in 0..5 { // no arc ✓ smooth, ✗ dashes misaligned
+        let i_f = f64::from(i);
+        let c = CircleSegment::new((500.,400.), 90.,90.,  i_f,1.+0.3);
+        let stroke_style_c = Stroke::new(10.-i_f) //.with_dashes(0.,[28.27433,28.27433])
+          .with_start_cap(Cap::Butt  )
+          .with_end_cap  (Cap::Butt  )
+          .with_join     (Join::Bevel);
+        scene.stroke(&stroke_style_c, Affine::IDENTITY, &css::RED, None, &c,);
+      }
+      for i in 0..5 { // arc ✗ smooth, ✓ dashes aligned
+        let i_f = f64::from(i);
+        let c = CircleSegment::new((700.,400.), 90.,90.,  i_f,1.+0.3).outer_arc();
+        let stroke_style_c = Stroke::new(10.-i_f) //.with_dashes(0.,[28.27433,28.27433])
+          .with_start_cap(Cap::Butt  )
+          .with_end_cap  (Cap::Butt  )
+          .with_join     (Join::Bevel);
+        scene.stroke(&stroke_style_c, Affine::IDENTITY, &css::GREEN, None, &c,);
+      }
+      // for i in 0..5 { let r = f64::from(i); let rad0 = r; // arc
+      //   let c = CircleSegment::new((500.,400.), 40.,40.,  rad0,1.).outer_arc();
+      //   let c1 = CircleSegment::new((500.,400.), 40.,40.,  rad0,1.).inner_arc();
+      //   let stroke_style_c = Stroke::new(10.)
+      //     .with_start_cap(Cap::Butt  )
+      //     .with_end_cap  (Cap::Butt  )
+      //     .with_join     (Join::Bevel);
+      //   scene.stroke(&stroke_style_c, Affine::IDENTITY, &css::WHEAT, None, &c,);
+      //   scene.stroke(&stroke_style_c, Affine::IDENTITY, &css::WHEAT, None, &c1,);
+      // }
+      // let prec = 0.01; //in
+      // let st = 600;
+      // for i in 0..st { let r = f64::from(i); let rad0 = 0.0 + r * prec; // ✗ arc NOT smooth!
+      //   let c = CircleSegment::new((500.,400.), 60.,60.,  rad0,prec).outer_arc();
+      //   let c1 = CircleSegment::new((500.,400.), 60.,60.,  rad0,prec).inner_arc();
+      //   let stroke_style_c = Stroke::new(10.)
+      //     .with_start_cap(Cap::Butt  )
+      //     .with_end_cap  (Cap::Butt  )
+      //     .with_join     (Join::Bevel);
+      //   scene.stroke(&stroke_style_c, Affine::IDENTITY, &css::WHEAT, None, &c,);
+      //   scene.stroke(&stroke_style_c, Affine::IDENTITY, &css::WHEAT, None, &c1,);
+      // }
+      // let shifty:f64 = 0.0001;
+      // let gappy:f64 = 0.001;
+      // for i in 0..st { let r = f64::from(i); let rad0 = 0.0 + r * prec;  // arc ✗ not smooth
+      //   let c = CircleSegment::new((500.,400.), 80.,80.,  rad0-shifty,prec+shifty+gappy).outer_arc();
+      //   let stroke_style_c = Stroke::new(10.)
+      //     .with_start_cap(Cap::Butt  )
+      //     .with_end_cap  (Cap::Butt  )
+      //     .with_join     (Join::Bevel);
+      //   scene.stroke(&stroke_style_c, Affine::IDENTITY, &css::WHEAT, None, &c,);
+      // }
+      // let shifty:f64 = 0.0001;
+      // let gappy:f64 = 0.01;  // ✓ works
+      // for i in 0..st { let r = f64::from(i); let rad0 = 0.0 + r * prec;  // ✓arc looks smooth?
+      //   let c = CircleSegment::new((500.,400.), 100.,100.,  rad0-shifty,prec+shifty+gappy).outer_arc();
+      //   let stroke_style_c = Stroke::new(10.)
+      //     .with_start_cap(Cap::Butt  )
+      //     .with_end_cap  (Cap::Butt  )
+      //     .with_join     (Join::Bevel);
+      //   scene.stroke(&stroke_style_c, Affine::IDENTITY, &css::WHEAT, None, &c,);
+      // }
+      // for i in 0..st { let r = f64::from(i); let rad0 = 0.0 + r * prec;
+      //   let c = CircleSegment::new((500.,400.), 120.,120.,  rad0,prec).outer_arc(); // manually 2 arcs, ✗ smooth
+      //   let c = CircleSegment::new((500.,400.), 120.,120.,  rad0,prec).inner_arc();
+      //   let stroke_style_c = Stroke::new(10.)
+      //     .with_start_cap(Cap::Butt  )
+      //     .with_end_cap  (Cap::Butt  )
+      //     .with_join     (Join::Bevel);
+      //   scene.stroke(&stroke_style_c, Affine::IDENTITY, &css::GREEN, None, &c,);
+      // }
+      // for i in 0..st { let r = f64::from(i); let rad0 = 0.0 + r * prec;
+      //   let c = CircleSegment::new((500.,400.), 140.,140.,  rad0,prec); // ✓ no arc smooth no dashes
+      //   let stroke_style_c = Stroke::new(10.)
+      //     .with_start_cap(Cap::Butt  )
+      //     .with_end_cap  (Cap::Butt  )
+      //     .with_join     (Join::Bevel);
+      //   scene.stroke(&stroke_style_c, Affine::IDENTITY, &css::GREEN, None, &c,);
+      // }
+      // for i in 0..st { let r = f64::from(i); let rad0 = 0.0 + r * prec;
+      //   let c = CircleSegment::new((500.,400.), 120.,120.,  rad0,prec); // ✓ smooth ✗ Dashes overlap
+      //   let stroke_c = Stroke::new(10.) //.with_dashes(0.,[12.,12.])
+      //     .with_start_cap(Cap::Butt  )
+      //     .with_end_cap  (Cap::Butt  )
+      //     .with_join     (Join::Bevel);
+      //   scene.stroke(&stroke_c, Affine::IDENTITY, &css::YELLOW, None, &c,);
+      // }
+
+
       // Draw pos-gradwidth segment separately without the extra iterator
       let c = CircleSegment::new((cx,cy), r0,0.   ,  r2beg_rad + rad_delta, skip_beg_rad).outer_arc();
       // let stroke_c = get_stroke_end(w2px);
