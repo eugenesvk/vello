@@ -150,6 +150,19 @@ mod impls {
       }
 
 
+      let dash_off:f64 = 10.;
+      // let dash_iter = [20.,20.,10.,10.]; //todo: reject negative numbers
+      let dash_iter = [20.,20.]; //todo: reject negative numbers
+      let deg_len = 2. * f64c::PI * r0 / 360.; //2π*100/360 = 1.74
+      let rad_len = 2. * f64c::PI * r0 / 360.0_f64.to_radians(); //2π*100/6.28 = 100
+      let dash_iter_len:f64 = dash_iter.iter().sum::<f64>(); //5
+      let dash_iter_len_deg:f64 = dash_iter_len / deg_len; //° 2.87356
+      let dash_off_deg = dash_off / deg_len;
+      let dash_off_rad = dash_off_deg.to_radians();
+      let dash_iter_len_rad = dash_iter_len_deg.to_radians(); //0.05015
+      let dash_iter_rad = dash_iter.iter().map(|w| w / rad_len).collect::<Vec<f64>>();
+      //3/(3+2) * 2.87 = 3/dash_iter_len * (dash_iter_len / deg_len) = 3 / deg_len
+      //1.044
       // Draw pos-gradwidth segment separately without the extra iterator
       let c = CircleSegment::new((cx,cy), r0,0.   ,  r2beg_rad + rad_delta, skip_beg_rad).outer_arc();
       // let stroke_c = get_stroke_end(w2px);
