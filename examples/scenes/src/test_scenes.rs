@@ -180,10 +180,50 @@ mod impls {
 
       let sign2 = if w2 > wavg { 1.} else if w2 < wavg {-1.} else {0.}; //(from avg) ↑ if bigger, ↓ if smaller
       for i in 0..steps_left { let r = f64::from(i);
-        let rad0 = (r2beg + r * precision_degps).to_radians();
-        let c = CircleSegment::new((cx,cy), r0,0.   ,  rad0,precision_radps).outer_arc();
+        let rad0 = r2beg_rad + r * precision_radps;
+        // let c = CircleSegment::new((cx,cy), r0,r0   ,  rad0,precision_radps+gap_correct).outer_arc(); //arc bugs with gaps
+        // let c = CircleSegment::new((cx,cy), r0,r0   ,  rad0,precision_radps);
         //                          center  rout/in    ∠start ∠sweep
-        // if i == 0 {println!("\n\n———————————————————————————————")};
+        let cw = wavg + sign2 * r * w_step_left;
+        // let stroke_c = get_stroke_end(cw);
+        let stroke_c = get_stroke_end(w2);
+
+          // let c = CircleSegment::new((cx,cy), r0,r0   ,  rad0,precision_radps);
+          // scene.stroke(&stroke_c, Affine::IDENTITY, &grad2, None, &c,);
+
+        let rad1 = rad0 + precision_radps;
+        let seg_beg = rad0 % dash_iter_len_rad; // cut off arc that fit into the previous dash set, so this is our segment beginning in the coordinate system of a dash set
+        let seg_end = seg_beg + precision_radps;
+        let mut is_drawn = true;
+        let mut d_beg = 0.; // length up to the beginning of this dash = ∑ of all previous dash lens
+
+        //     ──────  —————  outer line dash pattern (todo: what if our line is bigger than 1 pattern? like here)
+        //        ┌─────┐     our   line (always starts later due to "rad0 % dash_iter_len_rad")
+        // seg_beg┘     └seg_end
+        //         ↑↑  ↑ draw, overlaps with   active
+        //           ↑↑  skip, overlaps with inactive
+        for dash_i in &dash_iter_rad {
+          if is_drawn { // ignore inactive dashes
+            let d_end = d_beg + dash_i;
+            let draw_beg = d_beg.max(seg_beg).min(d_end); // start at dash begin, → to segment begin, but not past dash end
+            let draw_end = d_end.min(seg_end).max(d_beg); // start at dash end  , ← to segment end  , but not past dash beg
+            let draw_len = draw_end - draw_beg;
+            // if rad0      <=       d_end
+              // &&    seg_end >= d_beg  { // our segment overlaps with this dash
+            println!("{}abs {: >4.1}° → {: >4.1}° ⇒ {: >3.1}° │ rel {: >4.1}° → {: >4.1}° ⇒ {: >3.1}° ({: >4.1}°) │ seg {: >4.1}° → {: >4.1}° Δ{: >3.1}°"
+              ,if draw_len>0.{"✓ "}else{"  "}
+              ,rad0.to_degrees(),rad1.to_degrees(), (rad1-rad0).to_degrees()
+              ,draw_beg.to_degrees(), draw_end.to_degrees(), draw_len.to_degrees(), dash_i.to_degrees()
+              ,seg_beg.to_degrees(),seg_end.to_degrees(),(seg_end - seg_beg).to_degrees()
+              );
+            if draw_len > 0. {
+              let c = CircleSegment::new((cx,cy), r0,r0   ,rad0,draw_len);
+              scene.stroke(&stroke_c, Affine::IDENTITY, &grad2, None, &c,);
+            }
+          }
+          d_beg += dash_i;
+          is_drawn = !is_drawn;
+        }
         // println!("i={i}/{steps_left}  r={r:.1} r1beg={r1beg:.1} r*prec={:.1} deg={r2beg:.1} beg={:.1} end={:.1}",r * precision_degps
         //   ,       r2beg + r * precision_degps, r2beg + r * precision_degps + precision_degps);
         let cw = wavg + sign2 * r * w_step_left;
