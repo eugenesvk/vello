@@ -202,7 +202,7 @@ mod impls {
         //                          center  rout/in    ∠start ∠sweep
         let cw = wavg + sign2 * r * w_step_left;
         // let stroke_c = get_stroke_end(cw);
-        let stroke_c = get_stroke_end(w2);
+        let stroke_c = get_stroke_end(w2); // todo: same width for comparison with a reference
 
           // let c = CircleSegment::new((cx,cy), r0,r0   ,  rad0,precision_radps);
           // scene.stroke(&stroke_c, Affine::IDENTITY, &grad2, None, &c,);
