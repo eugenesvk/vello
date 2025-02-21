@@ -180,7 +180,8 @@ mod impls {
 
       let sign2 = if w2 > wavg { 1.} else if w2 < wavg {-1.} else {0.}; //(from avg) ↑ if bigger, ↓ if smaller
       for i in 0..steps_left { let r = f64::from(i);
-        let rad0 = r2beg_rad + r * precision_radps;
+        let seg0 = r * precision_radps; // segment beginning in our arc coords (arc start = 0)
+        let rad0 = r2beg_rad + seg0;
         // let c = CircleSegment::new((cx,cy), r0,r0   ,  rad0,precision_radps+gap_correct).outer_arc(); //arc bugs with gaps
         // let c = CircleSegment::new((cx,cy), r0,r0   ,  rad0,precision_radps);
         //                          center  rout/in    ∠start ∠sweep
@@ -192,7 +193,7 @@ mod impls {
           // scene.stroke(&stroke_c, Affine::IDENTITY, &grad2, None, &c,);
 
         let rad1 = rad0 + precision_radps;
-        let seg_beg = rad0 % dash_iter_len_rad; // cut off arc that fit into the previous dash set, so this is our segment beginning in the coordinate system of a dash set
+        let seg_beg = (rad0 - r2beg_rad) % dash_iter_len_rad; // cut off arc that fit into the previous dash set, so this is our segment beginning in the coordinate system of a dash set (set's begin = 0)
         let seg_end = seg_beg + precision_radps;
         let mut is_drawn = true;
         let mut d_beg = 0.; // length up to the beginning of this dash = ∑ of all previous dash lens
@@ -202,6 +203,7 @@ mod impls {
         // seg_beg┘     └seg_end
         //         ↑↑  ↑ draw, overlaps with   active
         //           ↑↑  skip, overlaps with inactive
+        if i == 0 {println!("\n\n—————————————————————————————————————————————————————————————————————————————————")};
         for dash_i in &dash_iter_rad {
           if is_drawn { // ignore inactive dashes
             let d_end = d_beg + dash_i;
@@ -210,17 +212,18 @@ mod impls {
             let draw_len = draw_end - draw_beg;
             // if rad0      <=       d_end
               // &&    seg_end >= d_beg  { // our segment overlaps with this dash
-            println!("{}abs {: >4.1}° → {: >4.1}° ⇒ {: >3.1}° │ rel {: >4.1}° → {: >4.1}° ⇒ {: >3.1}° ({: >4.1}°) │ seg {: >4.1}° → {: >4.1}° Δ{: >3.1}°"
+            println!("{}abs {: >4.1}° → {: >4.1}° Δ{: >3.1}° │ rel {: >4.1}° → {: >4.1}° Δ{: >3.1}° │ dash {: >4.1}° → {: >4.1}° Δ{: >3.1}° │ draw {: >4.1}° → {: >4.1}° ⇒ {: >3.1}° "
               ,if draw_len>0.{"✓ "}else{"  "}
               ,rad0.to_degrees(),rad1.to_degrees(), (rad1-rad0).to_degrees()
-              ,draw_beg.to_degrees(), draw_end.to_degrees(), draw_len.to_degrees(), dash_i.to_degrees()
               ,seg_beg.to_degrees(),seg_end.to_degrees(),(seg_end - seg_beg).to_degrees()
+              ,d_beg.to_degrees(),d_end.to_degrees(),dash_i.to_degrees()
+              ,draw_beg.to_degrees(), draw_end.to_degrees(), draw_len.to_degrees()
               );
             if draw_len > 0. {
               let c = CircleSegment::new((cx,cy), r0,r0   ,rad0,draw_len);
               scene.stroke(&stroke_c, Affine::IDENTITY, &grad2, None, &c,);
             }
-          }
+          } //else {println!("   inactive ({: >4.1}°)",dash_i.to_degrees());}
           d_beg += dash_i;
           is_drawn = !is_drawn;
         }
