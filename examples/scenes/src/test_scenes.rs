@@ -157,6 +157,26 @@ mod impls {
       // scene.stroke(&stroke_c, Affine::IDENTITY, &col_end, None, &c,);
       scene.stroke(&stroke_c, Affine::IDENTITY, &css::WHEAT, None, &c,); // for testing
 
+      // DEBUG copy shifted right
+      // let cyy = cy;
+      // let cxx = cx+5.;
+      // let grad2cc_p0 = ( cxx + r0*f64::cos( r2beg_rad                      ) , cyy + r0*f64::sin( r2beg_rad                      ) );
+      // let grad2cc_p1 = ( cxx + r0*f64::cos((r2beg + deg_delta).to_radians()) , cyy + r0*f64::sin((r2beg + deg_delta).to_radians()) );
+      // let grad2cc = Gradient::new_linear(grad2cc_p0, grad2cc_p1).with_stops([col_avg    ,col_end]);
+      // let c = CircleSegment::new((cxx,cyy), r0,r0,  r2beg_rad,arc_len_f.to_radians()).outer_arc();
+      // let stroke_c = get_stroke_end(w2).with_dashes(0.,dash_iter);
+      // scene.stroke(&stroke_c, Affine::IDENTITY, &grad2cc, None, &c,);
+
+      // DEBUG copy smaller (including dashes, should perfectly align)
+      let cyy = cy;
+      let cxx = cx;
+      let r00 = r0 - w2 - 1.;
+      let grad2cc_p0 = ( cxx + r00*f64::cos( r2beg_rad                      ) , cyy + r00*f64::sin( r2beg_rad                      ) );
+      let grad2cc_p1 = ( cxx + r00*f64::cos((r2beg + deg_delta).to_radians()) , cyy + r00*f64::sin((r2beg + deg_delta).to_radians()) );
+      let grad2cc = Gradient::new_linear(grad2cc_p0, grad2cc_p1).with_stops([col_avg    ,col_end]);
+      let c = CircleSegment::new((cxx,cyy), r00,r00,  r2beg_rad,arc_len_f.to_radians()).outer_arc();
+      let stroke_c = get_stroke_end(w2).with_dashes(0.,dash_iter.iter().map(|w| w*r00/r0).collect::<Vec<f64>>());
+      scene.stroke(&stroke_c, Affine::IDENTITY, &grad2cc, None, &c,);
 
       let sign2 = if w2 > wavg { 1.} else if w2 < wavg {-1.} else {0.}; //(from avg) ↑ if bigger, ↓ if smaller
       for i in 0..steps_left { let r = f64::from(i);
