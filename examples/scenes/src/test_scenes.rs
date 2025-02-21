@@ -153,7 +153,7 @@ mod impls {
       // Draw pos-gradwidth segment separately without the extra iterator
       let c = CircleSegment::new((cx,cy), r0,0.   ,  r2beg_rad + rad_delta, skip_beg_rad).outer_arc();
       // let stroke_c = get_stroke_end(w2px);
-      let stroke_c = get_stroke_end(w2px).with_dashes(0.,[10.,10.]);
+      let stroke_c = get_stroke_end(w2px).with_dashes(dash_off,dash_iter);
       // scene.stroke(&stroke_c, Affine::IDENTITY, &col_end, None, &c,);
       scene.stroke(&stroke_c, Affine::IDENTITY, &css::WHEAT, None, &c,); // for testing
 
@@ -164,7 +164,7 @@ mod impls {
       // let grad2cc_p1 = ( cxx + r0*f64::cos((r2beg + deg_delta).to_radians()) , cyy + r0*f64::sin((r2beg + deg_delta).to_radians()) );
       // let grad2cc = Gradient::new_linear(grad2cc_p0, grad2cc_p1).with_stops([col_avg    ,col_end]);
       // let c = CircleSegment::new((cxx,cyy), r0,r0,  r2beg_rad,arc_len_f.to_radians()).outer_arc();
-      // let stroke_c = get_stroke_end(w2).with_dashes(0.,dash_iter);
+      // let stroke_c = get_stroke_end(w2).with_dashes(dash_off,dash_iter);
       // scene.stroke(&stroke_c, Affine::IDENTITY, &grad2cc, None, &c,);
 
       // DEBUG copy smaller (including dashes, should perfectly align)
