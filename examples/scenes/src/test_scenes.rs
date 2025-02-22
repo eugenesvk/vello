@@ -268,16 +268,16 @@ mod impls {
               // &&    seg_end >= d_beg  { // our segment overlaps with this dash
             // if is_last {
             // println!(
-            //   "{}{}{: >2} {: >2} abs {: >4.1}° → {: >4.1}° Δ{: >3.1}° off {: >3.1}°¦{: >3.1}°\
-            //   │ rel {: >4.1}° → {: >4.1}° Δ{: >3.1}°\
-            //   │ dash {: >4.1}° → {: >4.1}° Δ{: >4.1}°\
-            //   │ draw {: >4.1}° → {: >4.1}° ⇒ {: >3.1}° "
-            //   ,if draw_len>0.{"✓ "}else{"  "},if is_last {"🛑"}else{" "} ,seg_count, j
-            //   ,rad0    .to_degrees(),rad1    .to_degrees(),(rad1-rad0).to_degrees(), dash_off_deg, seg_off
-            //   ,seg_beg .to_degrees(),seg_end .to_degrees(),(seg_end - seg_beg).to_degrees()
-            //   ,d_beg   .to_degrees(),d_end   .to_degrees(),dash_i.to_degrees()
-            //   ,draw_beg.to_degrees(),draw_end.to_degrees(),draw_len.to_degrees()
-            //   );
+              // "{}{}{: >2} {: >2} abs {: >4.1}° → {: >4.1}° Δ{: >3.1}° off {: >3.1}°¦{: >3.1}°\
+              // │ rel {: >4.1}° → {: >4.1}° Δ{: >3.1}°\
+              // │ dash {: >4.1}° → {: >4.1}° Δ{: >4.1}°\
+              // │ draw {: >4.1}° → {: >4.1}° ⇒ {: >3.1}° "
+              // ,if draw_len>0.{"✓ "}else{"  "},if is_last {"🛑"}else{" "} ,seg_count, j
+              // ,rad0    .to_degrees(),rad1    .to_degrees(),(rad1-rad0).to_degrees(), dash_off_deg, seg_off
+              // ,seg_beg .to_degrees(),seg_end .to_degrees(),(seg_end - seg_beg).to_degrees()
+              // ,d_beg   .to_degrees(),d_end   .to_degrees(),dash_i.to_degrees()
+              // ,draw_beg.to_degrees(),draw_end.to_degrees(),draw_len.to_degrees()
+              // );
             // }
             // todo ↓ do the same when not drawn, empty dashes also affect the positioning of the next set
           } //is_drawn else {println!("   inactive ({: >4.1}°)",dash_i.to_degrees());}
