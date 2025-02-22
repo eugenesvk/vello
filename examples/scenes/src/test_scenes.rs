@@ -284,6 +284,10 @@ mod impls {
           d_beg += dash_i;
           is_drawn = !is_drawn;
         }
+        // TODO: add remainder of a dash set that wasn't covered by our drawing segment
+        // if is_last {dash_partial = dash_iter_len_rad - d_beg;} // add remainder of a dash set that wasn't covered by our drawing segment
+        // if dash_partial >0. {println!("!!!!!! dash_partial = {}",dash_partial);}
+        // if is_last {println!("!! last with unfinished {}",d_beg.to_degrees());}
         // }
       } // ↓ in case step int conversion missed the last sliver
       let rad0_last = (r2beg + f64::from(steps_left) * precision_degps).to_radians();
