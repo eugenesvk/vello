@@ -133,6 +133,7 @@ mod impls {
       let grad2_p1 = ( cx + r0*f64::cos((r2beg + delta_deg).to_radians()) , cy + r0*f64::sin((r2beg + delta_deg).to_radians()) );
       let grad2 = Gradient::new_linear(grad2_p0, grad2_p1).with_stops([col_avg    ,col_end]);
 
+      // Segment 1: ~join part is 2nd (at the end)
       // Draw pre-gradwidth segment separately without the extra iterator
       let c = CircleSegment::new((cx,cy), r0,0.   ,  r1beg_rad,skip_beg_rad).outer_arc();
       let stroke_c = get_stroke_end(w1px);
@@ -203,6 +204,7 @@ mod impls {
       let stroke_c = get_stroke_end(w2).with_dashes(dash_off*r00/r0,dash_iter.iter().map(|w| w*r00/r0).collect::<Vec<f64>>());
       scene.stroke(&stroke_c, Affine::IDENTITY, &grad2cc, None, &c,);
 
+      // Segment 2: ~join part is 1st (at the start)
       // TODO: test if step length > dash set length (with very low precision)
       let mut dash_partial = 0.; // use as dash offset for the next segment to hide the partially drawn part
       let sign2 = if w2 > wavg { 1.} else if w2 < wavg {-1.} else {0.}; //(from avg) ↑ if bigger, ↓ if smaller
