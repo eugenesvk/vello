@@ -210,25 +210,29 @@ mod impls {
       let stroke_c = get_stroke_end(w2).with_dashes(dash_off*r00/r0,dash_iter.iter().map(|w| w*r00/r0).collect::<Vec<f64>>());
       scene.stroke(&stroke_c, Affine::IDENTITY, &grad2cc, None, &c,);
 
+      let mut dash_partial = 0.; // use as dash offset for the next segment to hide the partially drawn part
       let sign2 = if w2 > wavg { 1.} else if w2 < wavg {-1.} else {0.}; //(from avg) ↑ if bigger, ↓ if smaller
-      for i in 0..steps_left { let r = f64::from(i);
-        let seg0 = r * precision_radps; // segment beginning in our arc coords (arc start = 0)
+      for i in 0..=steps_delta_i { let r = f64::from(i); let is_last = i == steps_delta_i;
+        // NB! last step needs special handling since it's a fractional one, so not full "precision length"!
+        let seg0 = if is_last	{(r - 1.) * precision_rad_per_step + delta_rem_rad
+        } else               	{ r       * precision_rad_per_step}; // segment beginning in our arc coords (arc start = 0)
         let rad0 = r2beg_rad + seg0;
-        let rad1 = rad0 + precision_radps; // todo debug only
-        // let c = CircleSegment::new((cx,cy), r0,r0   ,  rad0,precision_radps+gap_correct).outer_arc(); //arc bugs with gaps
-        // let c = CircleSegment::new((cx,cy), r0,r0   ,  rad0,precision_radps);
+        let rad1 = rad0 + precision_rad_per_step; // todo debug only
+        // let c = CircleSegment::new((cx,cy), r0,r0   ,  rad0,precision_rad_per_step+gap_correct).outer_arc(); //arc bugs with gaps
+        // let c = CircleSegment::new((cx,cy), r0,r0   ,  rad0,precision_rad_per_step);
         //                          center  rout/in    ∠start ∠sweep
-        let cw = wavg + sign2 * r * w_step_left;
+        let cw = if is_last	{w2px
+        } else             	{wavg + sign2 * r * w_per_step_i};
         // let stroke_c = get_stroke_end(cw);
         let stroke_c = get_stroke_end(w2); // todo: same width for comparison with a reference
 
-          // let c = CircleSegment::new((cx,cy), r0,r0   ,  rad0,precision_radps);
+          // let c = CircleSegment::new((cx,cy), r0,r0   ,  rad0,precision_rad_per_step);
           // scene.stroke(&stroke_c, Affine::IDENTITY, &grad2, None, &c,);
 
         let seg_off = dash_off_rad % dash_iter_len_rad;
         let seg_beg = (dash_off_rad + seg0) % dash_iter_len_rad;// cut off arc that fit into the previous dash set, so this is our segment beginning in the coordinate system of a dash set (set's begin = 0)
         let seg_count = (dash_off_rad + seg0).div_euclid(dash_iter_len_rad) + 1.;
-        let seg_end = seg_beg + precision_radps;
+        let seg_end = seg_beg + precision_rad_per_step;
         let mut is_drawn = true;
         let mut d_beg = 0.; // length up to the beginning of this dash = ∑ of all previous dash lens
 
