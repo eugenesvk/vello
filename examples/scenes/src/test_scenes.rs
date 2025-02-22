@@ -208,6 +208,7 @@ mod impls {
       // TODO: test if step length > dash set length (with very low precision)
       let mut dash_partial = 0.; // use as dash offset for the next segment to hide the partially drawn part
       let sign2 = if w2 > wavg { 1.} else if w2 < wavg {-1.} else {0.}; //(from avg) ↑ if bigger, ↓ if smaller
+      let mut is_vis_draw = false; // whether a visible dash is drawing to clamp its first partial draw to the next. Switches to off when an invisible dash is "drawing"
       for i in 0..=steps_delta_i { let r = f64::from(i); let is_last = i == steps_delta_i;
         // NB! last step needs special handling since it's a fractional one, so not full "precision length"!
         let seg0 = if is_last	{(r - 1.) * precision_rad_per_step + delta_rem_rad
@@ -254,10 +255,10 @@ mod impls {
             let draw_end = d_end.min(seg_end).max(d_beg); // start at dash end  , ← to segment end  , but not past dash beg
             let draw_len = draw_end - draw_beg;
             if draw_len > 0.0 { // draw 1st from segment's end to attach to the next drawing
-              let c = if draw_started   {CircleSegment::new((cx,cy), r0,r0   ,rad0         ,draw_len)
-              } else {draw_started=true; CircleSegment::new((cx,cy), r0,r0   ,rad1-draw_len,draw_len)};
+              let c = if is_vis_draw   {CircleSegment::new((cx,cy), r0,r0   ,rad0         ,draw_len)
+              } else {is_vis_draw=true; CircleSegment::new((cx,cy), r0,r0   ,rad1-draw_len,draw_len)};
               if is_last	{scene.stroke(&stroke_c, Affine::IDENTITY, &css::LIME, None, &c,);
-              } else    	{scene.stroke(&stroke_c, Affine::IDENTITY, &grad2, None, &c,);}
+              } else    	{scene.stroke(&stroke_c, Affine::IDENTITY, &grad2    , None, &c,);}
               // todo: replace ↑ test with ↓
               // todo: replace ↑ lime test with ↓
               // scene.stroke(&stroke_c, Affine::IDENTITY, &grad2, None, &c,);
@@ -267,7 +268,7 @@ mod impls {
                 println!("! last +visible +draw w_dash {: >.4}° − {: >.4}° actual = {: >.4}° partial ({:.1}px) rad1 {:.3}°"
                   ,dash_i.to_degrees(),draw_len.to_degrees(), (d_end.min(seg_end) - d_beg).to_degrees(),dash_partial,rad1.to_degrees());
               }
-            } else {draw_started=false;}
+            } else {is_vis_draw=false;}
             // if rad0      <=       d_end
               // &&    seg_end >= d_beg  { // our segment overlaps with this dash
             // if is_last {
@@ -284,11 +285,12 @@ mod impls {
               // );
             // }
           } else { //println!("   inactive ({: >4.1}°)",dash_i.to_degrees());
+            let d_end = d_beg + dash_i;
+            let draw_beg = d_beg.max(seg_beg).min(d_end); // start at dash begin, → to segment begin, but not past dash end
+            let draw_end = d_end.min(seg_end).max(d_beg); // start at dash end  , ← to segment end  , but not past dash beg
+            let draw_len = draw_end - draw_beg;
+            if draw_len > 0.0 {is_vis_draw = false;}
             if is_last { // last invisible dash also needs to signal its width to update offset of the next arc
-              let d_end = d_beg + dash_i;
-              let draw_beg = d_beg.max(seg_beg).min(d_end); // start at dash begin, → to segment begin, but not past dash end
-              let draw_end = d_end.min(seg_end).max(d_beg); // start at dash end  , ← to segment end  , but not past dash beg
-              let draw_len = draw_end - draw_beg;
               let part_len = draw_end - d_beg; //how much of an existing dash is covered by all draws, incl. last
               if   draw_len > 0.0 // drawn something, but not the full invisible dash
                 && part_len < *dash_i - 0.00000000001 { //some float rounding error
