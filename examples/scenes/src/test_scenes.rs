@@ -63,6 +63,7 @@ mod impls {
     // convert circle segments to Arcs directly and overlap (except for the last segment) to avoid conflaction artifacts
     // test if step length > dash set length (with very low precision)
     // reject negative numbers on accepted dash iterator
+    // ?? convert rads to degree floats to avoid small errors on adding dashes?
     // + calculate the remainder from iterative approach and use it as a (-) offset to the main curve
   // ??? update offset algo to find index to the dash that matches offset ???
     //  let mut dash_ix = 0;
