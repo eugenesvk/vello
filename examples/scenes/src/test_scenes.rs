@@ -278,12 +278,9 @@ mod impls {
             //   ,d_beg   .to_degrees(),d_end   .to_degrees(),dash_i.to_degrees()
             //   ,draw_beg.to_degrees(),draw_end.to_degrees(),draw_len.to_degrees()
             //   );
-            if draw_len > 0.00001 { // draw 1st from segment's end to attach to the next drawing
-              let c = if draw_started   {CircleSegment::new((cx,cy), r0,r0   ,rad0         ,draw_len)
-              } else {draw_started=true; CircleSegment::new((cx,cy), r0,r0   ,rad1-draw_len,draw_len)};
-              scene.stroke(&stroke_c, Affine::IDENTITY, &grad2, None, &c,);
-            } else {draw_started=false;}
-          } //else {println!("   inactive ({: >4.1}°)",dash_i.to_degrees());}
+            // }
+            // todo ↓ do the same when not drawn, empty dashes also affect the positioning of the next set
+          } //is_drawn else {println!("   inactive ({: >4.1}°)",dash_i.to_degrees());}
           d_beg += dash_i;
           is_drawn = !is_drawn;
         }
