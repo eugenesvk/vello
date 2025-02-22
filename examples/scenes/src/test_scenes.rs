@@ -260,8 +260,11 @@ mod impls {
               } else    	{scene.stroke(&stroke_c, Affine::IDENTITY, &grad2, None, &c,);}
               // todo: replace ↑ test with ↓
               // scene.stroke(&stroke_c, Affine::IDENTITY, &grad2, None, &c,);
-              if is_last { dash_partial = (d_end.min(seg_end) - d_beg) * rad_len;
-                // println!("!! last +drawn +draw partial {:.1}px {:.1}°  rad1 {}°",dash_partial,(d_end.min(seg_end) - d_beg).to_degrees(),rad1.to_degrees());
+              if is_last && draw_len < *dash_i - 0.00000000001 { // drawn something, but not the full visible dash
+                let part_len = draw_end - d_beg; //how much of an existing dash is covered by all draws, incl. last
+                dash_partial = (d_beg + part_len) * rad_len; // add all prior dash segments within a set
+                println!("! last +visible +draw w_dash {: >.4}° − {: >.4}° actual = {: >.4}° partial ({:.1}px) rad1 {:.3}°"
+                  ,dash_i.to_degrees(),draw_len.to_degrees(), (d_end.min(seg_end) - d_beg).to_degrees(),dash_partial,rad1.to_degrees());
               }
             } else {draw_started=false;}
             // if rad0      <=       d_end
@@ -285,8 +288,21 @@ mod impls {
               let draw_beg = d_beg.max(seg_beg).min(d_end); // start at dash begin, → to segment begin, but not past dash end
               let draw_end = d_end.min(seg_end).max(d_beg); // start at dash end  , ← to segment end  , but not past dash beg
               let draw_len = draw_end - draw_beg;
-              if draw_len > 0.0 {dash_partial = (d_end.min(seg_end) - d_beg) * rad_len;}
-              // println!("!! last +drawn +draw partial {:.1}px {:.1}°  rad1 {}°",dash_partial,(d_end.min(seg_end) - d_beg).to_degrees(),rad1.to_degrees());
+              let part_len = draw_end - d_beg; //how much of an existing dash is covered by all draws, incl. last
+              if   draw_len > 0.0 // drawn something, but not the full invisible dash
+                && part_len < *dash_i - 0.00000000001 { //some float rounding error
+                dash_partial = (d_beg + part_len) * rad_len; // add all prior dash segments within a set
+                // dash_partial = 475.;
+                println!("{}№{} last -visible +draw dbeg {} draw_end {} dash−part_len={} w_dash {: >.2}° − {: >.2}° par = {: >.2}° left  drawn {: >.2}° (partial {:.1}px) rad1 {:.3}°"
+                  ,if dash_partial > 0. {"✓"}else{"✗"},seg_count
+                  ,d_beg.to_degrees(),draw_end.to_degrees()
+                  ,(dash_i-part_len).to_degrees()
+                  ,dash_i.to_degrees()
+                  ,        (draw_end - d_beg) .to_degrees() //part_len
+                  ,(dash_i-(draw_end - d_beg)).to_degrees()
+                  ,draw_len.to_degrees()
+                  ,dash_partial,rad1.to_degrees());
+              }
             }
           }
           d_beg += dash_i;
