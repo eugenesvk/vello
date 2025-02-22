@@ -182,13 +182,6 @@ mod impls {
       //3/(3+2) * 2.87 = 3/dash_iter_len * (dash_iter_len / deg_len) = 3 / deg_len
       //1.044
 
-      // Draw pos-gradwidth segment separately without the extra iterator
-      let c = CircleSegment::new((cx,cy), r0,0.   ,  r2beg_rad + rad_delta, skip_beg_rad).outer_arc();
-      // let stroke_c = get_stroke_end(w2px);
-      let stroke_c = get_stroke_end(w2px).with_dashes(dash_off,dash_iter);
-      // scene.stroke(&stroke_c, Affine::IDENTITY, &col_end, None, &c,);
-      scene.stroke(&stroke_c, Affine::IDENTITY, &css::WHEAT, None, &c,); // for testing
-
       // DEBUG copy shifted right
       // let cyy = cy;
       // let cxx = cx+5.;
@@ -297,6 +290,15 @@ mod impls {
       //   // scene.stroke(&stroke_c, Affine::IDENTITY, &grad2, None, &c,); // use col_avg? though grad should cover
       //   scene.stroke(&stroke_c, Affine::IDENTITY, &css::LIME, None, &c,); // for testing
       // }
+
+      // Draw pos-gradwidth segment separately without the extra iterator, including leftovers from whole steps not covering the full range
+      // println!("finishing steady curve from {:>3.0}° {: >2.1} ⇒ {: >4.1}",r2beg_rad.to_degrees(),rad_delta.to_degrees(),(r2beg_rad + rad_delta).to_degrees());
+      let c = CircleSegment::new((cx,cy), r0,0.   ,  r2beg_rad + rad_delta, skip_beg_rad).outer_arc();
+      // let stroke_c = get_stroke_end(w2px);
+      let stroke_c = get_stroke_end(w2px).with_dashes(dash_partial,dash_iter); // use remainder from the previous segment so that the total matches the style as though it were drawn in one step
+      // scene.stroke(&stroke_c, Affine::IDENTITY, &col_end, None, &c,);
+      scene.stroke(&stroke_c, Affine::IDENTITY, &css::WHEAT, None, &c,); // for testing
+
 
       // Draw debug circles showing where each gradient begins/ends
       let pstr = get_stroke_end(1.); // starting point bigger than the ending, angle to differentiate two curves
