@@ -60,7 +60,7 @@ mod impls {
     // Dashes harder/failed approaches: combine vertical line with 1/2 circle; add dashed strokes; split by path and try to manually check which should be drawn;  change stroke width in the last segments if they are covered by the 1/2 circle (not possible???? how to calculate a match? check if we can draw a semicircle and check if overlap); draw previous line;  draw splits with a different width and gradient
 
   // TODO
-    // convert circle segments to Arcs directly and overlap to avoid conflaction artifacts
+    // convert circle segments to Arcs directly and overlap (except for the last segment) to avoid conflaction artifacts
     // test if step length > dash set length (with very low precision)
     // reject negative numbers on accepted dash iterator
     // + calculate the remainder from iterative approach and use it as a (-) offset to the main curve
