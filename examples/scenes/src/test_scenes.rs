@@ -240,7 +240,8 @@ mod impls {
         // seg_beg┘     └seg_end
         //         ↑↑  ↑ draw, overlaps with   active
         //           ↑↑  skip, overlaps with inactive
-        // if i == 0 {println!("\n\n—————Σⁱ={steps_delta_i: >3}———————————————————————————————————————————————————————————————————————————")};
+        // if i == 0 {println!("\n\n—————Σⁱ={steps_delta_i: >3}——╍╍№{}╍off{dash_off_deg: >4.1}°╍{dash_iter_deg:?}°╍——beg {r2beg: >4.1}° Δ{delta_covered_deg: >4.1}° + {delta_rem_deg: >4.1}° rem = Δ{delta_deg: >4.1}°———————————————————————————————————————————————————"
+          ,dash_iter.len())};
         // let mut j = 0;
         let mut is_visible = false;
         // if seg_count == 1. {
