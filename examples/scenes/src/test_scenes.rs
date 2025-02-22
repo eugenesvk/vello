@@ -213,13 +213,19 @@ mod impls {
       let mut dash_partial = 0.; // use as dash offset for the next segment to hide the partially drawn part
       let sign2 = if w2 > wavg { 1.} else if w2 < wavg {-1.} else {0.}; //(from avg) ↑ if bigger, ↓ if smaller
       let mut is_vis_draw = false; // whether a visible dash is drawing to clamp its first partial draw to the next. Switches to off when an invisible dash is "drawing"
-      for i in 0..=steps_delta_i { let r = f64::from(i); let is_last = i == steps_delta_i;
+      let mut delta_over:f64 = 0.; // if Δstep covers 2 dash segments, the 1st one will store the remainer it didn't cover here for the 2nd to pick it up
+      // todo: make sure that this is accounted for on the last step and even on the 2nd arc draw
+
+      let is_extra_step = delta_rem_rad > 0.;
+      let steps_delta_xt = if is_extra_step {steps_delta_i} else {steps_delta_i-1};
+      for i in 0..=steps_delta_xt { let r = f64::from(i); let is_last = i == steps_delta_xt;
         // NB! last step needs special handling since it's a fractional one, so not full "precision length"!
-        let seg0 = if is_last	{(r - 1.) * precision_rad_per_step + delta_rem_rad
-        } else               	{ r       * precision_rad_per_step}; // segment beginning in our arc coords (arc start = 0)
+        let step_width = if is_last && is_extra_step	{delta_rem_rad
+        } else                                      	{precision_rad_per_step};
+        let seg0 = (r - 1.) * precision_rad_per_step + step_width; // segment beg in our arc coords (arc start = 0), replace last regular width with a custom step_width
         let rad0 = r2beg_rad + seg0;
-        let rad1 = rad0 + precision_rad_per_step; // todo debug only
-        // let c = CircleSegment::new((cx,cy), r0,r0   ,  rad0,precision_rad_per_step+gap_correct).outer_arc(); //arc bugs with gaps
+        let rad1 = rad0 + step_width; // todo debug only
+        // let c = CircleSegment::new((cx,cy), r0,r0   ,  rad0,step_width+gap_correct).outer_arc(); //arc bugs with gaps
         // let c = CircleSegment::new((cx,cy), r0,r0   ,  rad0,precision_rad_per_step);
         //                          center  rout/in    ∠start ∠sweep
         let cw = if is_last	{w2px
