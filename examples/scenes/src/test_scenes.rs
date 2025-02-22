@@ -172,8 +172,10 @@ mod impls {
 
       let dash_off:f64 = 10.;
       let dash_iter = [20.,15.,10.,35.]; //todo: reject negative numbers
+      let dash_iter_deg = [51.66,23.]; //in degrees, total segment is 180*.337 = 60.66
       let deg_len = 2. * f64c::PI * r0 / 360.; //2π*100/360 = 1.74
       let rad_len = 2. * f64c::PI * r0 / 360.0_f64.to_radians(); //2π*100/6.28 = 100
+      let dash_iter = dash_iter_deg.iter().map(|w| w * deg_len).collect::<Vec<f64>>();
       let dash_iter_len:f64 = dash_iter.iter().sum::<f64>(); //5
       let dash_iter_len_deg:f64 = dash_iter_len / deg_len; //° 2.87356
       let dash_off_deg = dash_off / deg_len;
