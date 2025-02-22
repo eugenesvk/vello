@@ -85,6 +85,7 @@ mod impls {
         // but this introduces strange artifacts :(( joins are visible, changing ending to round fixes it, but i want sharp ends!
         // ask how to fix them?
       // ((w1 + sign1 * w_step * r) * dpi).round() / dpi; //transition shouldn't be pixel-stepped!
+      // TODO: convert circle segments to Arcs directly? but then need to fix conflaction artifacts
       // todo3: test with dashes (unlikely to work? needs a different logic?)
         // Approach1:
           // calculate dashed sequence [1,2,1,4] length in radians (1+2+1+4=8px == 1 rad at radius X)
