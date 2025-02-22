@@ -200,7 +200,7 @@ mod impls {
       // DEBUG copy smaller (including dashes, should perfectly align as dash length/offsets are adjusted per difference in size)
       let cyy = cy;
       let cxx = cx;
-      let r00 = r0 - w2 - 1.;
+      let r00 = r0 - w2;
       let grad2cc_p0 = ( cxx + r00*f64::cos( r2beg_rad                      ) , cyy + r00*f64::sin( r2beg_rad                      ) );
       let grad2cc_p1 = ( cxx + r00*f64::cos((r2beg + delta_deg).to_radians()) , cyy + r00*f64::sin((r2beg + delta_deg).to_radians()) );
       let grad2cc = Gradient::new_linear(grad2cc_p0, grad2cc_p1).with_stops([col_avg    ,col_end]);
