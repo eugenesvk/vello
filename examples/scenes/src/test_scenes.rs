@@ -193,7 +193,7 @@ mod impls {
       // let stroke_c = get_stroke_end(w2).with_dashes(dash_off,dash_iter);
       // scene.stroke(&stroke_c, Affine::IDENTITY, &grad2cc, None, &c,);
 
-      // DEBUG copy smaller (including dashes, should perfectly align)
+      // DEBUG copy smaller (including dashes, should perfectly align as dash length/offsets are adjusted per difference in size)
       let cyy = cy;
       let cxx = cx;
       let r00 = r0 - w2 - 1.;
