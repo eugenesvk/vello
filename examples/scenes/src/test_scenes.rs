@@ -279,8 +279,16 @@ mod impls {
               // ,draw_beg.to_degrees(),draw_end.to_degrees(),draw_len.to_degrees()
               // );
             // }
-            // todo ↓ do the same when not drawn, empty dashes also affect the positioning of the next set
-          } //is_drawn else {println!("   inactive ({: >4.1}°)",dash_i.to_degrees());}
+          } else { //println!("   inactive ({: >4.1}°)",dash_i.to_degrees());
+            if is_last { // last invisible dash also needs to signal its width to update offset of the next arc
+              let d_end = d_beg + dash_i;
+              let draw_beg = d_beg.max(seg_beg).min(d_end); // start at dash begin, → to segment begin, but not past dash end
+              let draw_end = d_end.min(seg_end).max(d_beg); // start at dash end  , ← to segment end  , but not past dash beg
+              let draw_len = draw_end - draw_beg;
+              if draw_len > 0.0 {dash_partial = (d_end.min(seg_end) - d_beg) * rad_len;}
+              // println!("!! last +drawn +draw partial {:.1}px {:.1}°  rad1 {}°",dash_partial,(d_end.min(seg_end) - d_beg).to_degrees(),rad1.to_degrees());
+            }
+          }
           d_beg += dash_i;
           is_drawn = !is_drawn;
         }
