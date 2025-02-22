@@ -237,13 +237,17 @@ mod impls {
         // seg_beg┘     └seg_end
         //         ↑↑  ↑ draw, overlaps with   active
         //           ↑↑  skip, overlaps with inactive
-        // if i == 0 {println!("\n\n—————————————————————————————————————————————————————————————————————————————————")};
-        let mut j = 0;
+        // if i == 0 {println!("\n\n———————————————————————————————————————————————————————————————————————————————")};
+        // let mut j = 0;
         let mut draw_started = false;
         // if seg_count == 1. {
         for dash_i in &dash_iter_rad {
-          j += 1;
+          // j += 1;
           // if is_drawn && j == 3 {
+          // if seg_end < d_beg {
+          //   println!("{: >4.1}° {: >4.1}° → {: >4.1}°",seg_end.to_degrees(),d_beg.to_degrees(),(d_beg + dash_i).to_degrees());
+          //   break;
+          // } // our segment has been fully covered, no need to continue
           if is_drawn { // ignore inactive dashes
             let d_end = d_beg + dash_i;
             let draw_beg = d_beg.max(seg_beg).min(d_end); // start at dash begin, → to segment begin, but not past dash end
@@ -251,12 +255,13 @@ mod impls {
             let draw_len = draw_end - draw_beg;
             // if rad0      <=       d_end
               // &&    seg_end >= d_beg  { // our segment overlaps with this dash
+            // if is_last {
             // println!(
-            //   "{}{:} {:} abs {: >4.1}° → {: >4.1}° Δ{: >3.1}° off {: >3.1}°¦{: >3.1}°\
+            //   "{}{}{: >2} {: >2} abs {: >4.1}° → {: >4.1}° Δ{: >3.1}° off {: >3.1}°¦{: >3.1}°\
             //   │ rel {: >4.1}° → {: >4.1}° Δ{: >3.1}°\
             //   │ dash {: >4.1}° → {: >4.1}° Δ{: >4.1}°\
             //   │ draw {: >4.1}° → {: >4.1}° ⇒ {: >3.1}° "
-            //   ,if draw_len>0.{"✓ "}else{"  "}, seg_count, j
+            //   ,if draw_len>0.{"✓ "}else{"  "},if is_last {"🛑"}else{" "} ,seg_count, j
             //   ,rad0    .to_degrees(),rad1    .to_degrees(),(rad1-rad0).to_degrees(), dash_off_deg, seg_off
             //   ,seg_beg .to_degrees(),seg_end .to_degrees(),(seg_end - seg_beg).to_degrees()
             //   ,d_beg   .to_degrees(),d_end   .to_degrees(),dash_i.to_degrees()
