@@ -253,6 +253,17 @@ mod impls {
             let draw_beg = d_beg.max(seg_beg).min(d_end); // start at dash begin, → to segment begin, but not past dash end
             let draw_end = d_end.min(seg_end).max(d_beg); // start at dash end  , ← to segment end  , but not past dash beg
             let draw_len = draw_end - draw_beg;
+            if draw_len > 0.0 { // draw 1st from segment's end to attach to the next drawing
+              let c = if draw_started   {CircleSegment::new((cx,cy), r0,r0   ,rad0         ,draw_len)
+              } else {draw_started=true; CircleSegment::new((cx,cy), r0,r0   ,rad1-draw_len,draw_len)};
+              if is_last	{scene.stroke(&stroke_c, Affine::IDENTITY, &css::LIME, None, &c,);
+              } else    	{scene.stroke(&stroke_c, Affine::IDENTITY, &grad2, None, &c,);}
+              // todo: replace ↑ test with ↓
+              // scene.stroke(&stroke_c, Affine::IDENTITY, &grad2, None, &c,);
+              if is_last { dash_partial = (d_end.min(seg_end) - d_beg) * rad_len;
+                // println!("!! last +drawn +draw partial {:.1}px {:.1}°  rad1 {}°",dash_partial,(d_end.min(seg_end) - d_beg).to_degrees(),rad1.to_degrees());
+              }
+            } else {draw_started=false;}
             // if rad0      <=       d_end
               // &&    seg_end >= d_beg  { // our segment overlaps with this dash
             // if is_last {
