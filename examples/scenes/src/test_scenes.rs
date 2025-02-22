@@ -114,7 +114,7 @@ mod impls {
       let grad1 = Gradient::new_linear(grad1_p0, grad1_p1).with_stops([col_beg    ,col_avg]);
 
       let grad2_p0 = ( cx + r0*f64::cos( r2beg_rad                      ) , cy + r0*f64::sin( r2beg_rad                      ) );
-      let grad2_p1 = ( cx + r0*f64::cos((r2beg + deg_delta).to_radians()) , cy + r0*f64::sin((r2beg + deg_delta).to_radians()) );
+      let grad2_p1 = ( cx + r0*f64::cos((r2beg + delta_deg).to_radians()) , cy + r0*f64::sin((r2beg + delta_deg).to_radians()) );
       let grad2 = Gradient::new_linear(grad2_p0, grad2_p1).with_stops([col_avg    ,col_end]);
 
       // Draw pre-gradwidth segment separately without the extra iterator
