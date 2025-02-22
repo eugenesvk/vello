@@ -229,7 +229,6 @@ mod impls {
         let seg_beg = (dash_off_rad + seg0) % dash_iter_len_rad;// cut off arc that fit into the previous dash set, so this is our segment beginning in the coordinate system of a dash set (set's begin = 0)
         let seg_count = (dash_off_rad + seg0).div_euclid(dash_iter_len_rad) + 1.;
         let seg_end = seg_beg + precision_rad_per_step;
-        let mut is_drawn = true;
         let mut d_beg = 0.; // length up to the beginning of this dash = ∑ of all previous dash lens
 
         //     ──────  —————  outer line dash pattern (todo: what if our line is bigger than 1 pattern? like here)
@@ -239,16 +238,17 @@ mod impls {
         //           ↑↑  skip, overlaps with inactive
         // if i == 0 {println!("\n\n———————————————————————————————————————————————————————————————————————————————")};
         // let mut j = 0;
-        let mut draw_started = false;
+        let mut is_visible = false;
         // if seg_count == 1. {
         for dash_i in &dash_iter_rad {
+          is_visible = !is_visible;
           // j += 1;
-          // if is_drawn && j == 3 {
+          // if is_visible && j == 3 {
           // if seg_end < d_beg {
           //   println!("{: >4.1}° {: >4.1}° → {: >4.1}°",seg_end.to_degrees(),d_beg.to_degrees(),(d_beg + dash_i).to_degrees());
           //   break;
           // } // our segment has been fully covered, no need to continue
-          if is_drawn { // ignore inactive dashes
+          if is_visible { // ignore inactive dashes
             let d_end = d_beg + dash_i;
             let draw_beg = d_beg.max(seg_beg).min(d_end); // start at dash begin, → to segment begin, but not past dash end
             let draw_end = d_end.min(seg_end).max(d_beg); // start at dash end  , ← to segment end  , but not past dash beg
@@ -307,7 +307,6 @@ mod impls {
             }
           }
           d_beg += dash_i;
-          is_drawn = !is_drawn;
         }
       } // ↓ in case step int conversion missed the last sliver
       // if delta_rem_deg > 0. { // TODO: add dash logic here as well or just use the main loop for this remainder step
