@@ -284,19 +284,15 @@ mod impls {
           d_beg += dash_i;
           is_drawn = !is_drawn;
         }
-        // TODO: add remainder of a dash set that wasn't covered by our drawing segment
-        // if is_last {dash_partial = dash_iter_len_rad - d_beg;} // add remainder of a dash set that wasn't covered by our drawing segment
-        // if dash_partial >0. {println!("!!!!!! dash_partial = {}",dash_partial);}
-        // if is_last {println!("!! last with unfinished {}",d_beg.to_degrees());}
-        // }
       } // ↓ in case step int conversion missed the last sliver
-      let rad0_last = (r2beg + f64::from(steps_left) * precision_degps).to_radians();
-      if rad0_last < skip_beg_rad { //println!("{rad0_last:.4} < {skip_beg_rad:.4} step_last {:.1}°<{:.1}° end",rad0_last.to_degrees(),skip_beg_deg);
-        let c = CircleSegment::new((cx,cy), r0,0.   ,  rad0_last,skip_beg_rad - rad0_last).outer_arc();
-        let stroke_c = get_stroke_end(w2px);
-        // scene.stroke(&stroke_c, Affine::IDENTITY, &grad2, None, &c,); // use col_avg? though grad should cover
-        scene.stroke(&stroke_c, Affine::IDENTITY, &css::WHEAT, None, &c,); // for testing
-      }
+      // if delta_rem_deg > 0. { // TODO: add dash logic here as well or just use the main loop for this remainder step
+      //   let r2delta_deg = r2beg + delta_covered_deg; let r2delta_rad = r2delta_deg.to_radians();
+      //   // println!("rem {delta_rem_deg: >4.3}° covered {delta_covered_deg: >4.3}° to reach Δₛ{delta_deg: >4.3}° ¦ {r2delta_deg: >4.3}° → {: >4.3}°",r2delta_deg+delta_rem_deg);
+      //   let c = CircleSegment::new((cx,cy), r0,r0,  r2delta_rad,delta_rem_rad);
+      //   let stroke_c = get_stroke_end(w2px);
+      //   // scene.stroke(&stroke_c, Affine::IDENTITY, &grad2, None, &c,); // use col_avg? though grad should cover
+      //   scene.stroke(&stroke_c, Affine::IDENTITY, &css::LIME, None, &c,); // for testing
+      // }
 
       // Draw debug circles showing where each gradient begins/ends
       let pstr = get_stroke_end(1.); // starting point bigger than the ending, angle to differentiate two curves
