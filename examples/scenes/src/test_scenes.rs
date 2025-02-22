@@ -259,6 +259,7 @@ mod impls {
               if is_last	{scene.stroke(&stroke_c, Affine::IDENTITY, &css::LIME, None, &c,);
               } else    	{scene.stroke(&stroke_c, Affine::IDENTITY, &grad2, None, &c,);}
               // todo: replace ↑ test with ↓
+              // todo: replace ↑ lime test with ↓
               // scene.stroke(&stroke_c, Affine::IDENTITY, &grad2, None, &c,);
               if is_last && draw_len < *dash_i - 0.00000000001 { // drawn something, but not the full visible dash
                 let part_len = draw_end - d_beg; //how much of an existing dash is covered by all draws, incl. last
