@@ -148,19 +148,19 @@ mod impls {
       let w_per_step_i:f64	= w_delta_avg / f64::from(steps_delta_i); //to reach average
 
       let sign1 = if w1 > wavg {-1.} else if w1 < wavg {1.} else {0.}; //(to avg) ↓ if bigger, ↑ if smaller
-      for i in 0..steps_left { let r = f64::from(i);
-        let rad0 = (skip_beg_deg + r * precision_degps).to_radians();
-        let c = CircleSegment::new((cx,cy), r0,0.   ,  rad0,precision_radps).outer_arc();
+      for i in 0..steps_delta_i { let r = f64::from(i);
+        let rad0 = r2beg_rad + r * precision_rad_per_step;
+        let c = CircleSegment::new((cx,cy), r0,0.   ,  rad0,precision_rad_per_step).outer_arc();
         //                          center  rout/in    ∠start ∠sweep
         // if i == 0 {println!("\n\n———————————————————————————————")};
-        // println!("i={i}/{steps_left}  r={r:.1} r1beg={r1beg:.1} r*prec={:.1} deg={skip_beg_deg:.1} beg={:.1} end={:.1}",r * precision_degps
-        //   ,       skip_beg_deg + r * precision_degps, skip_beg_deg + r * precision_degps + precision_degps);
-        let cw = w1 + sign1 * r * w_step_left;
-        let stroke_c = if i >=  (steps_left - 2) {get_stroke_end(cw) //last steps no round ends
+        // println!("i={i}/{steps_delta_i}  r={r:.1} r1beg={r1beg:.1} r*prec={:.1} deg={skip_beg_deg:.1} beg={:.1} end={:.1}",r * precision_deg_per_step
+        //   ,       skip_beg_deg + r * precision_deg_per_step, skip_beg_deg + r * precision_deg_per_step + precision_deg_per_step);
+        let cw = w1 + sign1 * r * w_per_step_i;
+        let stroke_c = if i >=  (steps_delta_i - 3) {get_stroke_end(cw) //last steps no round ends
         } else {get_stroke(cw)}; // round ends to fix the outer arc artifacts when joining in rectangles without curves
         scene.stroke(&stroke_c, Affine::IDENTITY, &grad1, None, &c,);
       } // ↓ in case step int conversion missed the last sliver
-      let rad0_last = (skip_beg_deg + f64::from(steps_left) * precision_degps).to_radians();
+      let rad0_last = (skip_beg_deg + f64::from(steps_delta_i) * precision_deg_per_step).to_radians();
       if rad0_last < r1end_rad { //println!("{rad0_last:.4}<{r1end_rad:.4} step_last {:.1}°<{:.1}° end",rad0_last.to_degrees(),r1end);
         let c = CircleSegment::new((cx,cy), r0,0.   ,  rad0_last,r1end_rad - rad0_last).outer_arc();
         let stroke_c = get_stroke_end(w_delta_avg);
