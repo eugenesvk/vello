@@ -240,7 +240,7 @@ mod impls {
         // seg_beg┘     └seg_end
         //         ↑↑  ↑ draw, overlaps with   active
         //           ↑↑  skip, overlaps with inactive
-        // if i == 0 {println!("\n\n———————————————————————————————————————————————————————————————————————————————")};
+        // if i == 0 {println!("\n\n—————Σⁱ={steps_delta_i: >3}———————————————————————————————————————————————————————————————————————————")};
         // let mut j = 0;
         let mut is_visible = false;
         // if seg_count == 1. {
