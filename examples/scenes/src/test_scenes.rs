@@ -41,6 +41,40 @@ mod impls {
   fn get_stroke_end(width:f64) -> Stroke {Stroke::new(width).with_start_cap(Cap::Butt).with_end_cap(Cap::Butt ).with_join(Join::Bevel)}
   fn get_stroke1   (width:f64) -> Stroke {Stroke::new(width).with_start_cap(Cap::Butt).with_end_cap(Cap::Square).with_join(Join::Round)}
 
+  // Two curves joined by converging colors and widths, with an example of bottom/top Arcs:
+    // Curve is split in 2 parts: 1st near joins (≝~join) (end for the bottom arc, beg for the top) 2nd the rest
+    // ~Joins part is styled manually, the rest is styled as a regular line
+    // Color transition towards average:
+      // Regular "gradient" works, start at ~join outer edge with line's base color, end at the joint with an average color between lines
+      // TODO: if main lines have gradients themselves, this doesn't work, and not sure what the proper logic would be to glue arbitrary gradient styles together (maybe add handling of a few common cases?)
+    // Widths transition towards average:
+      // split each ~join into X steps based on user defined precision
+      // for each step, get the width delta and draw a small arc with the base width + steps * w_delta
+        // use circlesegment with both r1=r2 to avoid occlusion artifacts or make each arc end a bit futher to overalp
+      // last step is different as it doesn't cover the same length (since not all lines can be split into a whole number of equal steps)
+    // Dashes don't transition, not sure whether any logic that would introduce a 3rd var pattern is better:
+      // (this just describes the approach of adding dashes to our step-by-step approach)
+      // calculate dashed set [1,2,1,4] length in radians (1+2+1+4=8px == 1 rad at radius X)
+      // for each step, get where each step begin lands in set coordinates by calculating division remainder of step begin in curve coordinates (+offset) by set length
+      // within each set, iterate by dash item, and if it's an active/drawn item, determine how much of our step length fits there, and draw it
+    // Dashes harder/failed approaches: combine vertical line with 1/2 circle; add dashed strokes; split by path and try to manually check which should be drawn;  change stroke width in the last segments if they are covered by the 1/2 circle (not possible???? how to calculate a match? check if we can draw a semicircle and check if overlap); draw previous line;  draw splits with a different width and gradient
+
+  // TODO
+    // convert circle segments to Arcs directly and overlap to avoid conflaction artifacts
+    // test if step length > dash set length (with very low precision)
+    // reject negative numbers on accepted dash iterator
+    // + calculate the remainder from iterative approach and use it as a (-) offset to the main curve
+  // ??? update offset algo to find index to the dash that matches offset ???
+    //  let mut dash_ix = 0;
+    //  let mut dash_remaining = dashes[dash_ix] - dash_offset;
+    //  let mut is_active = true;
+    //  // Find place in dashes array for initial offset.
+    //  while dash_remaining < 0.0 {
+    //      dash_ix = (dash_ix + 1) % dashes.len();
+    //      dash_remaining += dashes[dash_ix];
+    //      is_active = !is_active;
+    //  }
+
   pub(super) fn stroke_styles(transform: Affine) -> impl FnMut(&mut Scene, &mut SceneParams<'_>) {
     use PathEl::*;
     move |scene, params| {
@@ -81,25 +115,7 @@ mod impls {
       let w1px = (w1 * dpi).round() / dpi; let w2px = (w2 * dpi).round() / dpi;
       let w_step = w_delta_avg / steps_delta_f; //12/2/45 0.13 to reach average
 
-      // TODO: change all circle segments to .outer_arc() otherwise we're drawing 2! lines
-        // but this introduces strange artifacts :(( joins are visible, changing ending to round fixes it, but i want sharp ends!
-        // ask how to fix them?
       // ((w1 + sign1 * w_step * r) * dpi).round() / dpi; //transition shouldn't be pixel-stepped!
-      // TODO: convert circle segments to Arcs directly? but then need to fix conflaction artifacts
-      // todo3: test with dashes (unlikely to work? needs a different logic?)
-        // Approach1:
-          // calculate dashed sequence [1,2,1,4] length in radians (1+2+1+4=8px == 1 rad at radius X)
-          // for each iterated gradwidht tiny segment, get remainder of divis by this iter length
-          // then determine, which sublength this short line belongs to (2nd: from 1/8 to (1+3)/8)
-          // then if this is an odd "dash" segment, draw, if not, skip
-        // Approach2: failed
-          // combine vertical line with 1/2 circle
-          // add dashed strokes
-          // split by path
-          // change stroke width in the last segments if they are covered by the 1/2 circle
-            // not possible???? how to calculate a match? check if we can draw a semicircle and check if overlap
-          // draw previous line
-          // draw splits with a different width and gradient
       let gap:f64 = 0.; // doesn't seem to 0.0001 affect anything with corrected ending style to Bevel
       let r1beg:f64 = 0.             	; let r1beg_rad = r1beg.to_radians(); //→
       let r1end = r1beg + arc_len_deg	; let r1end_rad = r1end.to_radians();
