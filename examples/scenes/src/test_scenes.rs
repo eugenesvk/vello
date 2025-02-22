@@ -259,7 +259,6 @@ mod impls {
               } else {is_vis_draw=true; CircleSegment::new((cx,cy), r0,r0   ,rad1-draw_len,draw_len)};
               if is_last	{scene.stroke(&stroke_c, Affine::IDENTITY, &css::LIME, None, &c,);
               } else    	{scene.stroke(&stroke_c, Affine::IDENTITY, &grad2    , None, &c,);}
-              // todo: replace ↑ test with ↓
               // todo: replace ↑ lime test with ↓
               // scene.stroke(&stroke_c, Affine::IDENTITY, &grad2, None, &c,);
               if is_last && draw_len < *dash_i - 0.00000000001 { // drawn something, but not the full visible dash
