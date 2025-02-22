@@ -171,7 +171,7 @@ mod impls {
 
 
       let dash_off:f64 = 10.;
-      let dash_iter = [20.,15.,10.,5.]; //todo: reject negative numbers
+      let dash_iter = [20.,15.,10.,35.]; //todo: reject negative numbers
       let deg_len = 2. * f64c::PI * r0 / 360.; //2π*100/360 = 1.74
       let rad_len = 2. * f64c::PI * r0 / 360.0_f64.to_radians(); //2π*100/6.28 = 100
       let dash_iter_len:f64 = dash_iter.iter().sum::<f64>(); //5
