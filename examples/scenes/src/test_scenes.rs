@@ -64,24 +64,22 @@ mod impls {
       // Position
       let cx = 900.; let cy = 200.; let r0 = 95.5; //600 circum len 300 half
       // Size
-      let arc_len = 180; let arc_len_f = f64::from(arc_len);
-      let precision_degps:f64 = 0.5; let precision_radps = precision_degps.to_radians(); //0.00873
-      let steps_f = arc_len_f / precision_degps; //360
-      let steps   = steps_f as i32;
+      let arc_len_deg:f64 = 180.;
+      let precision_deg_per_step:f64 = 0.5; let precision_rad_per_step = precision_deg_per_step.to_radians(); //0.00873
+      let steps_f = arc_len_deg / precision_deg_per_step; //360
+      let steps_i   = steps_f as i32;
       // Gradient / size convergence bounds
-      let f_delta = 0.337; // start changing width for the first/last quarter only
-      let deg_delta   	= arc_len_f *       f_delta; //18°
-      let rad_delta   	= deg_delta.to_radians();
-      let skip_beg_deg	= arc_len_f * (1. - f_delta);
-      let skip_beg_rad	= skip_beg_deg.to_radians();
-      let steps_delta 	= steps_f   * f_delta; //36
-      let skip_end    	= steps_delta as i32; //36
-      let skip_beg    	= steps - skip_end; //324
+      let f_delta = 0.337; // start changing width for the first/last % only
+      let delta_deg    	= arc_len_deg *       f_delta ; let rad_delta    = delta_deg   .to_radians();
+      let skip_beg_deg 	= arc_len_deg * (1. - f_delta); let skip_beg_rad = skip_beg_deg.to_radians();
+      let steps_delta_f	= steps_f   * f_delta; //36
+      let skip_end     	= steps_delta_f as i32; //36
+      let skip_beg     	= steps_i - skip_end; //324
       // Line width
       let w1:f64 = 20.; let w2:f64 =  4.; let wavg = (w1 + w2) / 2.; // 12
       let w_delta_avg = (w2 - w1).abs() / 2.;
       let w1px = (w1 * dpi).round() / dpi; let w2px = (w2 * dpi).round() / dpi;
-      let w_step = w_delta_avg / steps_delta; //12/2/45 0.13 to reach average
+      let w_step = w_delta_avg / steps_delta_f; //12/2/45 0.13 to reach average
 
       // TODO: change all circle segments to .outer_arc() otherwise we're drawing 2! lines
         // but this introduces strange artifacts :(( joins are visible, changing ending to round fixes it, but i want sharp ends!
@@ -102,10 +100,10 @@ mod impls {
           // draw previous line
           // draw splits with a different width and gradient
       let gap:f64 = 0.; // doesn't seem to 0.0001 affect anything with corrected ending style to Bevel
-      let r1beg:f64 = 0.           	; let r1beg_rad = r1beg.to_radians(); //→
-      let r1end = r1beg + arc_len_f	; let r1end_rad = r1end.to_radians();
-      let r2beg = r1end + gap      	; let r2beg_rad = r2beg.to_radians();
-      let r2end = r2beg + arc_len_f	; let r2end_rad = r2end.to_radians();
+      let r1beg:f64 = 0.             	; let r1beg_rad = r1beg.to_radians(); //→
+      let r1end = r1beg + arc_len_deg	; let r1end_rad = r1end.to_radians();
+      let r2beg = r1end + gap        	; let r2beg_rad = r2beg.to_radians();
+      let r2end = r2beg + arc_len_deg	; let r2end_rad = r2end.to_radians();
       let col_beg = css::LIME;
       let col_end = css::RED;
       let col_avg = col_beg.lerp(col_end,0.5,Default::default());
@@ -124,9 +122,13 @@ mod impls {
       // scene.stroke(&stroke_c, Affine::IDENTITY, &col_beg, None, &c,);
       scene.stroke(&stroke_c, Affine::IDENTITY, &css::ORANGE, None, &c,); // for testing
 
-      let steps_left_f = deg_delta / precision_degps;
-      let steps_left   = steps_left_f as i32;
-      let w_step_left:f64 = w_delta_avg / f64::from(steps_left); //to reach average
+      let steps_delta_f    	= delta_deg / precision_deg_per_step; // 180°*33% / 0.5 = 118.8
+      let steps_delta_i    	= steps_delta_f as i32; let steps_delta_if = f64::from(steps_delta_i); // 118 whole steps for later iteration and drawing by small step
+      let delta_covered_deg	=                  steps_delta_if  * precision_deg_per_step;
+      // let steps_delta_rem	=  steps_delta_f - steps_delta_if; //0.8 steps not covered by whole
+      let delta_rem_deg     	= delta_deg - delta_covered_deg; let delta_rem_rad = delta_rem_deg.to_radians();
+
+      let w_per_step_i:f64	= w_delta_avg / f64::from(steps_delta_i); //to reach average
 
       let sign1 = if w1 > wavg {-1.} else if w1 < wavg {1.} else {0.}; //(to avg) ↓ if bigger, ↑ if smaller
       for i in 0..steps_left { let r = f64::from(i);
@@ -174,9 +176,9 @@ mod impls {
       // let cyy = cy;
       // let cxx = cx+5.;
       // let grad2cc_p0 = ( cxx + r0*f64::cos( r2beg_rad                      ) , cyy + r0*f64::sin( r2beg_rad                      ) );
-      // let grad2cc_p1 = ( cxx + r0*f64::cos((r2beg + deg_delta).to_radians()) , cyy + r0*f64::sin((r2beg + deg_delta).to_radians()) );
+      // let grad2cc_p1 = ( cxx + r0*f64::cos((r2beg + delta_deg).to_radians()) , cyy + r0*f64::sin((r2beg + delta_deg).to_radians()) );
       // let grad2cc = Gradient::new_linear(grad2cc_p0, grad2cc_p1).with_stops([col_avg    ,col_end]);
-      // let c = CircleSegment::new((cxx,cyy), r0,r0,  r2beg_rad,arc_len_f.to_radians()).outer_arc();
+      // let c = CircleSegment::new((cxx,cyy), r0,r0,  r2beg_rad,arc_len_deg.to_radians()).outer_arc();
       // let stroke_c = get_stroke_end(w2).with_dashes(dash_off,dash_iter);
       // scene.stroke(&stroke_c, Affine::IDENTITY, &grad2cc, None, &c,);
 
@@ -185,9 +187,9 @@ mod impls {
       let cxx = cx;
       let r00 = r0 - w2 - 1.;
       let grad2cc_p0 = ( cxx + r00*f64::cos( r2beg_rad                      ) , cyy + r00*f64::sin( r2beg_rad                      ) );
-      let grad2cc_p1 = ( cxx + r00*f64::cos((r2beg + deg_delta).to_radians()) , cyy + r00*f64::sin((r2beg + deg_delta).to_radians()) );
+      let grad2cc_p1 = ( cxx + r00*f64::cos((r2beg + delta_deg).to_radians()) , cyy + r00*f64::sin((r2beg + delta_deg).to_radians()) );
       let grad2cc = Gradient::new_linear(grad2cc_p0, grad2cc_p1).with_stops([col_avg    ,col_end]);
-      let c = CircleSegment::new((cxx,cyy), r00,r00,  r2beg_rad,arc_len_f.to_radians()).outer_arc();
+      let c = CircleSegment::new((cxx,cyy), r00,r00,  r2beg_rad,arc_len_deg.to_radians()).outer_arc();
       let stroke_c = get_stroke_end(w2).with_dashes(dash_off*r00/r0,dash_iter.iter().map(|w| w*r00/r0).collect::<Vec<f64>>());
       scene.stroke(&stroke_c, Affine::IDENTITY, &grad2cc, None, &c,);
 
