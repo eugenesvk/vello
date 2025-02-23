@@ -98,7 +98,7 @@ mod impls {
       let dpi = 1.5;
       // Size
       let arc_len_deg:f64 = 180.;
-      let precision_deg_per_step:f64 = 0.5; let precision_rad_per_step = precision_deg_per_step.to_radians(); //0.00873
+      let precision_deg_per_step:f64 = 0.5; //rad 0.00873
       let steps_f = arc_len_deg / precision_deg_per_step; //360
       let steps_i   = steps_f as i32;
       // Gradient / size convergence bounds
