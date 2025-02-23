@@ -238,7 +238,7 @@ mod impls {
       let dash_iter_rad = dash_iter.iter().map(|w| w / rad_len).collect::<Vec<f64>>();
       let dash_off_pre_jn_rad = match jn { // if join is after dashed line, that line can be cut and thus dash continuation should start from an adjusted offset
         JoinWhere::Beg	=> 0.,
-        JoinWhere::End	=> ((arc_len_deg - delta_deg) % dash_iter_len_deg).to_radians(),
+        JoinWhere::End	=> skip_beg_rad % dash_iter_len_rad,
       };
 
       let (grad_p0,grad_p1) = match jn {
