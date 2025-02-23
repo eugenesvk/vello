@@ -168,9 +168,6 @@ mod impls {
       let dash_iter = dash_iter_deg.iter().map(|w|w*deg_len).collect::<Vec<f64>>();
       let dbg = 0;
 
-      let mut dash_partial = 0.; // use as dash offset for the next segment to hide the partially drawn part
-      let mut is_vis_draw  = false; // whether a visible dash is drawing to clamp its first partial draw to the next. Switches to off when an invisible dash is "drawing"
-      let mut carry_over:f64 = 0.; // if Δstep covers 2 dash segments, the 1st one will store the remainer it didn't cover here for the 2nd to pick it up
       let wpx = w2px;
       ddd(scene, (cx,cy),r0, r2beg_rad, JoinWhere::Beg,
         col_avg,col_end,
@@ -180,8 +177,7 @@ mod impls {
         dash_off_deg,dash_iter_deg.to_vec(),
         rad_delta,
         skip_beg_rad,
-        delta_deg,arc_len_deg,
-        dash_partial,carry_over,is_vis_draw,   dbg,
+        delta_deg,arc_len_deg, dbg,
       );
       ddd_debug(scene, (cx,cy),r0, r2beg_rad, arc_len_deg, col_avg,col_end, wpx, delta_deg, dash_off_deg,dash_iter_deg.to_vec());
 
@@ -226,9 +222,12 @@ mod impls {
     rad_delta:f64,
     skip_beg_rad:f64,
     delta_deg:f64,
-    arc_len_deg:f64,
-    mut dash_partial:f64,mut carry_over:f64,mut is_vis_draw:bool,   dbg:u8,
+    arc_len_deg:f64,     dbg:u8,
     ) {
+      let mut is_vis_draw  = false; // whether a visible dash is drawing to clamp its first partial draw to the next. Switches to off when an invisible dash is "drawing"
+      let mut dash_partial = 0.; // use as dash offset for the next segment to hide the partially drawn part
+      let mut carry_over:f64 = 0.; // if Δstep covers 2 dash segments, the 1st one will store the remainer it didn't cover here for the 2nd to pick it up
+
       let sign = match jn {
         JoinWhere::Beg	=> if wpx > wavg { 1.} else if wpx < wavg {-1.} else {0.}, //(from avg) ↑ if bigger, ↓ if smaller
         JoinWhere::End	=> if wpx > wavg {-1.} else if wpx < wavg { 1.} else {0.}, //(to   avg) ↓ if bigger, ↑ if smaller
