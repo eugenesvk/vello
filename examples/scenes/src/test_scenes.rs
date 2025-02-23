@@ -272,6 +272,16 @@ mod impls {
             let draw_beg = d_beg.max(seg_beg).min(d_end); // start at dash begin, → to segment begin, but not past dash end
             let draw_end = d_end.min(seg_end).max(d_beg); // start at dash end  , ← to segment end  , but not past dash beg
             let draw_len = draw_end - draw_beg;
+
+            if carry_over > 0. { // draw leftovers from the previous dash
+              prev_draw_len += carry_over;
+              // if is_vis_draw {println!("!!! leftovers from a previous dash should always 1st, but something else drew")}; //todo warn
+              is_vis_draw = true; // start drawing @ the end of prev ↓ step
+              let c = CircleSegment::new((cx,cy), r0,r0   ,rad0 - carry_over,carry_over);
+              // scene.stroke(&stroke_c, Affine::IDENTITY, &grad2    , None, &c,);
+              scene.stroke(&stroke_c, Affine::IDENTITY, css::MAGENTA , None, &c,); // todo: replace test with ↑
+              carry_over = 0.;
+            }
             if draw_len > 0.0 { // draw 1st from segment's end to attach to the next drawing
               let c = if is_vis_draw   {CircleSegment::new((cx,cy), r0,r0   ,rad0         ,draw_len)
               } else {is_vis_draw=true; CircleSegment::new((cx,cy), r0,r0   ,rad1-draw_len,draw_len)};
