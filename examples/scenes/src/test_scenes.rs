@@ -306,6 +306,18 @@ mod impls {
             let draw_end = d_end.min(seg_end).max(d_beg); // start at dash end  , ← to segment end  , but not past dash beg
             let draw_len = draw_end - draw_beg;
             if draw_len > 0.0 {is_vis_draw = false;}
+                if is_last { // no next step, draw in this one
+                  is_vis_draw = true;
+                  let carry_over_r0 = rad0 + prev_draw_len;
+                  let carry_over_r1 = (carry_over_r0 + carry_over).min(rad1) ;// up to our arc's end, the rest will be picked up by the next arc
+                  let carry_over_delta = carry_over_r1 - carry_over_r0;
+                  let c = CircleSegment::new((cx,cy), r0,r0   ,carry_over_r0,carry_over_delta);
+                  // scene.stroke(&stroke_c, Affine::IDENTITY, &grad2    , None, &c,);
+                  scene.stroke(&stroke_c, Affine::IDENTITY, css::MAGENTA , None, &c,); // todo: replace test with ↑
+                  dash_partial = carry_over_delta * rad_len; carry_over = 0.;
+                  // println!("last step - drawn next dash since it won't be handled later!");
+                // } else {println!("  Δover {: >4.1}° = step_w {: >4.1}° - {: >4.1}° drawn",carry_over.to_degrees(),step_width.to_degrees(),draw_len.to_degrees());
+                }
             if is_last { // last invisible dash also needs to signal its width to update offset of the next arc
               let part_len = draw_end - d_beg; //how much of an existing dash is covered by all draws, incl. last
               if   draw_len > 0. //drawn something… ↙some float rounding error
