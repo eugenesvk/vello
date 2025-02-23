@@ -191,7 +191,7 @@ mod impls {
       let grad2cc_p1 = ( cxx + r00*f64::cos((r2beg + delta_deg).to_radians()) , cyy + r00*f64::sin((r2beg + delta_deg).to_radians()) );
       let grad2cc = Gradient::new_linear(grad2cc_p0, grad2cc_p1).with_stops([col_avg    ,col_end]);
       let c = CircleSegment::new((cxx,cyy), r00,r00,  r2beg_rad,arc_len_deg.to_radians()).outer_arc();
-      let stroke_c = get_stroke_end(w2).with_dashes(dash_off*r00/r0,dash_iter.iter().map(|w| w*r00/r0).collect::<Vec<f64>>());
+      let stroke_c = get_stroke_end(w2px).with_dashes(dash_off*r00/r0,dash_iter.iter().map(|w| w*r00/r0).collect::<Vec<f64>>());
       scene.stroke(&stroke_c, Affine::IDENTITY, &grad2cc, None, &c,);
 
       // Segment 2: ~join part is 1st (at the start)
@@ -273,7 +273,7 @@ skip_beg_rad:f64,
         let cw = if is_last	{w2px
         } else             	{wavg + sign2 * r * w_per_step_i};
         // let stroke_c = get_stroke_end(cw);
-        let stroke_c = get_stroke_end(w2); // todo: same width for comparison with a reference
+        let stroke_c = get_stroke_end(w2px); // todo: same width for comparison with a reference
 
           // let c = CircleSegment::new((cx,cy), r0,r0   ,  rad0,step_width);
           // scene.stroke(&stroke_c, Affine::IDENTITY, &grad2, None, &c,);
