@@ -305,7 +305,10 @@ mod impls {
             let draw_beg = d_beg.max(seg_beg).min(d_end); // start at dash begin, → to segment begin, but not past dash end
             let draw_end = d_end.min(seg_end).max(d_beg); // start at dash end  , ← to segment end  , but not past dash beg
             let draw_len = draw_end - draw_beg;
-            if draw_len > 0.0 {is_vis_draw = false;}
+            if draw_len > 0.0 {is_vis_draw = false; prev_draw_len += draw_len;
+              let space_available = step_width.min(dash_iter_len_rad) - prev_draw_len;
+              if space_available > 0.00000000001 { // this+prev dashes didn't cover the full Δstep¦dash segment width (whichever is smaller, if dash segment fits in Δstep, then ), so should be drawn by the next visible dash
+                carry_over = space_available;
                 if is_last { // no next step, draw in this one
                   is_vis_draw = true;
                   let carry_over_r0 = rad0 + prev_draw_len;
@@ -318,6 +321,8 @@ mod impls {
                   // println!("last step - drawn next dash since it won't be handled later!");
                 // } else {println!("  Δover {: >4.1}° = step_w {: >4.1}° - {: >4.1}° drawn",carry_over.to_degrees(),step_width.to_degrees(),draw_len.to_degrees());
                 }
+              }
+            }
             if is_last { // last invisible dash also needs to signal its width to update offset of the next arc
               let part_len = draw_end - d_beg; //how much of an existing dash is covered by all draws, incl. last
               if   draw_len > 0. //drawn something… ↙some float rounding error
