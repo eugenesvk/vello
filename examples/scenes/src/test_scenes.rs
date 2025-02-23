@@ -196,14 +196,9 @@ mod impls {
       // Segment 2: ~join part is 1st (at the start)
       // TODO: test if step length > dash set length (with very low precision)
       let mut dash_partial = 0.; // use as dash offset for the next segment to hide the partially drawn part
-      let mut is_vis_draw = false; // whether a visible dash is drawing to clamp its first partial draw to the next. Switches to off when an invisible dash is "drawing"
+      let mut is_vis_draw  = false; // whether a visible dash is drawing to clamp its first partial draw to the next. Switches to off when an invisible dash is "drawing"
       let mut carry_over:f64 = 0.; // if Δstep covers 2 dash segments, the 1st one will store the remainer it didn't cover here for the 2nd to pick it up
-      ddd(
-      scene,
-      JoinWhere::Beg,
-      r0, cx, cy,
-      r2beg_rad,
-      grad2,
+      ddd(scene, (cx,cy),r0, r2beg_rad, JoinWhere::Beg, grad2,
       w2px,wavg,
       is_vis_draw,
       carry_over,
@@ -220,8 +215,6 @@ mod impls {
       rad_len,
       skip_beg_rad,
       );
-
-);
       // Draw debug circles showing where each gradient begins/ends
       let pstr = get_stroke_end(1.); // starting point bigger than the ending, angle to differentiate two curves
       let g1beg = Ellipse::new(grad1_p0, ( 2.,15.+5.),  33.0_f64.to_radians());scene.stroke(&pstr,Affine::IDENTITY, &col_beg, None, &g1beg,);
@@ -233,11 +226,8 @@ mod impls {
   }
   pub enum JoinWhere{Beg,End,}
 
-  pub fn ddd(scene:&mut Scene,
-    jn:JoinWhere,
-    r0:f64, cx:f64, cy:f64,
-    r2beg_rad:f64,
-    grad2:Gradient,
+  pub fn ddd(scene:&mut Scene, center:impl Into<Point>,r0:f64,
+    arc_beg:f64, jn:JoinWhere, grad2:Gradient,
     wpx:f64,wavg:f64,
     mut is_vis_draw:bool,
     mut carry_over:f64,
@@ -258,6 +248,16 @@ mod impls {
         JoinWhere::Beg	=> if wpx > wavg { 1.} else if wpx < wavg {-1.} else {0.}, //(from avg) ↑ if bigger, ↓ if smaller
         JoinWhere::End	=> if wpx > wavg {-1.} else if wpx < wavg { 1.} else {0.}, //(to   avg) ↓ if bigger, ↑ if smaller
       };
+      let c = center.into(); let (cx,cy) = (c.x,c.y);
+
+      if let JoinWhere::End = jn { // Segment 1: ~join part is 2nd (at the end)
+        // Draw pre-gradwidth segment separately without the extra iterator
+        let c = CircleSegment::new((cx,cy), r0,0.   ,  arc_beg,skip_beg_rad).outer_arc();
+        let stroke_c = get_stroke_end(wpx);
+        // scene.stroke(&stroke_c, Affine::IDENTITY, &col_beg, None, &c,);
+        scene.stroke(&stroke_c, Affine::IDENTITY, &css::ORANGE, None, &c,); // for testing
+      }
+
       // TODO: force precision to be so that one step is never bigger than a dash set length, otherwise would need to repeat the full dash parsing logic here
         // or maybe have a better loop logic that can handle it?
       let is_extra_step = delta_rem_rad > 0.;
@@ -267,7 +267,7 @@ mod impls {
         let step_width = if is_last && is_extra_step	{delta_rem_rad
         } else                                      	{precision_rad_per_step};
         let seg0 = (r - 1.) * precision_rad_per_step + step_width; // segment beg in our arc coords (arc start = 0), replace last regular width with a custom step_width
-        let rad0 = r2beg_rad + seg0;
+        let rad0 = arc_beg + seg0;
         let rad1 = rad0 + step_width; // todo debug only
         // let c = CircleSegment::new((cx,cy), r0,r0   ,  rad0,step_width+gap_correct).outer_arc(); //arc bugs with gaps
         // let c = CircleSegment::new((cx,cy), r0,r0   ,  rad0,step_width);
@@ -415,10 +415,11 @@ mod impls {
         }
       }
 
-      if let JoinWhere::Beg = jn { // Draw pos-gradwidth segment separately without the extra iterator, including leftovers from whole steps not covering the full range
+      if let JoinWhere::Beg = jn { // Segment 2: ~join part is 1st (at the start)
+        // Draws pos-gradwidth segment separately without the extra iterator, including leftovers from whole steps not covering the full range
         // println!("2nd curve@end: {: >3.0}° + Δ{: >3.0}° ⇒ {: >3.0}° + {: >3.0} skip_beg ╍part={: >3.0}° ({dash_partial: >3.0}px)"
-        //   ,r2beg_rad.to_degrees(),rad_delta.to_degrees(),(r2beg_rad + rad_delta).to_degrees(),skip_beg_rad.to_degrees(),(dash_partial/rad_len).to_degrees());
-        let c = Arc::new((cx,cy), (r0,r0) , r2beg_rad + rad_delta, skip_beg_rad, 0.);
+        //   ,arc_beg.to_degrees(),rad_delta.to_degrees(),(arc_beg + rad_delta).to_degrees(),skip_beg_rad.to_degrees(),(dash_partial/rad_len).to_degrees());
+        let c = Arc::new((cx,cy), (r0,r0) , arc_beg + rad_delta, skip_beg_rad, 0.);
         // let stroke_c = get_stroke_end(wpx); // todo↓ make dashes optional
         let stroke_c = get_stroke_end(wpx).with_dashes(dash_partial,dash_iter); // use remainder from the previous segment so that the total matches the style as though it were drawn in one step
         // scene.stroke(&stroke_c, Affine::IDENTITY, &col_end, None, &c,);
