@@ -61,6 +61,8 @@ mod impls {
 
   // TODO
     // make dashes optional
+    // make gradient sweeps for better precision with arcs instead of linear
+      // + for non-stepped lines, can use multiple colors with steps as well
     // maybe add a min average gap between two lines so that if first line ends with a partial inactive gap, the 2nd doesn't immediateely start with a visible dash, but + offset (unless it's too big for the 2d line, thus min average? or just min)
     // + convert circle segments to Arcs directly
       // add overlap (except for the last segment) to avoid conflaction artifacts
