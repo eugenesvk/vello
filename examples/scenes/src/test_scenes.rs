@@ -261,7 +261,7 @@ mod impls {
         // if seg_count == 1. {
         for dash_i in &dash_iter_rad {
           is_visible = !is_visible;
-          // j += 1;
+          j += 1;
           // if is_visible && j == 3 {
           // if seg_end < d_beg {
           //   println!("{: >4.1}° {: >4.1}° → {: >4.1}°",seg_end.to_degrees(),d_beg.to_degrees(),(d_beg + dash_i).to_degrees());
