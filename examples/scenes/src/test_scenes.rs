@@ -184,19 +184,43 @@ mod impls {
     skip_beg_rad:f64,delta_deg:f64,
     dash_off_deg:f64,dash_iter_deg:Vec<f64>,
     ) {
-    let c = center.into(); let (cxx,cyy) = (c.x,c.y); let r00 = r0 - wpx;
+    let c = center.into(); let (cx,cy) = (c.x,c.y); let r00 = r0 - wpx;
     let deg_len  	= 2. * f64c::PI * r0 / 360.0                 ; //2π*100/360 = 1.74
     let rad_len  	= 2. * f64c::PI * r0 / 360.0_f64.to_radians(); //2π*100/6.28 = 100
     let dash_off 	= dash_off_deg * deg_len;
     let dash_iter	= dash_iter_deg.iter().map(|w|w*deg_len).collect::<Vec<f64>>();
+    let arc_len_rad = arc_len_deg.to_radians();
 
-    let grad2cc_p0 = ( cxx + r00*f64::cos(arc_beg                         ) , cyy + r00*f64::sin(arc_beg                         ) );
-    let grad2cc_p1 = ( cxx + r00*f64::cos(arc_beg + delta_deg.to_radians()) , cyy + r00*f64::sin(arc_beg + delta_deg.to_radians()) );
-    let grad2cc = Gradient::new_linear(grad2cc_p0, grad2cc_p1).with_stops([col_avg    ,col_end]);
-    let c = Arc::new((cxx,cyy), (r00,r00),  arc_beg,arc_len_deg.to_radians(), 0.);
+    let (grad_p0,grad_p1, col_stops) = match jn {
+      JoinWhere::Beg	=> {
+        let grad_beg_p0 = ( cx + r0*f64::cos(arc_beg                           ) , cy + r0*f64::sin(arc_beg                         ) );
+        let grad_beg_p1 = ( cx + r0*f64::cos(arc_beg + delta_deg.to_radians()  ) , cy + r0*f64::sin(arc_beg + delta_deg.to_radians()) );
+        let col_stops_beg =[
+          (0.,col_avg),
+          ((delta_deg  .to_radians()/arc_len_rad) as f32,col_end),
+          ((delta_deg  .to_radians()/arc_len_rad) as f32,css::DARK_RED),
+          ((arc_len_deg.to_radians()/arc_len_rad) as f32,css::DARK_RED),
+          ];
+        // println!("beg {col_stops_beg:?}");
+        (grad_beg_p0,grad_beg_p1, col_stops_beg)},
+      JoinWhere::End	=> {
+        let p0x = cx + r0*f64::cos(arc_beg + skip_beg_rad            );
+        let p1x = cx + r0*f64::cos(arc_beg + arc_len_deg.to_radians());
+        let grad_end_p0 = ( cx + r0*f64::cos(arc_beg + skip_beg_rad            ) , cy + r0*f64::sin(arc_beg + skip_beg_rad          ));
+        let grad_end_p1 = ( cx + r0*f64::cos(arc_beg + arc_len_deg.to_radians()) , cy + r0*f64::sin(arc_beg + arc_len_deg.to_radians()));
+        let col_stops_end = [
+          (0.,css::DARK_GREEN),
+          ((skip_beg_rad            /arc_len_rad) as f32,css::DARK_GREEN),
+          ((skip_beg_rad            /arc_len_rad) as f32,col_beg),
+          ((arc_len_deg.to_radians()/arc_len_rad) as f32,col_avg),
+          ];
+        // println!("end {col_stops_end:?}");
+        (grad_end_p0,grad_end_p1, col_stops_end)},
+    };
+    let grad = Gradient::new_sweep((cx,cy),             arc_beg as f32,(arc_beg+arc_len_rad) as f32).with_stops(col_stops);
+    let c    = Arc::new           ((cx,cy), (r00,r00),  arc_beg       ,arc_len_rad, 0.);
     let stroke_c = get_stroke_end(wpx).with_dashes(dash_off*r00/r0,dash_iter.iter().map(|w| w*r00/r0).collect::<Vec<f64>>());
-    scene.stroke(&stroke_c, Affine::IDENTITY, &grad2cc, None, &c,);
-
+    scene.stroke(&stroke_c, Affine::IDENTITY, &grad, None, &c,);
   }
   pub fn ddd(scene:&mut Scene, center:impl Into<Point>,r0:f64,  arc_beg:f64, jn:JoinWhere,
     col_beg:Color,col_end:Color,col_avg:Color,
