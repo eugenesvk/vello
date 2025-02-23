@@ -278,29 +278,35 @@ mod impls {
         JoinWhere::End	=> skip_beg_rad % dash_iter_len_rad,
       };
 
-      let (grad_p0,grad_p1) = match jn {
+      let gap:f64 = 0.; // doesn't seem to 0.0001 affect anything with corrected ending style to Bevel
+      let r1beg:f64 = 0.             	; let r1beg_rad = r1beg.to_radians(); //→
+      let r1end = r1beg + arc_len_deg	; let r1end_rad = r1end.to_radians();
+      let r2beg = r1end + gap        	; let r2beg_rad = r2beg.to_radians();
+      let (grad_p0,grad_p1, col_stops) = match jn {
         JoinWhere::Beg	=> {
           let grad_beg_p0 = ( cx + r0*f64::cos(arc_beg                           ) , cy + r0*f64::sin(arc_beg                         ) );
           let grad_beg_p1 = ( cx + r0*f64::cos(arc_beg + delta_deg.to_radians()  ) , cy + r0*f64::sin(arc_beg + delta_deg.to_radians()) );
-          (grad_beg_p0,grad_beg_p1)},
+          let col_stops_beg = [col_avg,col_end];
+          (grad_beg_p0,grad_beg_p1, col_stops_beg)},
         JoinWhere::End	=> {
-          let grad_end_p0 = ( cx + r0*f64::cos(skip_beg_rad                      ) , cy + r0*f64::sin(skip_beg_rad));
-          let grad_end_p1 = ( cx + r0*f64::cos(arc_beg + arc_len_rad) , cy + r0*f64::sin(arc_beg + arc_len_rad));
-          (grad_end_p0,grad_end_p1)},
+          let grad_end_p0 = ( cx + r0*f64::cos(arc_beg + skip_beg_rad            ) , cy + r0*f64::sin(arc_beg + skip_beg_rad          ));
+          let grad_end_p1 = ( cx + r0*f64::cos(arc_beg + arc_len_rad             ) , cy + r0*f64::sin(arc_beg + arc_len_rad           ));
+          let col_stops_end = [col_beg,col_avg];
+          (grad_end_p0,grad_end_p1, col_stops_end)},
       };
       let gap:f64 = 0.; // doesn't seem to 0.0001 affect anything with corrected ending style to Bevel
       let r1beg:f64 = 0.             	; let r1beg_rad = r1beg.to_radians(); //→
       let r1end = r1beg + arc_len_deg	; let r1end_rad = r1end.to_radians();
       let r2beg = r1end + gap        	; let r2beg_rad = r2beg.to_radians();
 
-      let grad = Gradient::new_linear(grad_p0,grad_p1).with_stops([col_avg,col_end]);
+      let grad = Gradient::new_linear(grad_p0,grad_p1).with_stops(col_stops);
 
       if let JoinWhere::End = jn {// Segment 1: ~join part is 2nd (at the end)
         // Draw pre-gradwidth segment separately without the extra iterator
         let c = Arc::new((cx,cy), (r0,r0)   ,  arc_beg,skip_beg_rad, 0.);
         let stroke_c = get_stroke_end(w1px);
         // scene.stroke(&stroke_c, Affine::IDENTITY, &col_beg, None, &c,);
-        scene.stroke(&stroke_c, Affine::IDENTITY, &css::ORANGE, None, &c,); // for testing
+        scene.stroke(&stroke_c, Affine::IDENTITY, &css::DARK_GREEN, None, &c,); // for testing
       }
 
       // TODO: force precision to be so that one step is never bigger than a dash set length, otherwise would need to repeat the full dash parsing logic here
