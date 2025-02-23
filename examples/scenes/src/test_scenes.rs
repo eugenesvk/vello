@@ -120,6 +120,7 @@ mod impls {
       let col_avg = col_beg.lerp(col_end,0.5,Default::default());
 
 
+      // TODO: test if step length > dash set length (with very low precision)
       // Size
       let arc_len_deg:f64 = 180.; let precision_deg_per_step:f64 = 0.5;
       // Line width
