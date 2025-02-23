@@ -257,6 +257,7 @@ mod impls {
           step_covered -= dash_iter_len_rad;
         let mut j = 0;
         let mut is_visible = false;
+        let mut prev_draw_len:f64 = 0.; // store a sum of previously drawn dashes (vis+invis) so that if this dash doesn't cover the full Δstep or Σdash_len, we can see which part of it was covered before and which should go as Δover to the next step
         // if seg_count == 1. {
         for dash_i in &dash_iter_rad {
           is_visible = !is_visible;
