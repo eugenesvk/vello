@@ -366,15 +366,7 @@ mod impls {
           d_beg += dash_i;
         }
         }
-      } // ↓ in case step int conversion missed the last sliver
-      // if delta_rem_deg > 0. { // TODO: add dash logic here as well or just use the main loop for this remainder step
-      //   let r2delta_deg = r2beg + delta_covered_deg; let r2delta_rad = r2delta_deg.to_radians();
-      //   // println!("rem {delta_rem_deg: >4.3}° covered {delta_covered_deg: >4.3}° to reach Δₛ{delta_deg: >4.3}° ¦ {r2delta_deg: >4.3}° → {: >4.3}°",r2delta_deg+delta_rem_deg);
-      //   let c = CircleSegment::new((cx,cy), r0,r0,  r2delta_rad,delta_rem_rad);
-      //   let stroke_c = get_stroke_end(w2px);
-      //   // scene.stroke(&stroke_c, Affine::IDENTITY, &grad2, None, &c,); // use col_avg? though grad should cover
-      //   scene.stroke(&stroke_c, Affine::IDENTITY, &css::LIME, None, &c,); // for testing
-      // }
+      }
 
       // Draw pos-gradwidth segment separately without the extra iterator, including leftovers from whole steps not covering the full range
       // println!("2nd curve@end: {: >3.0}° + Δ{: >3.0}° ⇒ {: >3.0}° + {: >3.0} skip_beg ╍part={: >3.0}° ({dash_partial: >3.0}px)"
