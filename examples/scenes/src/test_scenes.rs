@@ -474,7 +474,7 @@ mod impls {
         // let stroke_c = get_stroke_end(w2px); // todo↓ make dashes optional
         let stroke_c = get_stroke_end(w2px).with_dashes(dash_partial,dash_iter); // use remainder from the previous segment so that the total matches the style as though it were drawn in one step
         // scene.stroke(&stroke_c, Affine::IDENTITY, &col_end, None, &c,);
-        scene.stroke(&stroke_c, Affine::IDENTITY, &css::WHEAT, None, &c,); // for testing
+        scene.stroke(&stroke_c, Affine::IDENTITY, &css::DARK_RED, None, &c,); // for testing
       }
     }
 }
