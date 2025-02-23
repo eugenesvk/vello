@@ -96,8 +96,6 @@ mod impls {
       let join_styles = [Join::Bevel, Join::Miter, Join::Round];
 
       let dpi = 1.5;
-      // Position
-      let cx = 900.; let cy = 200.; let r0 = 95.5; //600 circum len 300 half
       // Size
       let arc_len_deg:f64 = 180.;
       let precision_deg_per_step:f64 = 0.5; let precision_rad_per_step = precision_deg_per_step.to_radians(); //0.00873
@@ -126,14 +124,6 @@ mod impls {
       let col_end = css::RED;
       let col_avg = col_beg.lerp(col_end,0.5,Default::default());
 
-      let grad1_p0 = ( cx + r0*f64::cos( skip_beg_rad) , cy + r0*f64::sin(skip_beg_rad));
-      let grad1_p1 = ( cx + r0*f64::cos( r1end_rad   ) , cy + r0*f64::sin(r1end_rad   ));
-      let grad1 = Gradient::new_linear(grad1_p0, grad1_p1).with_stops([col_beg    ,col_avg]);
-
-      let grad2_p0 = ( cx + r0*f64::cos( r2beg_rad                      ) , cy + r0*f64::sin( r2beg_rad                      ) );
-      let grad2_p1 = ( cx + r0*f64::cos((r2beg + delta_deg).to_radians()) , cy + r0*f64::sin((r2beg + delta_deg).to_radians()) );
-      let grad2 = Gradient::new_linear(grad2_p0, grad2_p1).with_stops([col_avg    ,col_end]);
-
       // Segment 1: ~join part is 2nd (at the end)
       // Draw pre-gradwidth segment separately without the extra iterator
       let c = CircleSegment::new((cx,cy), r0,0.   ,  r1beg_rad,skip_beg_rad).outer_arc();
@@ -141,9 +131,9 @@ mod impls {
       // scene.stroke(&stroke_c, Affine::IDENTITY, &col_beg, None, &c,);
       scene.stroke(&stroke_c, Affine::IDENTITY, &css::ORANGE, None, &c,); // for testing
 
-      let steps_delta_f    	= delta_deg / precision_deg_per_step; // 180°*33% / 0.5 = 118.8
-      let steps_delta_i    	= steps_delta_f as i32; let steps_delta_if = f64::from(steps_delta_i); // 118 whole steps for later iteration and drawing by small step
-      let delta_covered_deg	=                  steps_delta_if  * precision_deg_per_step;
+      let steps_delta_f     	= delta_deg / precision_deg_per_step; // 180°*33% / 0.5 = 118.8
+      let steps_delta_i     	= steps_delta_f as i32; let steps_delta_if = f64::from(steps_delta_i); // 118 whole steps for later iteration and drawing by small step
+      let delta_covered_deg 	=                  steps_delta_if  * precision_deg_per_step;
       // let steps_delta_rem	=  steps_delta_f - steps_delta_if; //0.8 steps not covered by whole
       let delta_rem_deg     	= delta_deg - delta_covered_deg; let delta_rem_rad = delta_rem_deg.to_radians();
 
@@ -170,26 +160,28 @@ mod impls {
         scene.stroke(&stroke_c, Affine::IDENTITY, &css::ORANGE, None, &c,); // for testing
       }
 
+      // Position
+      let cx = 900.; let cy = 200.; let r0 = 95.5; //600 circum len 300 half
+      let deg_len = 2. * f64c::PI * r0 / 360.; //2π*100/360 = 1.74
+
+      let dash_off_deg = 30.1; let dash_iter_deg = [30.1,40.];
+      let dash_iter = dash_iter_deg.iter().map(|w|w*deg_len).collect::<Vec<f64>>();
+      let dbg = 0;
+
       let mut dash_partial = 0.; // use as dash offset for the next segment to hide the partially drawn part
       let mut is_vis_draw  = false; // whether a visible dash is drawing to clamp its first partial draw to the next. Switches to off when an invisible dash is "drawing"
       let mut carry_over:f64 = 0.; // if Δstep covers 2 dash segments, the 1st one will store the remainer it didn't cover here for the 2nd to pick it up
       let wpx = w2px;
-
-      let dash_off_deg = 30.1; let dash_iter_deg = [30.1,40.];
-      let deg_len = 2. * f64c::PI * r0 / 360.; //2π*100/360 = 1.74
-      let dash_off = dash_off_deg * deg_len;
-      let dash_iter = dash_iter_deg.iter().map(|w|w*deg_len).collect::<Vec<f64>>();
-      let dbg = 0;
-      ddd(scene, (cx,cy),r0, r2beg_rad, JoinWhere::Beg, grad2,
+      ddd(scene, (cx,cy),r0, r2beg_rad, JoinWhere::Beg,
+        col_avg,col_end,
         wpx,wavg,
         steps_delta_i,w_per_step_i,precision_rad_per_step,
         delta_rem_rad,
         dash_off_deg,dash_iter_deg.to_vec(),
-        dash_partial,
         rad_delta,
         skip_beg_rad,
-        carry_over, is_vis_draw,
-        dbg,
+        delta_deg,arc_len_deg,
+        dash_partial,carry_over,is_vis_draw,   dbg,
       );
       ddd_debug(scene, (cx,cy),r0, r2beg_rad, arc_len_deg, col_avg,col_end, wpx, delta_deg, dash_off_deg,dash_iter_deg.to_vec());
 
@@ -225,18 +217,17 @@ mod impls {
     scene.stroke(&stroke_c, Affine::IDENTITY, &grad2cc, None, &c,);
 
   }
-  pub fn ddd(scene:&mut Scene, center:impl Into<Point>,r0:f64,
-    arc_beg:f64, jn:JoinWhere, grad2:Gradient,
+  pub fn ddd(scene:&mut Scene, center:impl Into<Point>,r0:f64,  arc_beg:f64, jn:JoinWhere,
+    col_avg:Color,col_end:Color,
     wpx:f64,wavg:f64,
     steps_delta_i:i32,w_per_step_i:f64,precision_rad_per_step:f64,
     delta_rem_rad:f64,
     dash_off_deg:f64,dash_iter_deg:Vec<f64>,
-    mut dash_partial:f64,
     rad_delta:f64,
     skip_beg_rad:f64,
-    mut carry_over:f64,
-    mut is_vis_draw:bool,
-    dbg:u8,
+    delta_deg:f64,
+    arc_len_deg:f64,
+    mut dash_partial:f64,mut carry_over:f64,mut is_vis_draw:bool,   dbg:u8,
     ) {
       let sign = match jn {
         JoinWhere::Beg	=> if wpx > wavg { 1.} else if wpx < wavg {-1.} else {0.}, //(from avg) ↑ if bigger, ↓ if smaller
@@ -252,6 +243,24 @@ mod impls {
       let dash_iter_len_deg	= dash_iter_len_px / deg_len; let dash_iter_len_rad = dash_iter_len_deg.to_radians(); //2.87356° 0.05015
       let dash_off_deg     	= dash_off / deg_len; let dash_off_rad = dash_off_deg.to_radians();
       let dash_iter_rad = dash_iter.iter().map(|w| w / rad_len).collect::<Vec<f64>>();
+
+      let (grad_p0,grad_p1) = match jn {
+        JoinWhere::Beg	=> {
+          let grad_beg_p0 = ( cx + r0*f64::cos(arc_beg                           ) , cy + r0*f64::sin(arc_beg                         ) );
+          let grad_beg_p1 = ( cx + r0*f64::cos(arc_beg + delta_deg.to_radians()  ) , cy + r0*f64::sin(arc_beg + delta_deg.to_radians()) );
+          (grad_beg_p0,grad_beg_p1)},
+        JoinWhere::End	=> {
+          let grad_end_p0 = ( cx + r0*f64::cos(skip_beg_rad                      ) , cy + r0*f64::sin(skip_beg_rad));
+          let grad_end_p1 = ( cx + r0*f64::cos(arc_beg + arc_len_deg.to_radians()) , cy + r0*f64::sin(arc_beg + arc_len_deg.to_radians()));
+          (grad_end_p0,grad_end_p1)},
+      };
+      let gap:f64 = 0.; // doesn't seem to 0.0001 affect anything with corrected ending style to Bevel
+      let r1beg:f64 = 0.             	; let r1beg_rad = r1beg.to_radians(); //→
+      let r1end = r1beg + arc_len_deg	; let r1end_rad = r1end.to_radians();
+      let r2beg = r1end + gap        	; let r2beg_rad = r2beg.to_radians();
+
+      let grad = Gradient::new_linear(grad_p0,grad_p1).with_stops([col_avg,col_end]);
+
 
 
       if let JoinWhere::End = jn {// Segment 1: ~join part is 2nd (at the end)
@@ -282,7 +291,7 @@ mod impls {
         let stroke_c = get_stroke_end(wpx); // todo: same width for comparison with a reference
 
           // let c = CircleSegment::new((cx,cy), r0,r0   ,  rad0,step_width);
-          // scene.stroke(&stroke_c, Affine::IDENTITY, &grad2, None, &c,);
+          // scene.stroke(&stroke_c, Affine::IDENTITY, &grad, None, &c,);
 
         let seg_off =  dash_off_rad         % dash_iter_len_rad;
         let seg_be_ = (dash_off_rad + seg0) % dash_iter_len_rad;// cut off arc that fit into the previous dash set, so this is our segment beginning in the coordinate system of a dash set (set's begin = 0)
@@ -331,7 +340,7 @@ mod impls {
               // if is_vis_draw {println!("!!! leftovers from a previous dash should always 1st, but something else drew")}; //todo warn
               is_vis_draw = true; // start drawing @ the end of prev ↓ step
               let c = CircleSegment::new((cx,cy), r0,r0   ,rad0 - carry_over,carry_over);
-              // scene.stroke(&stroke_c, Affine::IDENTITY, &grad2    , None, &c,);
+              // scene.stroke(&stroke_c, Affine::IDENTITY, &grad    , None, &c,);
               scene.stroke(&stroke_c, Affine::IDENTITY, css::MAGENTA , None, &c,); // todo: replace test with ↑
               carry_over = 0.;
               dbgprint = true; // todo: remove
@@ -344,8 +353,8 @@ mod impls {
               let c = if is_vis_draw   {CircleSegment::new((cx,cy), r0,r0   ,rad0         ,draw_len).outer_arc()
               } else {is_vis_draw=true; CircleSegment::new((cx,cy), r0,r0   ,rad1-draw_len,draw_len).outer_arc()};
               if is_last	{scene.stroke(&stroke_c, Affine::IDENTITY, &css::LIME, None, &c,);
-              } else    	{scene.stroke(&stroke_c, Affine::IDENTITY, &grad2    , None, &c,);}
-              // scene.stroke(&stroke_c, Affine::IDENTITY, &grad2, None, &c,); // todo: replace ↑ lime test with ←
+              } else    	{scene.stroke(&stroke_c, Affine::IDENTITY, &grad    , None, &c,);}
+              // scene.stroke(&stroke_c, Affine::IDENTITY, &grad, None, &c,); // todo: replace ↑ lime test with ←
               if is_last && draw_len < *dash_i - epsi { // drawn something, but not the full visible dash
                 let part_len = draw_end - d_beg; //how much of an existing dash is covered by all draws, incl. last
                 dash_partial = (d_beg + part_len) * rad_len; // add all prior dash segments within a set
@@ -382,7 +391,7 @@ mod impls {
                   let carry_over_r1 = (carry_over_r0 + carry_over).min(rad1) ;// up to our arc's end, the rest will be picked up by the next arc
                   let carry_over_delta = carry_over_r1 - carry_over_r0;
                   let c = CircleSegment::new((cx,cy), r0,r0   ,carry_over_r0,carry_over_delta);
-                  // scene.stroke(&stroke_c, Affine::IDENTITY, &grad2    , None, &c,);
+                  // scene.stroke(&stroke_c, Affine::IDENTITY, &grad    , None, &c,);
                   scene.stroke(&stroke_c, Affine::IDENTITY, css::MAGENTA , None, &c,); // todo: replace test with ↑
                   dash_partial = carry_over_delta * rad_len; carry_over = 0.;
                   // println!("last step - drawn next dash since it won't be handled later!");
