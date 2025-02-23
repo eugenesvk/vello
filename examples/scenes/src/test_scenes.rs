@@ -240,7 +240,7 @@ mod impls {
           (grad_beg_p0,grad_beg_p1)},
         JoinWhere::End	=> {
           let grad_end_p0 = ( cx + r0*f64::cos(skip_beg_rad                      ) , cy + r0*f64::sin(skip_beg_rad));
-          let grad_end_p1 = ( cx + r0*f64::cos(arc_beg + arc_len_deg.to_radians()) , cy + r0*f64::sin(arc_beg + arc_len_deg.to_radians()));
+          let grad_end_p1 = ( cx + r0*f64::cos(arc_beg + arc_len_rad) , cy + r0*f64::sin(arc_beg + arc_len_rad));
           (grad_end_p0,grad_end_p1)},
       };
       let gap:f64 = 0.; // doesn't seem to 0.0001 affect anything with corrected ending style to Bevel
