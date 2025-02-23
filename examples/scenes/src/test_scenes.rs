@@ -294,8 +294,7 @@ mod impls {
             //   ,                      seg_beg .to_degrees(),seg_end .to_degrees()
             //   ,d_beg   .to_degrees(),d_end   .to_degrees(),dash_i.to_degrees()
             //   ,draw_beg.to_degrees(),draw_end.to_degrees(),draw_len.to_degrees()
-            //   );
-            // }
+            //   );}
           } else { //println!("   inactive ({: >4.1}°)",dash_i.to_degrees());
             let d_end = d_beg + dash_i;
             let draw_beg = d_beg.max(seg_beg).min(d_end); // start at dash begin, → to segment begin, but not past dash end
