@@ -36,6 +36,7 @@ mod impls {
   use vello::peniko::*;
   use vello::*;
   use std::f64::consts as f64c;
+  const epsi:f64 = 0.00000000001; // to counter some float precision errors
 
   fn get_stroke    (width:f64) -> Stroke {Stroke::new(width).with_start_cap(Cap::Butt).with_end_cap(Cap::Round).with_join(Join::Bevel)}
   fn get_stroke_end(width:f64) -> Stroke {Stroke::new(width).with_start_cap(Cap::Butt).with_end_cap(Cap::Butt ).with_join(Join::Bevel)}
@@ -232,8 +233,13 @@ mod impls {
           // let c = CircleSegment::new((cx,cy), r0,r0   ,  rad0,step_width);
           // scene.stroke(&stroke_c, Affine::IDENTITY, &grad2, None, &c,);
 
-        let seg_off = dash_off_rad % dash_iter_len_rad;
-        let seg_beg = (dash_off_rad + seg0) % dash_iter_len_rad;// cut off arc that fit into the previous dash set, so this is our segment beginning in the coordinate system of a dash set (set's begin = 0)
+        let seg_off =  dash_off_rad         % dash_iter_len_rad;
+        let seg_be_ = (dash_off_rad + seg0) % dash_iter_len_rad;// cut off arc that fit into the previous dash set, so this is our segment beginning in the coordinate system of a dash set (set's begin = 0)
+        let (seg_beg,seg_count) = if (dash_iter_len_rad - seg_be_).abs() < epsi { // segment starts at dash set end's, so shift it to next dash set's begin (float imprecision prevents clean division)
+          (0.     , (dash_off_rad + seg0).div_euclid(dash_iter_len_rad) + 1.+1.)
+        } else {
+          (seg_be_, (dash_off_rad + seg0).div_euclid(dash_iter_len_rad) + 1.   )
+        };
         let seg_count = (dash_off_rad + seg0).div_euclid(dash_iter_len_rad) + 1.;
         let seg_end = seg_beg + step_width;
         let mut d_beg = 0.; // length up to the beginning of this dash = ∑ of all previous dash lens
