@@ -343,7 +343,8 @@ mod impls {
       // }
 
       // Draw pos-gradwidth segment separately without the extra iterator, including leftovers from whole steps not covering the full range
-      // println!("finishing steady curve from {:>3.0}° {: >2.1} ⇒ {: >4.1}",r2beg_rad.to_degrees(),rad_delta.to_degrees(),(r2beg_rad + rad_delta).to_degrees());
+      // println!("2nd curve@end: {: >3.0}° + Δ{: >3.0}° ⇒ {: >3.0}° + {: >3.0} skip_beg ╍part={: >3.0}° ({dash_partial: >3.0}px)"
+      //   ,r2beg_rad.to_degrees(),rad_delta.to_degrees(),(r2beg_rad + rad_delta).to_degrees(),skip_beg_rad.to_degrees(),(dash_partial/rad_len).to_degrees());
       let c = CircleSegment::new((cx,cy), r0,0.   ,  r2beg_rad + rad_delta, skip_beg_rad).outer_arc();
       // let stroke_c = get_stroke_end(w2px);
       let stroke_c = get_stroke_end(w2px).with_dashes(dash_partial,dash_iter); // use remainder from the previous segment so that the total matches the style as though it were drawn in one step
