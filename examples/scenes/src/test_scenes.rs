@@ -212,6 +212,11 @@ mod impls {
       let w_step = w_delta_avg / steps_delta_f; //12/2/45 0.13 to reach average
       let w_per_step_i:f64	= w_delta_avg / f64::from(steps_delta_i); //to reach average
 
+      let arc_len_rad = arc_len_deg.to_radians();
+      let join_beg:f64 = match jn {
+        JoinWhere::Beg	=> arc_beg,
+        JoinWhere::End	=> arc_beg + (arc_len_deg - delta_deg).to_radians(),
+      };
 
       let sign = match jn {
         JoinWhere::Beg	=> if w2px > wavg { 1.} else if w2px < wavg {-1.} else {0.}, //(from avg) ↑ if bigger, ↓ if smaller
@@ -262,7 +267,7 @@ mod impls {
         let step_width = if is_last && is_extra_step	{delta_rem_rad
         } else                                      	{precision_rad_per_step};
         let seg0 = (r - 1.) * precision_rad_per_step + step_width; // segment beg in our arc coords (arc start = 0), replace last regular width with a custom step_width
-        let rad0 = arc_beg + seg0;
+        let rad0 = join_beg + seg0;
         let rad1 = rad0 + step_width; // todo debug only
         // let c = Arc::new((cx,cy), (r0,r0) ,  rad0,step_width+gap_correct, 0.); //arc bugs with gaps
         // let c = CircleSegment::new((cx,cy), r0,r0   ,  rad0,step_width); // alt fix
