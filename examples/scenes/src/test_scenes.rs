@@ -102,7 +102,7 @@ mod impls {
       let steps_f = arc_len_deg / precision_deg_per_step; //360
       let steps_i   = steps_f as i32;
       // Gradient / size convergence bounds
-      let f_delta = 0.337; // start changing width for the first/last % only
+      let f_delta = 0.5; // start changing width for the first/last % only
       let delta_deg    	= arc_len_deg *       f_delta ; let rad_delta    = delta_deg   .to_radians();
       let skip_beg_deg 	= arc_len_deg * (1. - f_delta); let skip_beg_rad = skip_beg_deg.to_radians();
       let steps_delta_f	= steps_f   * f_delta; //36
