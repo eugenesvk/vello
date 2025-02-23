@@ -288,13 +288,13 @@ mod impls {
                 // ,(rad1 - step_width - carry_over).to_degrees(),rad1.to_degrees(),step_width.to_degrees(),carry_over.to_degrees()
                 // ,(rad1 - step_width).to_degrees());
             }
-            if draw_len > 0.0 { // draw 1st from segment's end to attach to the next drawing
-              let c = if is_vis_draw   {CircleSegment::new((cx,cy), r0,r0   ,rad0         ,draw_len)
-              } else {is_vis_draw=true; CircleSegment::new((cx,cy), r0,r0   ,rad1-draw_len,draw_len)};
+            if draw_len > 0.0 { // 1st draw starts @ seg end to attach to the next draw in case of partials
+              prev_draw_len += draw_len;
+              let c = if is_vis_draw   {CircleSegment::new((cx,cy), r0,r0   ,rad0         ,draw_len).outer_arc()
+              } else {is_vis_draw=true; CircleSegment::new((cx,cy), r0,r0   ,rad1-draw_len,draw_len).outer_arc()};
               if is_last	{scene.stroke(&stroke_c, Affine::IDENTITY, &css::LIME, None, &c,);
               } else    	{scene.stroke(&stroke_c, Affine::IDENTITY, &grad2    , None, &c,);}
-              // todo: replace ↑ lime test with ↓
-              // scene.stroke(&stroke_c, Affine::IDENTITY, &grad2, None, &c,);
+              // scene.stroke(&stroke_c, Affine::IDENTITY, &grad2, None, &c,); // todo: replace ↑ lime test with ←
               if is_last && draw_len < *dash_i - epsi { // drawn something, but not the full visible dash
                 let part_len = draw_end - d_beg; //how much of an existing dash is covered by all draws, incl. last
                 dash_partial = (d_beg + part_len) * rad_len; // add all prior dash segments within a set
