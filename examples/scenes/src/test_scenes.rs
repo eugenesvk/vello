@@ -243,6 +243,7 @@ mod impls {
     rad_delta:f64,
     rad_len:f64,
     skip_beg_rad:f64,
+    dbg:u8,
     ) {
       let sign = match jn {
         JoinWhere::Beg	=> if wpx > wavg { 1.} else if wpx < wavg {-1.} else {0.}, //(from avg) ↑ if bigger, ↓ if smaller
@@ -351,7 +352,7 @@ mod impls {
             } else {is_vis_draw=false;}
             // if rad0       <=       d_end
             // &&    seg_end >= d_beg  { // (alt check) our segment overlaps with this dash
-            if dbgprint || i == 0 || is_last || (78<= i && i <=83) {println!( //👁👀👓  seg={dash_off_deg: >3.1} % {dash_iter_len_deg: >3.1}
+            if dbg>0 && (dbgprint || i == 0 || is_last || (78<= i && i <=83)) {println!( //👁👀👓  seg={dash_off_deg: >3.1} % {dash_iter_len_deg: >3.1}
               "{}👀{}{i: >3} {} {j: >2}\
               │ +{: >4.1}={: >4.1}° ↷ {: >4.1}° Δ{: >3.1}° off {: >3.1}° \
               │№{seg_count: >2} {: >4.1}° ↷ {: >4.1}°\
@@ -397,7 +398,7 @@ mod impls {
                 //   ,dash_i.to_degrees(),(dash_i-part_len).to_degrees(),rad1.to_degrees());
               }
             }
-            if dbgprint || i == 0 || is_last || (78<= i && i <=83) {println!( //👁👀👓  seg={dash_off_deg: >3.1} % {dash_iter_len_deg: >3.1}
+            if dbg>1 && (dbgprint || i == 0 || is_last || (78<= i && i <=83)) {println!( //👁👀👓  seg={dash_off_deg: >3.1} % {dash_iter_len_deg: >3.1}
               "{}👓{}{i: >3} {} {j: >2}\
               │ +{: >4.1}={: >4.1}° ↷ {: >4.1}° Δ{: >3.1}° off {: >3.1}° \
               │№{seg_count: >2} {: >4.1}° ↷ {: >4.1}°\
