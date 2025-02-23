@@ -233,6 +233,10 @@ mod impls {
       let dash_iter_len_px 	= dash_iter.iter().sum::<f64>(); //5
       let dash_iter_len_deg	= dash_iter_len_px / deg_len; let dash_iter_len_rad = dash_iter_len_deg.to_radians(); //2.87356° 0.05015
       let dash_iter_rad = dash_iter.iter().map(|w| w / rad_len).collect::<Vec<f64>>();
+      let dash_off_pre_jn_rad = match jn { // if join is after dashed line, that line can be cut and thus dash continuation should start from an adjusted offset
+        JoinWhere::Beg	=> 0.,
+        JoinWhere::End	=> ((arc_len_deg - delta_deg) % dash_iter_len_deg).to_radians(),
+      };
 
       let (grad_p0,grad_p1) = match jn {
         JoinWhere::Beg	=> {
@@ -281,14 +285,14 @@ mod impls {
           // let c = Arc::new((cx,cy), (r0,r0)   ,  rad0,step_width, 0.);
           // scene.stroke(&stroke_c, Affine::IDENTITY, &grad, None, &c,);
 
-        let seg_off =  dash_off_rad         % dash_iter_len_rad;
-        let seg_be_ = (dash_off_rad + seg0) % dash_iter_len_rad;// cut off arc that fit into the previous dash set, so this is our segment beginning in the coordinate system of a dash set (set's begin = 0)
+        let seg_off =  dash_off_pre_jn_rad + dash_off_rad         % dash_iter_len_rad;
+        let seg_be_ = (dash_off_pre_jn_rad + dash_off_rad + seg0) % dash_iter_len_rad;// cut off arc that fit into the previous dash set, so this is our segment beginning in the coordinate system of a dash set (set's begin = 0)
         let (seg_beg,seg_count) = if (dash_iter_len_rad - seg_be_).abs() < epsi { // segment starts at dash set end's, so shift it to next dash set's begin (float imprecision prevents clean division)
-          (0.     , (dash_off_rad + seg0).div_euclid(dash_iter_len_rad) + 1.+1.)
+          (0.     , (dash_off_pre_jn_rad + dash_off_rad + seg0).div_euclid(dash_iter_len_rad) + 1.+1.)
         } else {
-          (seg_be_, (dash_off_rad + seg0).div_euclid(dash_iter_len_rad) + 1.   )
+          (seg_be_, (dash_off_pre_jn_rad + dash_off_rad + seg0).div_euclid(dash_iter_len_rad) + 1.   )
         };
-        let seg_count = (dash_off_rad + seg0).div_euclid(dash_iter_len_rad) + 1.;
+        let seg_count = (dash_off_pre_jn_rad + dash_off_rad + seg0).div_euclid(dash_iter_len_rad) + 1.;
         let seg_end = seg_beg + step_width;
         let mut d_beg = 0.; // length up to the beginning of this dash = ∑ of all previous dash lens
 
