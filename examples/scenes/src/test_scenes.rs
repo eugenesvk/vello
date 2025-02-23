@@ -119,41 +119,6 @@ mod impls {
       let col_end = css::RED;
       let col_avg = col_beg.lerp(col_end,0.5,Default::default());
 
-      // Segment 1: ~join part is 2nd (at the end)
-      // Draw pre-gradwidth segment separately without the extra iterator
-      let c = CircleSegment::new((cx,cy), r0,0.   ,  r1beg_rad,skip_beg_rad).outer_arc();
-      let stroke_c = get_stroke_end(w1px);
-      // scene.stroke(&stroke_c, Affine::IDENTITY, &col_beg, None, &c,);
-      scene.stroke(&stroke_c, Affine::IDENTITY, &css::ORANGE, None, &c,); // for testing
-
-      let steps_delta_f     	= delta_deg / precision_deg_per_step; // 180°*33% / 0.5 = 118.8
-      let steps_delta_i     	= steps_delta_f as i32; let steps_delta_if = f64::from(steps_delta_i); // 118 whole steps for later iteration and drawing by small step
-      let delta_covered_deg 	=                  steps_delta_if  * precision_deg_per_step;
-      // let steps_delta_rem	=  steps_delta_f - steps_delta_if; //0.8 steps not covered by whole
-      let delta_rem_deg     	= delta_deg - delta_covered_deg; let delta_rem_rad = delta_rem_deg.to_radians();
-
-      let w_per_step_i:f64	= w_delta_avg / f64::from(steps_delta_i); //to reach average
-
-      let sign1 = if w1 > wavg {-1.} else if w1 < wavg {1.} else {0.}; //(to avg) ↓ if bigger, ↑ if smaller
-      for i in 0..steps_delta_i { let r = f64::from(i);
-        let rad0 = r2beg_rad + r * precision_rad_per_step;
-        let c = CircleSegment::new((cx,cy), r0,0.   ,  rad0,precision_rad_per_step).outer_arc();
-        //                          center  rout/in    ∠start ∠sweep
-        // if i == 0 {println!("\n\n———————————————————————————————")};
-        // println!("i={i}/{steps_delta_i}  r={r:.1} r1beg={r1beg:.1} r*prec={:.1} deg={skip_beg_deg:.1} beg={:.1} end={:.1}",r * precision_deg_per_step
-        //   ,       skip_beg_deg + r * precision_deg_per_step, skip_beg_deg + r * precision_deg_per_step + precision_deg_per_step);
-        let cw = w1 + sign1 * r * w_per_step_i;
-        let stroke_c = if i >=  (steps_delta_i - 3) {get_stroke_end(cw) //last steps no round ends
-        } else {get_stroke(cw)}; // round ends to fix the outer arc artifacts when joining in rectangles without curves
-        scene.stroke(&stroke_c, Affine::IDENTITY, &grad1, None, &c,);
-      } // ↓ in case step int conversion missed the last sliver
-      let rad0_last = (skip_beg_deg + f64::from(steps_delta_i) * precision_deg_per_step).to_radians();
-      if rad0_last < r1end_rad { //println!("{rad0_last:.4}<{r1end_rad:.4} step_last {:.1}°<{:.1}° end",rad0_last.to_degrees(),r1end);
-        let c = CircleSegment::new((cx,cy), r0,0.   ,  rad0_last,r1end_rad - rad0_last).outer_arc();
-        let stroke_c = get_stroke_end(w_delta_avg);
-        // scene.stroke(&stroke_c, Affine::IDENTITY, &grad1, None, &c,); // use col_avg? though grad should cover
-        scene.stroke(&stroke_c, Affine::IDENTITY, &css::ORANGE, None, &c,); // for testing
-      }
 
       // Position
       let cx = 900.; let cy = 200.; let r0 = 95.5; //600 circum len 300 half
