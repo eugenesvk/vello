@@ -303,9 +303,9 @@ mod impls {
             if draw_len > 0.0 {is_vis_draw = false;}
             if is_last { // last invisible dash also needs to signal its width to update offset of the next arc
               let part_len = draw_end - d_beg; //how much of an existing dash is covered by all draws, incl. last
-              if   draw_len > 0.0 // drawn something, but not the full invisible dash
-                && part_len < *dash_i - 0.00000000001 { //some float rounding error
-                dash_partial = (d_beg + part_len) * rad_len; // add all prior dash segments within a set
+              if   draw_len > 0. //drawn something… ↙some float rounding error
+                && part_len < *dash_i - 0.00000000001 { //…but not the full invisible dash
+                dash_partial = (d_beg + part_len) * rad_len; //≝draw_end add all prior dash segments within a set
                 // println!("{}№{} last -visible +draw dbeg {} draw_end {} dash−part_len={} w_dash {: >.2}° − {: >.2}° par = {: >.2}° left  drawn {: >.2}° (partial {:.1}px) rad1 {:.3}°"
                   // ,if dash_partial > 0. {"✓"}else{"✗"},seg_count
                   // ,d_beg.to_degrees(),draw_end.to_degrees()
