@@ -194,9 +194,28 @@ mod impls {
       let mut dash_partial = 0.; // use as dash offset for the next segment to hide the partially drawn part
       let mut carry_over:f64 = 0.; // if Δstep covers 2 dash segments, the 1st one will store the remainer it didn't cover here for the 2nd to pick it up
 
+      // Line width
+      let wavg = (w1 + w2) / 2.; let wavgpx = (wavg * dpi).round() / dpi;
+      let w_delta_avg = (w2 - w1).abs() / 2.;
+      let w1px = (w1 * dpi).round() / dpi;
+      let w2px = (w2 * dpi).round() / dpi;
+
+      let precision_rad_per_step = precision_deg_per_step.to_radians(); //0.5° = 0.00873
+      let steps_f           	= arc_len_deg / precision_deg_per_step; //180° → 360 steps at 0.5° precision
+      let steps_i           	= steps_f as i32;
+      let steps_delta_f     	= delta_deg / precision_deg_per_step; // 180°*33% / 0.5 = 118.8
+      let steps_delta_i     	= steps_delta_f as i32; let steps_delta_if = f64::from(steps_delta_i); // 118 whole steps for later iteration and drawing by small step
+      let delta_covered_deg 	=                  steps_delta_if  * precision_deg_per_step;
+      // let steps_delta_rem	=  steps_delta_f - steps_delta_if; //0.8 steps not covered by whole
+      let delta_rem_deg     	= delta_deg - delta_covered_deg; let delta_rem_rad = delta_rem_deg.to_radians();
+
+      let w_step = w_delta_avg / steps_delta_f; //12/2/45 0.13 to reach average
+      let w_per_step_i:f64	= w_delta_avg / f64::from(steps_delta_i); //to reach average
+
+
       let sign = match jn {
-        JoinWhere::Beg	=> if wpx > wavg { 1.} else if wpx < wavg {-1.} else {0.}, //(from avg) ↑ if bigger, ↓ if smaller
-        JoinWhere::End	=> if wpx > wavg {-1.} else if wpx < wavg { 1.} else {0.}, //(to   avg) ↓ if bigger, ↑ if smaller
+        JoinWhere::Beg	=> if w2px > wavg { 1.} else if w2px < wavg {-1.} else {0.}, //(from avg) ↑ if bigger, ↓ if smaller
+        JoinWhere::End	=> if w1px > wavg {-1.} else if w1px < wavg { 1.} else {0.}, //(to   avg) ↓ if bigger, ↑ if smaller
       };
       let c = center.into(); let (cx,cy) = (c.x,c.y);
 
