@@ -294,10 +294,6 @@ mod impls {
           let col_stops_end = [col_beg,col_avg];
           (grad_end_p0,grad_end_p1, col_stops_end)},
       };
-      let gap:f64 = 0.; // doesn't seem to 0.0001 affect anything with corrected ending style to Bevel
-      let r1beg:f64 = 0.             	; let r1beg_rad = r1beg.to_radians(); //→
-      let r1end = r1beg + arc_len_deg	; let r1end_rad = r1end.to_radians();
-      let r2beg = r1end + gap        	; let r2beg_rad = r2beg.to_radians();
 
       let grad = Gradient::new_linear(grad_p0,grad_p1).with_stops(col_stops);
 
