@@ -108,11 +108,6 @@ mod impls {
       let steps_delta_f	= steps_f   * f_delta; //36
       let skip_end     	= steps_delta_f as i32; //36
       let skip_beg     	= steps_i - skip_end; //324
-      // Line width
-      let w1:f64 = 20.; let w2:f64 =  4.; let wavg = (w1 + w2) / 2.; let wavgpx = (wavg * dpi).round() / dpi;
-      let w_delta_avg = (w2 - w1).abs() / 2.;
-      let w1px = (w1 * dpi).round() / dpi; let w2px = (w2 * dpi).round() / dpi;
-      let w_step = w_delta_avg / steps_delta_f; //12/2/45 0.13 to reach average
 
       // ((w1 + sign1 * w_step * r) * dpi).round() / dpi; //transition shouldn't be pixel-stepped!
       let gap:f64 = 0.; // doesn't seem to 0.0001 affect anything with corrected ending style to Bevel
