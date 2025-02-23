@@ -50,7 +50,7 @@ mod impls {
     // Widths transition towards average:
       // split each ~join into X steps based on user defined precision
       // for each step, get the width delta and draw a small arc with the base width + steps * w_delta
-        // use circlesegment with both r1=r2 to avoid occlusion artifacts or make each arc end a bit futher to overalp
+        // use Circle segment with both r1=r2 to avoid occlusion artifacts or make each arc end a bit futher to overalp
       // last step is different as it doesn't cover the same length (since not all lines can be split into a whole number of equal steps)
     // Dashes don't transition, not sure whether any logic that would introduce a 3rd var pattern is better:
       // (this just describes the approach of adding dashes to our step-by-step approach)
