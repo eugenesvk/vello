@@ -212,7 +212,7 @@ mod impls {
     let grad2cc_p0 = ( cxx + r00*f64::cos(arc_beg                         ) , cyy + r00*f64::sin(arc_beg                         ) );
     let grad2cc_p1 = ( cxx + r00*f64::cos(arc_beg + delta_deg.to_radians()) , cyy + r00*f64::sin(arc_beg + delta_deg.to_radians()) );
     let grad2cc = Gradient::new_linear(grad2cc_p0, grad2cc_p1).with_stops([col_avg    ,col_end]);
-    let c = CircleSegment::new((cxx,cyy), r00,r00,  arc_beg,arc_len_deg.to_radians()).outer_arc();
+    let c = Arc::new((cxx,cyy), (r00,r00),  arc_beg,arc_len_deg.to_radians(), 0.);
     let stroke_c = get_stroke_end(wpx).with_dashes(dash_off*r00/r0,dash_iter.iter().map(|w| w*r00/r0).collect::<Vec<f64>>());
     scene.stroke(&stroke_c, Affine::IDENTITY, &grad2cc, None, &c,);
 
@@ -265,7 +265,7 @@ mod impls {
 
       if let JoinWhere::End = jn {// Segment 1: ~join part is 2nd (at the end)
         // Draw pre-gradwidth segment separately without the extra iterator
-        let c = CircleSegment::new((cx,cy), r0,0.   ,  arc_beg,skip_beg_rad).outer_arc();
+        let c = Arc::new((cx,cy), (r0,r0)   ,  arc_beg,skip_beg_rad, 0.);
         let stroke_c = get_stroke_end(wpx);
         // scene.stroke(&stroke_c, Affine::IDENTITY, &col_beg, None, &c,);
         scene.stroke(&stroke_c, Affine::IDENTITY, &css::ORANGE, None, &c,); // for testing
@@ -282,15 +282,15 @@ mod impls {
         let seg0 = (r - 1.) * precision_rad_per_step + step_width; // segment beg in our arc coords (arc start = 0), replace last regular width with a custom step_width
         let rad0 = arc_beg + seg0;
         let rad1 = rad0 + step_width; // todo debug only
-        // let c = CircleSegment::new((cx,cy), r0,r0   ,  rad0,step_width+gap_correct).outer_arc(); //arc bugs with gaps
-        // let c = CircleSegment::new((cx,cy), r0,r0   ,  rad0,step_width);
+        // let c = Arc::new((cx,cy), (r0,r0) ,  rad0,step_width+gap_correct, 0.); //arc bugs with gaps
+        // let c = CircleSegment::new((cx,cy), r0,r0   ,  rad0,step_width); // alt fix
         //                          center  rout/in    ∠start ∠sweep
         let cw = if is_last	{wpx
         } else             	{wavg + sign * r * w_per_step_i};
         // let stroke_c = get_stroke_end(cw);
         let stroke_c = get_stroke_end(wpx); // todo: same width for comparison with a reference
 
-          // let c = CircleSegment::new((cx,cy), r0,r0   ,  rad0,step_width);
+          // let c = Arc::new((cx,cy), (r0,r0)   ,  rad0,step_width, 0.);
           // scene.stroke(&stroke_c, Affine::IDENTITY, &grad, None, &c,);
 
         let seg_off =  dash_off_rad         % dash_iter_len_rad;
@@ -339,7 +339,7 @@ mod impls {
               prev_draw_len += carry_over;
               // if is_vis_draw {println!("!!! leftovers from a previous dash should always 1st, but something else drew")}; //todo warn
               is_vis_draw = true; // start drawing @ the end of prev ↓ step
-              let c = CircleSegment::new((cx,cy), r0,r0   ,rad0 - carry_over,carry_over);
+              let c = Arc::new((cx,cy), (r0,r0)   ,rad0 - carry_over,carry_over, 0.);
               // scene.stroke(&stroke_c, Affine::IDENTITY, &grad    , None, &c,);
               scene.stroke(&stroke_c, Affine::IDENTITY, css::MAGENTA , None, &c,); // todo: replace test with ↑
               carry_over = 0.;
@@ -350,8 +350,8 @@ mod impls {
             }
             if draw_len > 0.0 { // 1st draw starts @ seg end to attach to the next draw in case of partials
               prev_draw_len += draw_len;
-              let c = if is_vis_draw   {CircleSegment::new((cx,cy), r0,r0   ,rad0         ,draw_len).outer_arc()
-              } else {is_vis_draw=true; CircleSegment::new((cx,cy), r0,r0   ,rad1-draw_len,draw_len).outer_arc()};
+              let c = if is_vis_draw   {Arc::new((cx,cy), (r0,r0)   ,rad0         ,draw_len, 0.)
+              } else {is_vis_draw=true; Arc::new((cx,cy), (r0,r0)   ,rad1-draw_len,draw_len, 0.)};
               if is_last	{scene.stroke(&stroke_c, Affine::IDENTITY, &css::LIME, None, &c,);
               } else    	{scene.stroke(&stroke_c, Affine::IDENTITY, &grad    , None, &c,);}
               // scene.stroke(&stroke_c, Affine::IDENTITY, &grad, None, &c,); // todo: replace ↑ lime test with ←
@@ -390,7 +390,7 @@ mod impls {
                   let carry_over_r0 = rad0 + prev_draw_len;
                   let carry_over_r1 = (carry_over_r0 + carry_over).min(rad1) ;// up to our arc's end, the rest will be picked up by the next arc
                   let carry_over_delta = carry_over_r1 - carry_over_r0;
-                  let c = CircleSegment::new((cx,cy), r0,r0   ,carry_over_r0,carry_over_delta);
+                  let c = Arc::new((cx,cy), (r0,r0)   ,carry_over_r0,carry_over_delta, 0.);
                   // scene.stroke(&stroke_c, Affine::IDENTITY, &grad    , None, &c,);
                   scene.stroke(&stroke_c, Affine::IDENTITY, css::MAGENTA , None, &c,); // todo: replace test with ↑
                   dash_partial = carry_over_delta * rad_len; carry_over = 0.;
