@@ -268,12 +268,12 @@ mod impls {
           //   println!("{: >4.1}° {: >4.1}° → {: >4.1}°",seg_end.to_degrees(),d_beg.to_degrees(),(d_beg + dash_i).to_degrees());
           //   break;
           // } // our segment has been fully covered, no need to continue
+          let mut dbgprint = false;
           if is_visible {
             let d_end = d_beg + dash_i;
             let draw_beg = d_beg.max(seg_beg).min(d_end); // start at dash begin, → to segment begin, but not past dash end
             let draw_end = d_end.min(seg_end).max(d_beg); // start at dash end  , ← to segment end  , but not past dash beg
             let draw_len = draw_end - draw_beg;
-            let mut dbgprint = false;
 
             if carry_over > 0. { // draw leftovers from the previous dash
               prev_draw_len += carry_over;
