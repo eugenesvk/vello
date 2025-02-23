@@ -267,10 +267,10 @@ mod impls {
         // let c = Arc::new((cx,cy), (r0,r0) ,  rad0,step_width+gap_correct, 0.); //arc bugs with gaps
         // let c = CircleSegment::new((cx,cy), r0,r0   ,  rad0,step_width); // alt fix
         //                          center  rout/in    ∠start ∠sweep
-        let cw = if is_last	{wpx
-        } else             	{wavg + sign * r * w_per_step_i};
-        // let stroke_c = get_stroke_end(cw);
-        let stroke_c = get_stroke_end(wpx); // todo: same width for comparison with a reference
+        let cw = if is_last {
+          match jn	{JoinWhere::Beg	=> w2px
+            ,     	 JoinWhere::End	=> wavg,}
+        } else    	{wavg + sign * r * w_per_step_i};
 
           // let c = Arc::new((cx,cy), (r0,r0)   ,  rad0,step_width, 0.);
           // scene.stroke(&stroke_c, Affine::IDENTITY, &grad, None, &c,);
