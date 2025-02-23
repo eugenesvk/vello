@@ -277,8 +277,8 @@ mod impls {
               if is_last && draw_len < *dash_i - 0.00000000001 { // drawn something, but not the full visible dash
                 let part_len = draw_end - d_beg; //how much of an existing dash is covered by all draws, incl. last
                 dash_partial = (d_beg + part_len) * rad_len; // add all prior dash segments within a set
-                // println!("! last +visible +draw w_dash {: >.4}° − {: >.4}° actual = {: >.4}° partial ({:.1}px) rad1 {:.3}°"
-                //   ,dash_i.to_degrees(),draw_len.to_degrees(), (d_end.min(seg_end) - d_beg).to_degrees(),dash_partial,rad1.to_degrees());
+                // println!("! last +visible +draw ╍w {: >.4}° − {: >.4}° actual = {: >.4}° {: >.4}°part_len partial ({:.1}px) rad1 {:.3}°"
+                //   ,dash_i.to_degrees(),draw_len.to_degrees(), (d_end.min(seg_end) - d_beg).to_degrees(),part_len.to_degrees(), dash_partial,rad1.to_degrees());
               }
             } else {is_vis_draw=false;}
             // if rad0       <=       d_end
