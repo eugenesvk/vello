@@ -132,12 +132,10 @@ mod impls {
       let dash_iter = dash_iter_deg.iter().map(|w|w*deg_len).collect::<Vec<f64>>();
       let dbg = 0;
 
-      let wpx = w2px;
-      ddd(scene, (cx,cy),r0, r2beg_rad, JoinWhere::Beg,
+      ddd(scene, (cx,cy),r0, r1beg_rad, JoinWhere::End,
         col_avg,col_end,
-        wpx,wavg,
-        steps_delta_i,w_per_step_i,precision_rad_per_step,
-        delta_rem_rad,
+        w1,w2, dpi,
+        precision_deg_per_step,
         dash_off_deg,dash_iter_deg.to_vec(),
         rad_delta,
         skip_beg_rad,
@@ -184,9 +182,8 @@ mod impls {
   }
   pub fn ddd(scene:&mut Scene, center:impl Into<Point>,r0:f64,  arc_beg:f64, jn:JoinWhere,
     col_avg:Color,col_end:Color,
-    wpx:f64,wavg:f64,
-    steps_delta_i:i32,w_per_step_i:f64,precision_rad_per_step:f64,
-    delta_rem_rad:f64,
+    w1:f64,w2:f64, dpi:f64,
+    precision_deg_per_step:f64,
     dash_off_deg:f64,dash_iter_deg:Vec<f64>,
     rad_delta:f64,
     skip_beg_rad:f64,
