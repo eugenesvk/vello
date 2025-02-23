@@ -191,14 +191,7 @@ mod impls {
         carry_over, is_vis_draw,
         dbg,
       );
-      // DEBUG copy smaller (including dashes, should perfectly align as dash length/offsets are adjusted per difference in size)
-      let cyy = cy; let cxx = cx; let r00 = r0 - wpx;
-      let grad2cc_p0 = ( cxx + r00*f64::cos( r2beg_rad                      ) , cyy + r00*f64::sin( r2beg_rad                      ) );
-      let grad2cc_p1 = ( cxx + r00*f64::cos((r2beg + delta_deg).to_radians()) , cyy + r00*f64::sin((r2beg + delta_deg).to_radians()) );
-      let grad2cc = Gradient::new_linear(grad2cc_p0, grad2cc_p1).with_stops([col_avg    ,col_end]);
-      let c = CircleSegment::new((cxx,cyy), r00,r00,  r2beg_rad,arc_len_deg.to_radians()).outer_arc();
-      let stroke_c = get_stroke_end(w2px).with_dashes(dash_off*r00/r0,dash_iter.iter().map(|w| w*r00/r0).collect::<Vec<f64>>());
-      scene.stroke(&stroke_c, Affine::IDENTITY, &grad2cc, None, &c,);
+      ddd_debug(scene, (cx,cy),r0, r2beg_rad, arc_len_deg, col_avg,col_end, wpx, delta_deg, dash_off_deg,dash_iter_deg.to_vec());
 
       // Draw debug circles showing where each gradient begins/ends
       let pstr = get_stroke_end(1.); // starting point bigger than the ending, angle to differentiate two curves
@@ -211,6 +204,27 @@ mod impls {
   }
   pub enum JoinWhere{Beg,End,}
 
+  // DEBUG copy smaller (including dashes, should perfectly align as dash length/offsets are adjusted per difference in size)
+  pub fn ddd_debug(scene:&mut Scene, center:impl Into<Point>,r0:f64, arc_beg:f64, arc_len_deg:f64,
+    col_avg:Color,col_end:Color,
+    wpx:f64,
+    delta_deg:f64,
+    dash_off_deg:f64,dash_iter_deg:Vec<f64>,
+    ) {
+    let c = center.into(); let (cxx,cyy) = (c.x,c.y); let r00 = r0 - wpx;
+    let deg_len  	= 2. * f64c::PI * r0 / 360.0                 ; //2π*100/360 = 1.74
+    let rad_len  	= 2. * f64c::PI * r0 / 360.0_f64.to_radians(); //2π*100/6.28 = 100
+    let dash_off 	= dash_off_deg * deg_len;
+    let dash_iter	= dash_iter_deg.iter().map(|w|w*deg_len).collect::<Vec<f64>>();
+
+    let grad2cc_p0 = ( cxx + r00*f64::cos(arc_beg                         ) , cyy + r00*f64::sin(arc_beg                         ) );
+    let grad2cc_p1 = ( cxx + r00*f64::cos(arc_beg + delta_deg.to_radians()) , cyy + r00*f64::sin(arc_beg + delta_deg.to_radians()) );
+    let grad2cc = Gradient::new_linear(grad2cc_p0, grad2cc_p1).with_stops([col_avg    ,col_end]);
+    let c = CircleSegment::new((cxx,cyy), r00,r00,  arc_beg,arc_len_deg.to_radians()).outer_arc();
+    let stroke_c = get_stroke_end(wpx).with_dashes(dash_off*r00/r0,dash_iter.iter().map(|w| w*r00/r0).collect::<Vec<f64>>());
+    scene.stroke(&stroke_c, Affine::IDENTITY, &grad2cc, None, &c,);
+
+  }
   pub fn ddd(scene:&mut Scene, center:impl Into<Point>,r0:f64,
     arc_beg:f64, jn:JoinWhere, grad2:Gradient,
     wpx:f64,wavg:f64,
