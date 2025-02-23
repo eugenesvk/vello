@@ -227,11 +227,11 @@ mod impls {
 
       let deg_len = 2. * f64c::PI * r0 / 360.0                 ; //2π*100/360 = 1.74
       let rad_len = 2. * f64c::PI * r0 / 360.0_f64.to_radians(); //2π*100/6.28 = 100
+      let dash_off_rad     	= dash_off_deg.to_radians();
       let dash_off         	= dash_off_deg * deg_len;
       let dash_iter        	= dash_iter_deg.iter().map(|w|w*deg_len).collect::<Vec<f64>>();
       let dash_iter_len_px 	= dash_iter.iter().sum::<f64>(); //5
       let dash_iter_len_deg	= dash_iter_len_px / deg_len; let dash_iter_len_rad = dash_iter_len_deg.to_radians(); //2.87356° 0.05015
-      let dash_off_deg     	= dash_off / deg_len; let dash_off_rad = dash_off_deg.to_radians();
       let dash_iter_rad = dash_iter.iter().map(|w| w / rad_len).collect::<Vec<f64>>();
 
       let (grad_p0,grad_p1) = match jn {
