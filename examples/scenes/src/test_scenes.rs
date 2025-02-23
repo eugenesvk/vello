@@ -183,16 +183,6 @@ mod impls {
       //3/(3+2) * 2.87 = 3/dash_iter_len_px * (dash_iter_len_px / deg_len) = 3 / deg_len
       //1.044
 
-      // DEBUG copy shifted right
-      // let cyy = cy;
-      // let cxx = cx+5.;
-      // let grad2cc_p0 = ( cxx + r0*f64::cos( r2beg_rad                      ) , cyy + r0*f64::sin( r2beg_rad                      ) );
-      // let grad2cc_p1 = ( cxx + r0*f64::cos((r2beg + delta_deg).to_radians()) , cyy + r0*f64::sin((r2beg + delta_deg).to_radians()) );
-      // let grad2cc = Gradient::new_linear(grad2cc_p0, grad2cc_p1).with_stops([col_avg    ,col_end]);
-      // let c = CircleSegment::new((cxx,cyy), r0,r0,  r2beg_rad,arc_len_deg.to_radians()).outer_arc();
-      // let stroke_c = get_stroke_end(w2).with_dashes(dash_off,dash_iter);
-      // scene.stroke(&stroke_c, Affine::IDENTITY, &grad2cc, None, &c,);
-
       // DEBUG copy smaller (including dashes, should perfectly align as dash length/offsets are adjusted per difference in size)
       let cyy = cy;
       let cxx = cx;
