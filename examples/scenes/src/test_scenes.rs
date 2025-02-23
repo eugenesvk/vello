@@ -120,6 +120,10 @@ mod impls {
       let col_avg = col_beg.lerp(col_end,0.5,Default::default());
 
 
+      // Size
+      let arc_len_deg:f64 = 180.; let precision_deg_per_step:f64 = 0.5;
+      // Line width
+      let w1:f64 = 20.; let w2:f64 =  4.;
       // Position
       let cx = 900.; let cy = 200.; let r0 = 95.5; //600 circum len 300 half
       let deg_len = 2. * f64c::PI * r0 / 360.; //2π*100/360 = 1.74
