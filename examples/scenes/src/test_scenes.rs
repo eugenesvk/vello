@@ -107,13 +107,19 @@ mod impls {
       let join_styles = [Join::Bevel, Join::Miter, Join::Round];
 
       let dpi = 1.5;
+      // TODO: test if step length > dash set length (with very low precision)
       // Size
-      let arc_len_deg:f64 = 180.;
-      let precision_deg_per_step:f64 = 0.5; //rad 0.00873
+      let arc_len_deg:f64 = 180.; let precision_deg_per_step = 2.5; //rad 0.00873
       let steps_f = arc_len_deg / precision_deg_per_step; //360
       let steps_i   = steps_f as i32;
+      // Line width
+      let w1:f64 = 20.; let w2:f64 =  4.;
+      // Position
+      let cx = 900.; let cy = 200.; let r0 = 95.5; //600 circum len 300 half
+      let deg_len = 2. * f64c::PI * r0 / 360.; //2π*100/360 = 1.74
+
       // Gradient / size convergence bounds
-      let f_delta = 0.5; // start changing width for the first/last % only
+      let f_delta = 1.; // start changing width for the first/last % only
       let delta_deg    	= arc_len_deg *       f_delta ; let rad_delta    = delta_deg   .to_radians();
       let skip_beg_deg 	= arc_len_deg * (1. - f_delta); let skip_beg_rad = skip_beg_deg.to_radians();
       let steps_delta_f	= steps_f   * f_delta; //36
@@ -129,16 +135,6 @@ mod impls {
       let col_beg = css::LIME;
       let col_end = css::RED;
       let col_avg = col_beg.lerp(col_end,0.5,Default::default());
-
-
-      // TODO: test if step length > dash set length (with very low precision)
-      // Size
-      let arc_len_deg:f64 = 180.; let precision_deg_per_step:f64 = 0.5;
-      // Line width
-      let w1:f64 = 20.; let w2:f64 =  4.;
-      // Position
-      let cx = 900.; let cy = 200.; let r0 = 95.5; //600 circum len 300 half
-      let deg_len = 2. * f64c::PI * r0 / 360.; //2π*100/360 = 1.74
 
       // let dash_off_deg = 30.1; let dash_iter_deg = [30.1,40.];
       let dash_off_deg = 0.; let dash_iter_deg = [10.,10.];
