@@ -295,7 +295,7 @@ mod impls {
               } else    	{scene.stroke(&stroke_c, Affine::IDENTITY, &grad2    , None, &c,);}
               // todo: replace ↑ lime test with ↓
               // scene.stroke(&stroke_c, Affine::IDENTITY, &grad2, None, &c,);
-              if is_last && draw_len < *dash_i - 0.00000000001 { // drawn something, but not the full visible dash
+              if is_last && draw_len < *dash_i - epsi { // drawn something, but not the full visible dash
                 let part_len = draw_end - d_beg; //how much of an existing dash is covered by all draws, incl. last
                 dash_partial = (d_beg + part_len) * rad_len; // add all prior dash segments within a set
                 // println!("! last +visible +draw ╍w {: >.4}° − {: >.4}° actual = {: >.4}° {: >.4}°part_len partial ({:.1}px) rad1 {:.3}°"
