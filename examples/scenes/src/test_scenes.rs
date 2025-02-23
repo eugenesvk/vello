@@ -138,7 +138,8 @@ mod impls {
       let cx = 900.; let cy = 200.; let r0 = 95.5; //600 circum len 300 half
       let deg_len = 2. * f64c::PI * r0 / 360.; //2π*100/360 = 1.74
 
-      let dash_off_deg = 30.1; let dash_iter_deg = [30.1,40.];
+      // let dash_off_deg = 30.1; let dash_iter_deg = [30.1,40.];
+      let dash_off_deg = 0.; let dash_iter_deg = [10.,10.];
       let dash_iter = dash_iter_deg.iter().map(|w|w*deg_len).collect::<Vec<f64>>();
       let dbg = 0;
 
