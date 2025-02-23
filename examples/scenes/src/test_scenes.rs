@@ -173,18 +173,13 @@ mod impls {
 
       let deg_len = 2. * f64c::PI * r0 / 360.; //2π*100/360 = 1.74
       let rad_len = 2. * f64c::PI * r0 / 360.0_f64.to_radians(); //2π*100/6.28 = 100
-      // let dash_iter = [20.,15.,10.,35.]; //todo: reject negative numbers
-      // let dash_iter_deg = [50.,10.66]; //in degrees //° Σsegment 0.337⋅180 = 60.66
-      let dash_off_deg = 0.; let dash_off = dash_off_deg * deg_len;
-      let dash_iter_deg = [51.66,23.]; let dash_iter = dash_iter_deg.iter().map(|w| w * deg_len).collect::<Vec<f64>>();
-      let dash_iter = [20.,16.]; //todo: bugs, positioning seems +px
-      let dash_iter_len:f64 = dash_iter.iter().sum::<f64>(); //5
-      let dash_iter_len_deg:f64 = dash_iter_len / deg_len; //° 2.87356
-      let dash_off_deg = dash_off / deg_len;
-      let dash_off_rad = dash_off_deg.to_radians();
-      let dash_iter_len_rad = dash_iter_len_deg.to_radians(); //0.05015
+      let dash_off_deg = 0.1; let dash_off = dash_off_deg * deg_len;
+      let dash_iter_deg = [30.0,40.]; let dash_iter = dash_iter_deg.iter().map(|w|w*deg_len).collect::<Vec<f64>>();
+      let dash_iter_len_px 	= dash_iter.iter().sum::<f64>(); //5
+      let dash_iter_len_deg	= dash_iter_len_px / deg_len; let dash_iter_len_rad = dash_iter_len_deg.to_radians(); //2.87356° 0.05015
+      let dash_off_deg     	= dash_off / deg_len; let dash_off_rad = dash_off_deg.to_radians();
       let dash_iter_rad = dash_iter.iter().map(|w| w / rad_len).collect::<Vec<f64>>();
-      //3/(3+2) * 2.87 = 3/dash_iter_len * (dash_iter_len / deg_len) = 3 / deg_len
+      //3/(3+2) * 2.87 = 3/dash_iter_len_px * (dash_iter_len_px / deg_len) = 3 / deg_len
       //1.044
 
       // DEBUG copy shifted right
