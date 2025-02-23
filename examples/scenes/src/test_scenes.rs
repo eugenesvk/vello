@@ -251,7 +251,12 @@ mod impls {
         //           ↑↑  skip, overlaps with inactive
         // if i == 0 {println!("\n\n—————Σⁱ={steps_delta_xt: >3}——╍╍№{} Σ{dash_iter_len_deg: >4.1}° off{dash_off_deg: >4.1}° {dash_iter_deg:?}°╍╍——beg {r2beg: >4.1}° Δ{delta_covered_deg: >4.1}° + {delta_rem_deg: >4.1}° rem = Δ{delta_deg: >4.1}°————————————————————————————————————————————"
           // ,dash_iter.len())};
-        // let mut j = 0;
+        let mut dr = 0; // track dash 🗘
+        let mut step_covered = step_width; // track Σ dash_iter_len_rad covering each Δstep
+        while step_covered > 0.  {
+          dr += 1;
+          step_covered -= dash_iter_len_rad;
+        let mut j = 0;
         let mut is_visible = false;
         // if seg_count == 1. {
         for dash_i in &dash_iter_rad {
@@ -326,6 +331,7 @@ mod impls {
             //   );}
           }
           d_beg += dash_i;
+        }
         }
       } // ↓ in case step int conversion missed the last sliver
       // if delta_rem_deg > 0. { // TODO: add dash logic here as well or just use the main loop for this remainder step
