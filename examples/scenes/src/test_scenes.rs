@@ -200,7 +200,62 @@ mod impls {
       let sign2 = if w2 > wavg { 1.} else if w2 < wavg {-1.} else {0.}; //(from avg) ↑ if bigger, ↓ if smaller
       let mut is_vis_draw = false; // whether a visible dash is drawing to clamp its first partial draw to the next. Switches to off when an invisible dash is "drawing"
       let mut carry_over:f64 = 0.; // if Δstep covers 2 dash segments, the 1st one will store the remainer it didn't cover here for the 2nd to pick it up
+      ddd(
+scene,
+r0, cx, cy,
+r2beg_rad,
+grad2,
+w2px,
+wavg,
+sign2,
+is_vis_draw,
+carry_over,
+steps_delta_i,
+w_per_step_i,
+delta_rem_rad,
+precision_rad_per_step,
+dash_iter_rad,
+dash_iter_len_rad,
+dash_iter,
+dash_off_rad,
+dash_partial,
+rad_delta,
+rad_len,
+skip_beg_rad,
 
+);
+      // Draw debug circles showing where each gradient begins/ends
+      let pstr = get_stroke_end(1.); // starting point bigger than the ending, angle to differentiate two curves
+      let g1beg = Ellipse::new(grad1_p0, ( 2.,15.+5.),  33.0_f64.to_radians());scene.stroke(&pstr,Affine::IDENTITY, &col_beg, None, &g1beg,);
+      let g1end = Ellipse::new(grad1_p1, ( 2.,15.+0.),  33.0_f64.to_radians());scene.stroke(&pstr,Affine::IDENTITY, &col_end, None, &g1end,);
+      let g2beg = Ellipse::new(grad2_p0, ( 2.,15.+5.),  99.0_f64.to_radians());scene.stroke(&pstr,Affine::IDENTITY, &col_beg, None, &g2beg,);
+      let g2end = Ellipse::new(grad2_p1, ( 2.,15.+0.),  99.0_f64.to_radians());scene.stroke(&pstr,Affine::IDENTITY, &col_end, None, &g2end,);
+
+    }
+  }
+      pub fn ddd(
+scene:&mut Scene,
+r0:f64, cx:f64, cy:f64,
+r2beg_rad:f64,
+grad2:Gradient,
+w2px:f64,
+wavg:f64,
+sign2:f64,
+mut is_vis_draw:bool,
+mut carry_over:f64,
+steps_delta_i:i32,
+w_per_step_i:f64,
+delta_rem_rad:f64,
+precision_rad_per_step:f64,
+dash_iter_rad:Vec<f64>,
+dash_iter_len_rad:f64,
+dash_iter:Vec<f64>,
+dash_off_rad:f64,
+mut dash_partial:f64,
+rad_delta:f64,
+rad_len:f64,
+skip_beg_rad:f64,
+                 ) {
       // TODO: force precision to be so that one step is never bigger than a dash set length, otherwise would need to repeat the full dash parsing logic here
         // or maybe have a better loop logic that can handle it?
       let is_extra_step = delta_rem_rad > 0.;
@@ -366,15 +421,5 @@ mod impls {
       let stroke_c = get_stroke_end(w2px).with_dashes(dash_partial,dash_iter); // use remainder from the previous segment so that the total matches the style as though it were drawn in one step
       // scene.stroke(&stroke_c, Affine::IDENTITY, &col_end, None, &c,);
       scene.stroke(&stroke_c, Affine::IDENTITY, &css::WHEAT, None, &c,); // for testing
-
-
-      // Draw debug circles showing where each gradient begins/ends
-      let pstr = get_stroke_end(1.); // starting point bigger than the ending, angle to differentiate two curves
-      let g1beg = Ellipse::new(grad1_p0, ( 2.,15.+5.),  33.0_f64.to_radians());scene.stroke(&pstr,Affine::IDENTITY, &col_beg, None, &g1beg,);
-      let g1end = Ellipse::new(grad1_p1, ( 2.,15.+0.),  33.0_f64.to_radians());scene.stroke(&pstr,Affine::IDENTITY, &col_end, None, &g1end,);
-      let g2beg = Ellipse::new(grad2_p0, ( 2.,15.+5.),  99.0_f64.to_radians());scene.stroke(&pstr,Affine::IDENTITY, &col_beg, None, &g2beg,);
-      let g2end = Ellipse::new(grad2_p1, ( 2.,15.+0.),  99.0_f64.to_radians());scene.stroke(&pstr,Affine::IDENTITY, &col_end, None, &g2end,);
-
-    }
-  }
+      }
 }
