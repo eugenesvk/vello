@@ -245,12 +245,10 @@ mod impls {
 
       let grad = Gradient::new_linear(grad_p0,grad_p1).with_stops([col_avg,col_end]);
 
-
-
       if let JoinWhere::End = jn {// Segment 1: ~join part is 2nd (at the end)
         // Draw pre-gradwidth segment separately without the extra iterator
         let c = Arc::new((cx,cy), (r0,r0)   ,  arc_beg,skip_beg_rad, 0.);
-        let stroke_c = get_stroke_end(wpx);
+        let stroke_c = get_stroke_end(w1px);
         // scene.stroke(&stroke_c, Affine::IDENTITY, &col_beg, None, &c,);
         scene.stroke(&stroke_c, Affine::IDENTITY, &css::ORANGE, None, &c,); // for testing
       }
