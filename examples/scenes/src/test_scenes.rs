@@ -216,6 +216,8 @@ mod impls {
       let mut delta_over:f64 = 0.; // if Δstep covers 2 dash segments, the 1st one will store the remainer it didn't cover here for the 2nd to pick it up
       // todo: make sure that this is accounted for on the last step and even on the 2nd arc draw
 
+      // TODO: force precision to be so that one step is never bigger than a dash set length, otherwise would need to repeat the full dash parsing logic here
+        // or maybe have a better loop logic that can handle it?
       let is_extra_step = delta_rem_rad > 0.;
       let steps_delta_xt = if is_extra_step {steps_delta_i} else {steps_delta_i-1};
       for i in 0..=steps_delta_xt { let r = f64::from(i); let is_last = i == steps_delta_xt;
