@@ -191,6 +191,11 @@ mod impls {
     }
   }
   pub enum JoinWhere{Beg,End,}
+  use std::fmt::Display;
+  impl Display for JoinWhere {fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result { match self {
+    JoinWhere::Beg	=> write!(f, "╍╍——"),
+    JoinWhere::End	=> write!(f, "——╍╍")}   }
+  }
 
   // DEBUG copy smaller (including dashes, should perfectly align as dash length/offsets are adjusted per difference in size)
   pub fn ddd_debug(scene:&mut Scene, center:impl Into<Point>,r0:f64, arc_beg:f64, arc_len_deg:f64,
