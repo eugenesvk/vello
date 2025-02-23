@@ -141,7 +141,7 @@ mod impls {
       // todo: bugs gradient bottom first ending 1px wandering of green, due to too precise overlap?
       // todo: bugs bottom 1 section smaller slightly, check overflow logic for the bottom again
       ddd(scene, (cx,cy),r0, r1beg_rad, JoinWhere::End,
-        col_avg,col_end,
+        col_beg,col_end,col_avg,
         w1,w2, dpi,
         precision_deg_per_step,
         dash_off_deg,dash_iter_deg.to_vec(),
@@ -149,7 +149,17 @@ mod impls {
         skip_beg_rad,
         delta_deg,arc_len_deg, dbg,
       );
-      ddd_debug(scene, (cx,cy),r0, r2beg_rad, arc_len_deg, col_avg,col_end, wpx, delta_deg, dash_off_deg,dash_iter_deg.to_vec());
+      ddd(scene, (cx,cy),r0, r2beg_rad, JoinWhere::Beg,
+        col_beg,col_end,col_avg,
+        w1,w2, dpi,
+        precision_deg_per_step,
+        dash_off_deg,dash_iter_deg.to_vec(),
+        rad_delta,
+        skip_beg_rad,
+        delta_deg,arc_len_deg, dbg,
+      );
+      ddd_debug(scene, (cx,cy),r0, r1beg_rad, arc_len_deg, JoinWhere::End, col_beg,col_end,col_avg, w1, skip_beg_rad,delta_deg, dash_off_deg,dash_iter_deg.to_vec());
+      ddd_debug(scene, (cx,cy),r0, r2beg_rad, arc_len_deg, JoinWhere::Beg, col_beg,col_end,col_avg, w2, skip_beg_rad,delta_deg, dash_off_deg,dash_iter_deg.to_vec());
 
       // Draw debug circles showing where each gradient begins/ends
       let pstr = get_stroke_end(1.); // starting point bigger than the ending, angle to differentiate two curves
@@ -168,10 +178,10 @@ mod impls {
   }
 
   // DEBUG copy smaller (including dashes, should perfectly align as dash length/offsets are adjusted per difference in size)
-  pub fn ddd_debug(scene:&mut Scene, center:impl Into<Point>,r0:f64, arc_beg:f64, arc_len_deg:f64,
-    col_avg:Color,col_end:Color,
+  pub fn ddd_debug(scene:&mut Scene, center:impl Into<Point>,r0:f64, arc_beg:f64, arc_len_deg:f64, jn:JoinWhere,
+    col_beg:Color,col_end:Color,col_avg:Color,
     wpx:f64,
-    delta_deg:f64,
+    skip_beg_rad:f64,delta_deg:f64,
     dash_off_deg:f64,dash_iter_deg:Vec<f64>,
     ) {
     let c = center.into(); let (cxx,cyy) = (c.x,c.y); let r00 = r0 - wpx;
@@ -189,13 +199,12 @@ mod impls {
 
   }
   pub fn ddd(scene:&mut Scene, center:impl Into<Point>,r0:f64,  arc_beg:f64, jn:JoinWhere,
-    col_avg:Color,col_end:Color,
+    col_beg:Color,col_end:Color,col_avg:Color,
     w1:f64,w2:f64, dpi:f64,
     precision_deg_per_step:f64,
     dash_off_deg:f64,dash_iter_deg:Vec<f64>,
     rad_delta:f64,
-    skip_beg_rad:f64,
-    delta_deg:f64,
+    skip_beg_rad:f64,delta_deg:f64,
     arc_len_deg:f64,     dbg:u8,
     ) {
       let mut is_vis_draw  = false; // whether a visible dash is drawing to clamp its first partial draw to the next. Switches to off when an invisible dash is "drawing"
