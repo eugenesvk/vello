@@ -306,15 +306,10 @@ mod impls {
               if   draw_len > 0. //drawn something… ↙some float rounding error
                 && part_len < *dash_i - 0.00000000001 { //…but not the full invisible dash
                 dash_partial = (d_beg + part_len) * rad_len; //≝draw_end add all prior dash segments within a set
-                // println!("{}№{} last -visible +draw dbeg {} draw_end {} dash−part_len={} w_dash {: >.2}° − {: >.2}° par = {: >.2}° left  drawn {: >.2}° (partial {:.1}px) rad1 {:.3}°"
-                  // ,if dash_partial > 0. {"✓"}else{"✗"},seg_count
-                  // ,d_beg.to_degrees(),draw_end.to_degrees()
-                  // ,(dash_i-part_len).to_degrees()
-                  // ,dash_i.to_degrees()
-                  // ,        (draw_end - d_beg) .to_degrees() //part_len
-                  // ,(dash_i-(draw_end - d_beg)).to_degrees()
-                  // ,draw_len.to_degrees()
-                  // ,dash_partial,rad1.to_degrees());
+                // println!("{}№{seg_count} last -visible +draw ╍beg {: >3.3}° draw_end {: >3.3}°≝partial ({:.1}px) Δ{: >3.3}° Δstep {: >3.3}° drawn │ ╍w {: >.2}° left {: >.2}° rad1 {:.3}°"
+                //   ,if dash_partial > 0. {"✓"}else{"✗"}
+                //   ,d_beg.to_degrees(),draw_end.to_degrees(),dash_partial,part_len.to_degrees(),draw_len.to_degrees()
+                //   ,dash_i.to_degrees(),(dash_i-part_len).to_degrees(),rad1.to_degrees());
               }
             }
             // if dbgprint || i == 0 || is_last || (58<= i && i <=62) {println!( //👁👀👓  seg={dash_off_deg: >3.1} % {dash_iter_len_deg: >3.1}
