@@ -106,19 +106,30 @@ mod impls {
       // Line width
       let w1:f64 = 20.; let w2:f64 =  4.;
       // Position
-      let cx = 900.; let cy = 200.; let r0 = 95.5; //600 circum len 300 half
+      let cx = 0.; let cy = 100.; let r0 = 95.5; //600 circum len 300 half
       let r1beg:f64 = 0.             	; let r1beg_rad = r1beg.to_radians(); //→
       let r2beg = r1beg + arc_len_deg	; let r2beg_rad = r2beg.to_radians();
       // Color
       let col_beg = css::LIME;let col_end = css::RED;
       // Dashes
-      let dash_off_deg = 30.1; let dash_iter_deg = [30.1,40.];
+      let mut dashes = vec![];
+      dashes.push( ( 0. , None            ) );
+      dashes.push( (30.1, Some([30.1,40.])) );
+      dashes.push( (15.1, Some([10.1,10.])) );
+      dashes.push( (12.1, Some([20.1,20.])) );
+      dashes.push( (11.1, Some([30.1,10.])) );
+      dashes.push( (0.  , Some([30.1,10.])) );
       let dbg = 1;
 
-      ddd(scene, (cx,cy),r0, r1beg_rad, arc_len_deg,  JoinWhere::End,delta_transit,
-        col_beg,col_end,  w1,w2, dpi,  precision_deg_per_step,  dash_off_deg,dash_iter_deg,   dbg,);
-      ddd(scene, (cx,cy),r0, r2beg_rad, arc_len_deg,  JoinWhere::Beg,delta_transit,
-        col_beg,col_end,  w1,w2, dpi,  precision_deg_per_step,  dash_off_deg,dash_iter_deg,   dbg,);
+      let end = dashes.len();
+      for i in 0..end { let f = f64::from(i as u32);
+        let cx = 20. + (1. + f    *       2. )*(r0 + w1.max(w2));
+        let cy = 20. + (1. + f.div_euclid(5.))*(r0 + w1.max(w2)); // 5 circles in a row
+        ddd(scene, (cx,cy),r0, r1beg_rad, arc_len_deg,  JoinWhere::End,delta_transit,
+          col_beg,col_end,  w1,w2, dpi,  precision_deg_per_step,  dashes[i].0,dashes[i].1, dbg,);
+        ddd(scene, (cx,cy),r0, r2beg_rad, arc_len_deg,  JoinWhere::Beg,delta_transit,
+          col_beg,col_end,  w1,w2, dpi,  precision_deg_per_step,  dashes[i].0,dashes[i].1, dbg,);
+      }
 
       // Draw debug circles showing where each gradient begins/ends
       // let pstr = get_stroke_end(1.); // starting point bigger than the ending, angle to differentiate two curves
@@ -134,7 +145,7 @@ mod impls {
     col_beg:Color,col_end:Color,
     w1:f64,w2:f64, dpi:f64,
     precision_deg_per_step:f64,
-    dash_off_deg:f64,dash_iter_deg:I,   dbg:u8,
+    dash_off_deg:f64,dash_iter_deg_o:Option<I>,   dbg:u8,
     ) where I:IntoIterator, I::Item:Borrow<f64> {
       let mut is_vis_draw  = false; // whether a visible dash is drawing to clamp its first partial draw to the next. Switches to off when an invisible dash is "drawing"
       let mut dash_partial = 0.; // use as dash offset for the next segment to hide the partially drawn part
@@ -177,16 +188,22 @@ mod impls {
       let c = center.into(); let (cx,cy) = (c.x,c.y);
 
       // Dashes
-      let deg_len = f64c::TAU * r0 / 360.; //2π*100/360 = 1.74
-      let dash_off_rad     	= dash_off_deg.to_radians();
-      let dash_off         	= dash_off_deg * deg_len;
-      let dash_iter        	= dash_iter_deg.into_iter().map(|w|f_round(*w.borrow() * deg_len,6)).collect::<Vec<f64>>();
-      let dash_iter_len_px 	= dash_iter.iter().sum::<f64>(); //5
-      let dash_iter_len_deg	= dash_iter_len_px / deg_len; let dash_iter_len_rad = dash_iter_len_deg.to_radians(); //2.87356° 0.05015
-      let dash_iter_rad = dash_iter.iter().map(|w| w / r0).collect::<Vec<f64>>();
-      let dash_off_pre_jn_rad = match jn { // if join is after dashed line, that line can be cut and thus dash continuation should start from an adjusted offset
-        JoinWhere::Beg	=> 0.,
-        JoinWhere::End	=> skip_beg_rad % dash_iter_len_rad,
+      let (is_dash, dash_off_px, dash_off_rad, dash_off_pre_jn_rad, dash_iter_len_deg, dash_iter_len_rad, dash_iter_px, dash_iter_rad) = match dash_iter_deg_o {
+        Some(dash_iter_deg)	=> {
+          let deg_len = f64c::TAU * r0 / 360.; //2π*100/360 = 1.74
+          let dash_off_rad     	= dash_off_deg.to_radians();
+          let dash_off_px      	= dash_off_deg * deg_len;
+          let dash_iter_px     	= dash_iter_deg.into_iter().map(|w|f_round(*w.borrow() * deg_len,6)).collect::<Vec<f64>>();
+          let dash_iter_len_px 	= dash_iter_px.iter().sum::<f64>(); //5
+          let dash_iter_rad    	= dash_iter_px.iter().map(|w| w / r0).collect::<Vec<f64>>();
+          let dash_iter_len_deg	= dash_iter_len_px / deg_len; let dash_iter_len_rad = dash_iter_len_deg.to_radians(); //2.87356° 0.05015
+          let dash_off_pre_jn_rad = match jn { // if join is after dashed line, that line can be cut and thus dash continuation should start from an adjusted offset
+            JoinWhere::Beg	=> 0.,
+            JoinWhere::End	=> skip_beg_rad % dash_iter_len_rad,
+          };
+          (true, dash_off_px, dash_off_rad, dash_off_pre_jn_rad, dash_iter_len_deg, dash_iter_len_rad, dash_iter_px, dash_iter_rad)
+        },
+        None	=> (false, 0.,0.,0., precision_deg_per_step,precision_rad_per_step, vec![precision_deg_per_step],vec![precision_rad_per_step]),
       };
 
       let dbg_col_beg = if dbg>=1{css::DARK_RED  }else{col_end};
@@ -266,8 +283,8 @@ mod impls {
         // seg_beg┘     └seg_end
         //         ↑↑  ↑ draw, overlaps with   active
         //           ↑↑  skip, overlaps with inactive
-        if dbg>=2 {if i == 0 {println!("\n\n—————Σⁱ={steps_delta_xt: >3}——╍╍№{} Σ{dash_iter_len_deg: >4.1}° off{dash_off_deg: >4.1}° {dash_iter:?}°╍╍——beg {: >4.1}° Δ{delta_covered_deg: >4.1}° + {delta_rem_deg: >4.1}° rem = Δ{delta_deg: >4.1}°————————————————————————————————————————————"
-          ,dash_iter.len(), arc_beg.to_degrees())}};
+        if dbg>=2 {if i == 0 {println!("\n\n—————Σⁱ={steps_delta_xt: >3}——╍╍№{} Σ{dash_iter_len_deg: >4.1}° off{dash_off_deg: >4.1}° {dash_iter_px:?}°╍╍——beg {: >4.1}° Δ{delta_covered_deg: >4.1}° + {delta_rem_deg: >4.1}° rem = Δ{delta_deg: >4.1}°————————————————————————————————————————————"
+          ,dash_iter_px.len(), arc_beg.to_degrees())}};
         let mut dr = 0; // track dash 🗘
         let mut step_covered = step_width; // track Σ dash_iter_len_rad covering each Δstep
         while step_covered > 0.  {
@@ -322,7 +339,7 @@ mod impls {
             } else {is_vis_draw=false;}
             // if rad0       <=       d_end
             // &&    seg_end >= d_beg  { // (alt check) our segment overlaps with this dash
-            if dbg>=2 && (dbgprint || i == 0 || is_last || (78<= i && i <=83)) {println!( //👁👀👓  seg={dash_off_deg: >3.1} % {dash_iter_len_deg: >3.1}
+            if dbg>=2 && (dbgprint || i == 0 || is_last || (78<= i && i <=83)) {println!( //👁👀👓
               "{}👀{}{i: >3} {} {j: >2}\
               │ +{: >4.1}={: >4.1}° ↷ {: >4.1}° Δ{: >3.1}° off {: >3.1}° \
               │№{seg_count: >2} {: >4.1}° ↷ {: >4.1}°\
@@ -368,7 +385,7 @@ mod impls {
                 //   ,dash_i.to_degrees(),(dash_i-part_len).to_degrees(),rad1.to_degrees());
               }
             }
-            if dbg>=3 && (dbgprint || i == 0 || is_last || (78<= i && i <=83)) {println!( //👁👀👓  seg={dash_off_deg: >3.1} % {dash_iter_len_deg: >3.1}
+            if dbg>=3 && (dbgprint || i == 0 || is_last || (78<= i && i <=83)) {println!( //👁👀👓
               "{}👓{}{i: >3} {} {j: >2}\
               │ +{: >4.1}={: >4.1}° ↷ {: >4.1}° Δ{: >3.1}° off {: >3.1}° \
               │№{seg_count: >2} {: >4.1}° ↷ {: >4.1}°\
@@ -392,7 +409,9 @@ mod impls {
         //   ,arc_beg.to_degrees(),delta_rad.to_degrees(),(arc_beg + delta_rad).to_degrees(),skip_beg_rad.to_degrees(),(dash_partial/r0).to_degrees());
         let c = Arc::new((cx,cy), (r0,r0) , arc_beg + delta_rad, skip_beg_rad, 0.);
         // let stroke_c = get_stroke_end(w2px); // todo↓ make dashes optional
-        let stroke_c = get_stroke_end(w2px).with_dashes(dash_partial,&dash_iter); // use remainder from the previous segment so that the total matches the style as though it were drawn in one step
+        let stroke_c = if is_dash { // use remainder from the previous segment so that the total matches the style as though it were drawn in one step
+          get_stroke_end      (w2px).with_dashes(dash_partial,&dash_iter_px)
+        } else {get_stroke_end(w2px)};
         // scene.stroke(&stroke_c, Affine::IDENTITY, &col_end, None, &c,);
         scene.stroke(&stroke_c, Affine::IDENTITY, &css::DARK_RED, None, &c,); // for testing
       }
@@ -406,7 +425,9 @@ mod impls {
         JoinWhere::End	=> w1px,};
       let grad = Gradient::new_sweep((cx,cy),             arc_beg as f32,(arc_beg + arc_len_rad) as f32).with_stops(col_stops);
       let c    = Arc::new           ((cx,cy), (r00,r00),  arc_beg       ,           arc_len_rad, 0.);
-      let stroke_c = get_stroke_end(wpx).with_dashes(dash_off*r00/r0,dash_iter.iter().map(|w|f_round(w*r00/r0,6)).collect::<Vec<f64>>());
+      let stroke_c = if is_dash {
+        get_stroke_end(wpx).with_dashes(dash_off_px*r00/r0,dash_iter_px.iter().map(|w|f_round(w*r00/r0,6)).collect::<Vec<f64>>())
+      } else {get_stroke_end(wpx)};
       scene.stroke(&stroke_c, Affine::IDENTITY, &grad, None, &c,);
     }
   }
