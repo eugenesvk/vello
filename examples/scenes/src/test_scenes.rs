@@ -431,8 +431,8 @@ mod impls {
                   let carry_over_r1 = (carry_over_r0 + carry_over).min(rad1) ;// up to our arc's end, the rest will be picked up by the next arc
                   let carry_over_delta = carry_over_r1 - carry_over_r0;
                   let c = Arc::new((cx,cy), (r0,r0)   ,carry_over_r0,carry_over_delta, 0.);
-                  // scene.stroke(&stroke_c, Affine::IDENTITY, &grad    , None, &c,);
-                  scene.stroke(&stroke_c, Affine::IDENTITY, css::MAGENTA , None, &c,); // todo: replace test with ↑
+                  if dbg>=1	{scene.stroke(&stroke_c, Affine::IDENTITY, css::MAGENTA , None, &c,);
+                  } else   	{scene.stroke(&stroke_c, Affine::IDENTITY, &grad        , None, &c,);}
                   dash_partial = carry_over_delta * rad_len; carry_over = 0.;
                   // println!("last step - drawn next dash since it won't be handled later!");
                 // } else {println!("  Δover {: >4.1}° = step_w {: >4.1}° - {: >4.1}° drawn",carry_over.to_degrees(),step_width.to_degrees(),draw_len.to_degrees());
