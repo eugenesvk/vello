@@ -123,8 +123,8 @@ mod impls {
 
       let end = dashes.len();
       for i in 0..end { let f = f64::from(i as u32);
-        let cx = 20. + (1. + f    *       2. )*(r0 + w1.max(w2));
-        let cy = 20. + (1. + f.div_euclid(5.))*(r0 + w1.max(w2)); // 5 circles in a row
+        let cx = 20. + (1. + (f     %      5.) * 2. )*(r0 + w1.max(w2));
+        let cy = 20. + (1. +  f.div_euclid(5.) * 2. )*(r0 + w1.max(w2)); // 5 circles in a row
         ddd(scene, (cx,cy),r0, r1beg_rad, arc_len_deg,  JoinWhere::End,delta_transit,
           col_beg,col_end,  w1,w2, dpi,  precision_deg_per_step,  dashes[i].0,dashes[i].1, dbg,);
         ddd(scene, (cx,cy),r0, r2beg_rad, arc_len_deg,  JoinWhere::Beg,delta_transit,
