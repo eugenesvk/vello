@@ -88,6 +88,13 @@ mod impls {
     //      is_active = !is_active;
     //  }
 
+  pub enum JoinWhere{Beg,End,}
+  use std::fmt::Display;
+  impl Display for JoinWhere {fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result { match self {
+    JoinWhere::Beg	=> write!(f, "╍╍——"),
+    JoinWhere::End	=> write!(f, "——╍╍")}   }
+  }
+
   pub(super) fn stroke_styles(transform: Affine) -> impl FnMut(&mut Scene, &mut SceneParams<'_>) {
     use PathEl::*;
     move |scene, params| {
@@ -149,12 +156,6 @@ mod impls {
       // let g2beg = Ellipse::new(grad2_p0, ( 2.,15.+5.),  99.0_f64.to_radians());scene.stroke(&pstr,Affine::IDENTITY, &col_beg, None, &g2beg,);
       // let g2end = Ellipse::new(grad2_p1, ( 2.,15.+0.),  99.0_f64.to_radians());scene.stroke(&pstr,Affine::IDENTITY, &col_end, None, &g2end,);
     }
-  }
-  pub enum JoinWhere{Beg,End,}
-  use std::fmt::Display;
-  impl Display for JoinWhere {fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result { match self {
-    JoinWhere::Beg	=> write!(f, "╍╍——"),
-    JoinWhere::End	=> write!(f, "——╍╍")}   }
   }
 
   pub fn ddd<I>(scene:&mut Scene, center:impl Into<Point>,r0:f64,  arc_beg:f64, jn:JoinWhere,
