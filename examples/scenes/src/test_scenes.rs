@@ -141,10 +141,6 @@ mod impls {
         skip_beg_rad,
         delta_deg,arc_len_deg, dbg,
       );
-      ddd_debug(scene, (cx,cy),r0, r1beg_rad, arc_len_deg, JoinWhere::End,
-        col_beg,col_end,col_avg, w1, skip_beg_rad,delta_deg, dash_off_deg,dash_iter_deg);
-      ddd_debug(scene, (cx,cy),r0, r2beg_rad, arc_len_deg, JoinWhere::Beg,
-        col_beg,col_end,col_avg, w2, skip_beg_rad,delta_deg, dash_off_deg,dash_iter_deg);
 
       // Draw debug circles showing where each gradient begins/ends
       let pstr = get_stroke_end(1.); // starting point bigger than the ending, angle to differentiate two curves
@@ -152,7 +148,6 @@ mod impls {
       let g1end = Ellipse::new(grad1_p1, ( 2.,15.+0.),  33.0_f64.to_radians());scene.stroke(&pstr,Affine::IDENTITY, &col_end, None, &g1end,);
       let g2beg = Ellipse::new(grad2_p0, ( 2.,15.+5.),  99.0_f64.to_radians());scene.stroke(&pstr,Affine::IDENTITY, &col_beg, None, &g2beg,);
       let g2end = Ellipse::new(grad2_p1, ( 2.,15.+0.),  99.0_f64.to_radians());scene.stroke(&pstr,Affine::IDENTITY, &col_end, None, &g2end,);
-
     }
   }
   pub enum JoinWhere{Beg,End,}
@@ -162,50 +157,6 @@ mod impls {
     JoinWhere::End	=> write!(f, "——╍╍")}   }
   }
 
-  // DEBUG copy smaller (including dashes, should perfectly align as dash length/offsets are adjusted per difference in size)
-  pub fn ddd_debug<I>(scene:&mut Scene, center:impl Into<Point>,r0:f64, arc_beg:f64, arc_len_deg:f64, jn:JoinWhere,
-    col_beg:Color,col_end:Color,col_avg:Color,
-    wpx:f64,
-    skip_beg_rad:f64,delta_deg:f64,
-    dash_off_deg:f64,dash_iter_deg:I,
-    ) where I:IntoIterator, I::Item:Borrow<f64> {
-    let c = center.into(); let (cx,cy) = (c.x,c.y); let r00 = r0 - wpx;
-    let deg_len  	= f64c::TAU * r0 / 360.0; //2π*100/360 = 1.74
-    let dash_off 	= dash_off_deg * deg_len;
-    let dash_iter	= dash_iter_deg.into_iter().map(|w|f_round(*w.borrow() * deg_len,6)).collect::<Vec<f64>>();
-    let arc_len_rad = arc_len_deg.to_radians();
-
-    let (grad_p0,grad_p1, col_stops) = match jn {
-      JoinWhere::Beg	=> {
-        let grad_beg_p0 = ( cx + r0*f64::cos(arc_beg                           ) , cy + r0*f64::sin(arc_beg                         ) );
-        let grad_beg_p1 = ( cx + r0*f64::cos(arc_beg + delta_deg.to_radians()  ) , cy + r0*f64::sin(arc_beg + delta_deg.to_radians()) );
-        let col_stops_beg =[
-          (0.,col_avg),
-          ((delta_deg  .to_radians()/arc_len_rad) as f32,col_end),
-          ((delta_deg  .to_radians()/arc_len_rad) as f32,css::DARK_RED),
-          ((arc_len_deg.to_radians()/arc_len_rad) as f32,css::DARK_RED),
-          ];
-        // println!("beg {col_stops_beg:?}");
-        (grad_beg_p0,grad_beg_p1, col_stops_beg)},
-      JoinWhere::End	=> {
-        let p0x = cx + r0*f64::cos(arc_beg + skip_beg_rad            );
-        let p1x = cx + r0*f64::cos(arc_beg + arc_len_deg.to_radians());
-        let grad_end_p0 = ( cx + r0*f64::cos(arc_beg + skip_beg_rad            ) , cy + r0*f64::sin(arc_beg + skip_beg_rad          ));
-        let grad_end_p1 = ( cx + r0*f64::cos(arc_beg + arc_len_deg.to_radians()) , cy + r0*f64::sin(arc_beg + arc_len_deg.to_radians()));
-        let col_stops_end = [
-          (0.,css::DARK_GREEN),
-          ((skip_beg_rad            /arc_len_rad) as f32,css::DARK_GREEN),
-          ((skip_beg_rad            /arc_len_rad) as f32,col_beg),
-          ((arc_len_deg.to_radians()/arc_len_rad) as f32,col_avg),
-          ];
-        // println!("end {col_stops_end:?}");
-        (grad_end_p0,grad_end_p1, col_stops_end)},
-    };
-    let grad = Gradient::new_sweep((cx,cy),             arc_beg as f32,(arc_beg+arc_len_rad) as f32).with_stops(col_stops);
-    let c    = Arc::new           ((cx,cy), (r00,r00),  arc_beg       ,arc_len_rad, 0.);
-    let stroke_c = get_stroke_end(wpx).with_dashes(dash_off*r00/r0,dash_iter.iter().map(|w|f_round(w*r00/r0,6)).collect::<Vec<f64>>());
-    scene.stroke(&stroke_c, Affine::IDENTITY, &grad, None, &c,);
-  }
   pub fn ddd<I>(scene:&mut Scene, center:impl Into<Point>,r0:f64,  arc_beg:f64, jn:JoinWhere,
     col_beg:Color,col_end:Color,col_avg:Color,
     w1:f64,w2:f64, dpi:f64,
@@ -270,16 +221,25 @@ mod impls {
         JoinWhere::Beg	=> {
           let grad_beg_p0 = ( cx + r0*f64::cos(arc_beg                           ) , cy + r0*f64::sin(arc_beg                         ) );
           let grad_beg_p1 = ( cx + r0*f64::cos(arc_beg + delta_deg.to_radians()  ) , cy + r0*f64::sin(arc_beg + delta_deg.to_radians()) );
-          let col_stops_beg = [col_avg,col_end];
+          let col_stops_beg = if dbg>=1 {[
+            (0.,col_avg),
+            ((delta_deg  .to_radians()/arc_len_rad) as f32,col_end),
+            ((delta_deg  .to_radians()/arc_len_rad) as f32,css::DARK_RED),
+            ((arc_len_deg.to_radians()/arc_len_rad) as f32,css::DARK_RED),
+          ]} else {[col_avg,col_end]};
           (grad_beg_p0,grad_beg_p1, col_stops_beg)},
         JoinWhere::End	=> {
           let grad_end_p0 = ( cx + r0*f64::cos(arc_beg + skip_beg_rad            ) , cy + r0*f64::sin(arc_beg + skip_beg_rad          ));
           let grad_end_p1 = ( cx + r0*f64::cos(arc_beg + arc_len_rad             ) , cy + r0*f64::sin(arc_beg + arc_len_rad           ));
-          let col_stops_end = [col_beg,col_avg];
+          let col_stops_beg = if dbg>=1 {[
+            (0.,css::DARK_GREEN),
+            ((skip_beg_rad            /arc_len_rad) as f32,css::DARK_GREEN),
+            ((skip_beg_rad            /arc_len_rad) as f32,col_beg),
+            ((arc_len_deg.to_radians()/arc_len_rad) as f32,col_avg),
+          ]} else {[col_beg,col_avg]};
           (grad_end_p0,grad_end_p1, col_stops_end)},
       };
-
-      let grad = Gradient::new_linear(grad_p0,grad_p1).with_stops(col_stops);
+      let grad = Gradient::new_sweep((cx,cy),arc_beg as f32,(arc_beg + arc_len_rad) as f32).with_stops(col_stops);
 
       if let JoinWhere::End = jn {// Segment 1: ~join part is 2nd (at the end)
         // Draw pre-gradwidth segment separately without the extra iterator
@@ -462,5 +422,15 @@ mod impls {
         // scene.stroke(&stroke_c, Affine::IDENTITY, &col_end, None, &c,);
         scene.stroke(&stroke_c, Affine::IDENTITY, &css::DARK_RED, None, &c,); // for testing
       }
+
+    if dbg >=1 { // DEBUG copy smaller (including dashes, should perfectly align as dash length/offsets are adjusted per difference in size)
+      let r00 = match jn {
+        JoinWhere::Beg	=> r0 - w2,
+        JoinWhere::End	=> r0 - w1,}
+      let grad = Gradient::new_sweep((cx,cy),             arc_beg as f32,(arc_beg + arc_len_rad) as f32).with_stops(col_stops);
+      let c    = Arc::new           ((cx,cy), (r00,r00),  arc_beg       ,           arc_len_rad, 0.);
+      let stroke_c = get_stroke_end(wpx).with_dashes(dash_off*r00/r0,dash_iter.iter().map(|w|f_round(w*r00/r0,6)).collect::<Vec<f64>>());
+      scene.stroke(&stroke_c, Affine::IDENTITY, &grad, None, &c,);
     }
+  }
 }
