@@ -237,8 +237,7 @@ mod impls {
         // Draw pre-gradwidth segment separately without the extra iterator
         let c = Arc::new((cx,cy), (r0,r0)   ,  arc_beg,skip_beg_rad, 0.);
         let stroke_c = get_stroke_end(w1px);
-        // scene.stroke(&stroke_c, Affine::IDENTITY, &col_beg, None, &c,);
-        scene.stroke(&stroke_c, Affine::IDENTITY, &css::DARK_GREEN, None, &c,); // for testing
+        scene.stroke(&stroke_c, Affine::IDENTITY, &dbg_col_end, None, &c,);
       }
 
       // TODO: force precision to be so that one step is never bigger than a dash set length, otherwise would need to repeat the full dash parsing logic here
