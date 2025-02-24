@@ -379,8 +379,8 @@ mod impls {
               // if is_vis_draw {println!("!!! leftovers from a previous dash should always 1st, but something else drew")}; //todo warn
               is_vis_draw = true; // start drawing @ the end of prev ↓ step
               let c = Arc::new((cx,cy), (r0,r0)   ,rad0 - carry_over,carry_over, 0.);
-              // scene.stroke(&stroke_c, Affine::IDENTITY, &grad    , None, &c,);
-              scene.stroke(&stroke_c, Affine::IDENTITY, css::MAGENTA , None, &c,); // todo: replace test with ↑
+              if dbg>=1	{scene.stroke(&stroke_c, Affine::IDENTITY, css::MAGENTA , None, &c,);
+              } else   	{scene.stroke(&stroke_c, Affine::IDENTITY, &grad        , None, &c,);}
               carry_over = 0.;
               dbgprint = true; // todo: remove
               // println!("{i} drawing Δover {: >2.1} @ {: >3.2} = ({: >2.1}-{: >2.1}-Δ{: >2.1}) → {: >3.2}",carry_over.to_degrees()
