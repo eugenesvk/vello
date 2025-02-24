@@ -115,25 +115,15 @@ mod impls {
       // Gradient / size convergence bounds
       let steps_f = arc_len_deg / precision_deg_per_step; //360
       let steps_i   = steps_f as i32;
-      let f_delta = 1.; // start changing width for the first/last % only
-      let delta_deg   	= arc_len_deg *       f_delta ; let delta_rad    = delta_deg   .to_radians();
-      let skip_beg_deg	= arc_len_deg * (1. - f_delta); let skip_beg_rad = skip_beg_deg.to_radians();
+      let delta_transit = 1.0; // start changing width for the first/last % only
 
       let r1beg:f64 = 0.             	; let r1beg_rad = r1beg.to_radians(); //→
       let r2beg = r1beg + arc_len_deg	; let r2beg_rad = r2beg.to_radians();
 
-      ddd(scene, (cx,cy),r0, r1beg_rad, arc_len_deg,  JoinWhere::End,
-        col_beg,col_end,   w1,w2, dpi,   precision_deg_per_step,
-        dash_off_deg,dash_iter_deg,
-        delta_rad,
-        skip_beg_rad,
-        delta_deg, dbg,);
-      ddd(scene, (cx,cy),r0, r2beg_rad, arc_len_deg,  JoinWhere::Beg,
-        col_beg,col_end,   w1,w2, dpi,   precision_deg_per_step,
-        dash_off_deg,dash_iter_deg,
-        delta_rad,
-        skip_beg_rad,
-        delta_deg, dbg,);
+      ddd(scene, (cx,cy),r0, r1beg_rad, arc_len_deg,  JoinWhere::End,delta_transit,
+        col_beg,col_end,  w1,w2, dpi,  precision_deg_per_step,  dash_off_deg,dash_iter_deg,   dbg,);
+      ddd(scene, (cx,cy),r0, r2beg_rad, arc_len_deg,  JoinWhere::Beg,delta_transit,
+        col_beg,col_end,  w1,w2, dpi,  precision_deg_per_step,  dash_off_deg,dash_iter_deg,   dbg,);
 
       // Draw debug circles showing where each gradient begins/ends
       // let pstr = get_stroke_end(1.); // starting point bigger than the ending, angle to differentiate two curves
@@ -145,16 +135,18 @@ mod impls {
   }
 
   pub fn ddd<I>(scene:&mut Scene, center:impl Into<Point>,r0:f64,  arc_beg:f64, arc_len_deg:f64,
-    jn:JoinWhere,
+    jn:JoinWhere, delta_transit:f64,
     col_beg:Color,col_end:Color,
     w1:f64,w2:f64, dpi:f64,
     precision_deg_per_step:f64,
-    dash_off_deg:f64,dash_iter_deg:I,
-    delta_rad:f64, skip_beg_rad:f64,delta_deg:f64,  dbg:u8,
+    dash_off_deg:f64,dash_iter_deg:I,   dbg:u8,
     ) where I:IntoIterator, I::Item:Borrow<f64> {
       let mut is_vis_draw  = false; // whether a visible dash is drawing to clamp its first partial draw to the next. Switches to off when an invisible dash is "drawing"
       let mut dash_partial = 0.; // use as dash offset for the next segment to hide the partially drawn part
       let mut carry_over:f64 = 0.; // if Δstep covers 2 dash segments, the 1st one will store the remainer it didn't cover here for the 2nd to pick it up
+
+      let delta_deg   	= arc_len_deg *       delta_transit ; let delta_rad    = delta_deg   .to_radians();
+      let skip_beg_deg	= arc_len_deg * (1. - delta_transit); let skip_beg_rad = skip_beg_deg.to_radians();
 
       // Line width
       let wavg = (w1 + w2) / 2.; let wavgpx = (wavg * dpi).round() / dpi;
