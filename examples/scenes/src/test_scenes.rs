@@ -244,6 +244,13 @@ mod impls {
         // or maybe have a better loop logic that can handle it?
       let is_extra_step = delta_rem_rad > 0.;
       let steps_delta_xt = if is_extra_step {steps_delta_i} else {steps_delta_i-1};
+      let w_beg = match jn {
+        JoinWhere::Beg	=> wavg,
+        JoinWhere::End	=> w1px,};
+      let w_end = match jn {
+        JoinWhere::Beg	=> w2px,
+        JoinWhere::End	=> wavg,};
+
       for i in 0..=steps_delta_xt { let r = f64::from(i); let is_last = i == steps_delta_xt;
         // NB! last step needs special handling since it's a fractional one, so not full "precision length"!
         let step_width = if is_last && is_extra_step	{delta_rem_rad
@@ -254,10 +261,8 @@ mod impls {
         // let c = Arc::new((cx,cy), (r0,r0) ,  rad0,step_width+gap_correct, 0.); //arc bugs with gaps
         // let c = CircleSegment::new((cx,cy), r0,r0   ,  rad0,step_width); // alt fix
         //                          center  rout/in    ∠start ∠sweep
-        let cw = if is_last {
-          match jn	{JoinWhere::Beg	=> w2px
-            ,     	 JoinWhere::End	=> wavg,}
-        } else    	{wavg + sign * r * w_per_step_i};
+        let cw = if is_last	{w_end
+        } else             	{w_beg + sign * r * w_per_step_i};
 
         let stroke_c = if dbg>=2 {match jn {
           JoinWhere::Beg	=> get_stroke_end(w2px),
