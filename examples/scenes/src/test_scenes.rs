@@ -90,22 +90,6 @@ mod impls {
   pub(super) fn stroke_styles(transform: Affine) -> impl FnMut(&mut Scene, &mut SceneParams<'_>) {
     use PathEl::*;
     move |scene, params| {
-      let colors = [
-        Color::from_rgb8(140, 181, 236),
-        Color::from_rgb8(246, 236, 202),
-        Color::from_rgb8(201, 147, 206),
-        Color::from_rgb8(150, 195, 160),
-      ];
-      let join_stroke = [ MoveTo (( 0. , 0.).into()),
-        CurveTo((20. , 0.).into(), (42.5, 5.).into(), ( 50., 25.).into()),
-        CurveTo((57.5, 5.).into(), (80. , 0.).into(), (100.,  0.).into()),];
-      let stroke1     = [ MoveTo (( 0. , 0.).into()),
-        CurveTo((20. , 0.).into(), (42.5, 5.).into(), ( 50., 25.).into()),];
-      let stroke2     = [ MoveTo (                   ( 50., 25.).into()),
-        CurveTo((57.5, 5.).into(), (80. , 0.).into(), (100.,  0.).into()),];
-      let cap_styles  = [Cap::Butt  , Cap::Round ]; //Cap::Square,
-      let join_styles = [Join::Bevel, Join::Miter, Join::Round];
-
       let dpi = 1.5;
       // TODO: test if step length > dash set length (with very low precision)
       // Size
