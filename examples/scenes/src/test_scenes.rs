@@ -217,26 +217,28 @@ mod impls {
       let r1beg:f64 = 0.             	; let r1beg_rad = r1beg.to_radians(); //→
       let r1end = r1beg + arc_len_deg	; let r1end_rad = r1end.to_radians();
       let r2beg = r1end + gap        	; let r2beg_rad = r2beg.to_radians();
+      let dbg_col_beg = if dbg>=1{css::DARK_RED  }else{col_end};
+      let dbg_col_end = if dbg>=1{css::DARK_GREEN}else{col_beg};
       let (grad_p0,grad_p1, col_stops) = match jn {
         JoinWhere::Beg	=> {
           let grad_beg_p0 = ( cx + r0*f64::cos(arc_beg                           ) , cy + r0*f64::sin(arc_beg                         ) );
           let grad_beg_p1 = ( cx + r0*f64::cos(arc_beg + delta_deg.to_radians()  ) , cy + r0*f64::sin(arc_beg + delta_deg.to_radians()) );
-          let col_stops_beg = if dbg>=1 {[
-            (0.,col_avg),
-            ((delta_deg  .to_radians()/arc_len_rad) as f32,col_end),
-            ((delta_deg  .to_radians()/arc_len_rad) as f32,css::DARK_RED),
-            ((arc_len_deg.to_radians()/arc_len_rad) as f32,css::DARK_RED),
-          ]} else {[col_avg,col_end]};
+          let col_stops_beg = [
+            (0.                                           ,col_avg    ),
+            ((delta_deg  .to_radians()/arc_len_rad) as f32,col_end    ),
+            ((delta_deg  .to_radians()/arc_len_rad) as f32,dbg_col_beg),
+            ((arc_len_deg.to_radians()/arc_len_rad) as f32,dbg_col_beg),
+            ];
           (grad_beg_p0,grad_beg_p1, col_stops_beg)},
         JoinWhere::End	=> {
           let grad_end_p0 = ( cx + r0*f64::cos(arc_beg + skip_beg_rad            ) , cy + r0*f64::sin(arc_beg + skip_beg_rad          ));
           let grad_end_p1 = ( cx + r0*f64::cos(arc_beg + arc_len_rad             ) , cy + r0*f64::sin(arc_beg + arc_len_rad           ));
-          let col_stops_beg = if dbg>=1 {[
-            (0.,css::DARK_GREEN),
-            ((skip_beg_rad            /arc_len_rad) as f32,css::DARK_GREEN),
-            ((skip_beg_rad            /arc_len_rad) as f32,col_beg),
-            ((arc_len_deg.to_radians()/arc_len_rad) as f32,col_avg),
-          ]} else {[col_beg,col_avg]};
+          let col_stops_end = [
+            (0.                                           ,dbg_col_end),
+            ((skip_beg_rad            /arc_len_rad) as f32,dbg_col_end),
+            ((skip_beg_rad            /arc_len_rad) as f32,col_beg    ),
+            ((arc_len_deg.to_radians()/arc_len_rad) as f32,col_avg    ),
+            ];
           (grad_end_p0,grad_end_p1, col_stops_end)},
       };
       let grad = Gradient::new_sweep((cx,cy),arc_beg as f32,(arc_beg + arc_len_rad) as f32).with_stops(col_stops);
@@ -418,7 +420,7 @@ mod impls {
         //   ,arc_beg.to_degrees(),rad_delta.to_degrees(),(arc_beg + rad_delta).to_degrees(),skip_beg_rad.to_degrees(),(dash_partial/r0).to_degrees());
         let c = Arc::new((cx,cy), (r0,r0) , arc_beg + rad_delta, skip_beg_rad, 0.);
         // let stroke_c = get_stroke_end(w2px); // todo↓ make dashes optional
-        let stroke_c = get_stroke_end(w2px).with_dashes(dash_partial,dash_iter); // use remainder from the previous segment so that the total matches the style as though it were drawn in one step
+        let stroke_c = get_stroke_end(w2px).with_dashes(dash_partial,&dash_iter); // use remainder from the previous segment so that the total matches the style as though it were drawn in one step
         // scene.stroke(&stroke_c, Affine::IDENTITY, &col_end, None, &c,);
         scene.stroke(&stroke_c, Affine::IDENTITY, &css::DARK_RED, None, &c,); // for testing
       }
@@ -426,7 +428,10 @@ mod impls {
     if dbg >=1 { // DEBUG copy smaller (including dashes, should perfectly align as dash length/offsets are adjusted per difference in size)
       let r00 = match jn {
         JoinWhere::Beg	=> r0 - w2,
-        JoinWhere::End	=> r0 - w1,}
+        JoinWhere::End	=> r0 - w1,};
+      let wpx = match jn {
+        JoinWhere::Beg	=> w2px,
+        JoinWhere::End	=> w1px,};
       let grad = Gradient::new_sweep((cx,cy),             arc_beg as f32,(arc_beg + arc_len_rad) as f32).with_stops(col_stops);
       let c    = Arc::new           ((cx,cy), (r00,r00),  arc_beg       ,           arc_len_rad, 0.);
       let stroke_c = get_stroke_end(wpx).with_dashes(dash_off*r00/r0,dash_iter.iter().map(|w|f_round(w*r00/r0,6)).collect::<Vec<f64>>());
