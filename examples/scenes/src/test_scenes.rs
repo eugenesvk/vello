@@ -34,7 +34,9 @@ mod impls {
   use vello::peniko::color::{palette, AlphaColor, Lch, palette::css};
   use vello::peniko::*;
   use vello::*;
+  use crate::color::Srgb;
   use std::f64::consts as f64c;
+
   const epsi:f64 = 0.00000000001; // to counter some float precision errors
 
   fn get_stroke    (width:f64) -> Stroke {Stroke::new(width).with_start_cap(Cap::Butt).with_end_cap(Cap::Round).with_join(Join::Bevel)}
