@@ -143,8 +143,6 @@ mod impls {
       let dash_iter = dash_iter_deg.iter().map(|w|w*deg_len).collect::<Vec<f64>>();
       let dbg = 0;
 
-      // todo: bugs gradient bottom first ending 1px wandering of green, due to too precise overlap?
-      // todo: bugs bottom 1 section smaller slightly, check overflow logic for the bottom again
       ddd(scene, (cx,cy),r0, r1beg_rad, JoinWhere::End,
         col_beg,col_end,col_avg,
         w1,w2, dpi,
