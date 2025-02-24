@@ -333,9 +333,10 @@ mod impls {
               prev_draw_len += draw_len;
               let c = if is_vis_draw   {Arc::new((cx,cy), (r0,r0)   ,rad0         ,draw_len, 0.)
               } else {is_vis_draw=true; Arc::new((cx,cy), (r0,r0)   ,rad1-draw_len,draw_len, 0.)};
-              if is_last	{scene.stroke(&stroke_c, Affine::IDENTITY, &css::LIME, None, &c,);
-              } else    	{scene.stroke(&stroke_c, Affine::IDENTITY, &grad    , None, &c,);}
-              // scene.stroke(&stroke_c, Affine::IDENTITY, &grad, None, &c,); // todo: replace ↑ lime test with ←
+              if dbg>=1 {
+                if is_last	{scene.stroke(&stroke_c, Affine::IDENTITY, &css::LIME, None, &c,);
+                } else    	{scene.stroke(&stroke_c, Affine::IDENTITY, &grad     , None, &c,);}
+              } else      	{scene.stroke(&stroke_c, Affine::IDENTITY, &grad     , None, &c,);}
               if is_last && draw_len < *dash_i - epsi { // drawn something, but not the full visible dash
                 let part_len = draw_end - d_beg; //how much of an existing dash is covered by all draws, incl. last
                 dash_partial = (d_beg + part_len) * r0; // add all prior dash segments within a set
