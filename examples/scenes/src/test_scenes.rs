@@ -70,6 +70,8 @@ mod impls {
     // reject negative numbers on accepted dash iterator
     // ?? convert rads to degree floats to avoid small errors on adding dashes?
     // + calculate the remainder from iterative approach and use it as a (-) offset to the main curve
+  // Kurbo precision bug leading to artifacts comparing to a reference dashed circle (which is incorrect, ↓ block 4 from the bottom has incorrect shape vs other blocks)
+    // let dash_off_deg = 0.; let dash_iter_deg = [10.,10.]; ← translates to >10e-6 numbers, while kurbo precision limit is e-6
   // ??? update offset algo to find index to the dash that matches offset ???
     //  let mut dash_ix = 0;
     //  let mut dash_remaining = dashes[dash_ix] - dash_offset;
