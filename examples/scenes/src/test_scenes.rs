@@ -120,9 +120,9 @@ mod impls {
       // ((w1 + sign1 * w_step * r) * dpi).round() / dpi; //transition shouldn't be pixel-stepped!
       let gap:f64 = 0.; // doesn't seem to 0.0001 affect anything with corrected ending style to Bevel
       let r1beg:f64 = 0.             	; let r1beg_rad = r1beg.to_radians(); //→
-      let r1end = r1beg + arc_len_deg	; let r1end_rad = r1end.to_radians();
+      let r1end = r1beg + arc_len_deg	;
       let r2beg = r1end + gap        	; let r2beg_rad = r2beg.to_radians();
-      let r2end = r2beg + arc_len_deg	; let r2end_rad = r2end.to_radians();
+      let r2end = r2beg + arc_len_deg	;
       let col_beg = css::LIME;
       let col_end = css::RED;
       let col_avg = col_beg.lerp(col_end,0.5,Default::default());
@@ -214,10 +214,6 @@ mod impls {
         JoinWhere::End	=> skip_beg_rad % dash_iter_len_rad,
       };
 
-      let gap:f64 = 0.; // doesn't seem to 0.0001 affect anything with corrected ending style to Bevel
-      let r1beg:f64 = 0.             	; let r1beg_rad = r1beg.to_radians(); //→
-      let r1end = r1beg + arc_len_deg	; let r1end_rad = r1end.to_radians();
-      let r2beg = r1end + gap        	; let r2beg_rad = r2beg.to_radians();
       let dbg_col_beg = if dbg>=1{css::DARK_RED  }else{col_end};
       let dbg_col_end = if dbg>=1{css::DARK_GREEN}else{col_beg};
       let (grad_p0,grad_p1, col_stops) = match jn {
@@ -295,8 +291,8 @@ mod impls {
         // seg_beg┘     └seg_end
         //         ↑↑  ↑ draw, overlaps with   active
         //           ↑↑  skip, overlaps with inactive
-        if dbg>=2 {if i == 0 {println!("\n\n—————Σⁱ={steps_delta_xt: >3}——╍╍№{} Σ{dash_iter_len_deg: >4.1}° off{dash_off_deg: >4.1}° {dash_iter:?}°╍╍——beg {r2beg: >4.1}° Δ{delta_covered_deg: >4.1}° + {delta_rem_deg: >4.1}° rem = Δ{delta_deg: >4.1}°————————————————————————————————————————————"
-          ,dash_iter.len())}};
+        if dbg>=2 {if i == 0 {println!("\n\n—————Σⁱ={steps_delta_xt: >3}——╍╍№{} Σ{dash_iter_len_deg: >4.1}° off{dash_off_deg: >4.1}° {dash_iter:?}°╍╍——beg {: >4.1}° Δ{delta_covered_deg: >4.1}° + {delta_rem_deg: >4.1}° rem = Δ{delta_deg: >4.1}°————————————————————————————————————————————"
+          ,dash_iter.len(), arc_beg.to_degrees())}};
         let mut dr = 0; // track dash 🗘
         let mut step_covered = step_width; // track Σ dash_iter_len_rad covering each Δstep
         while step_covered > 0.  {
