@@ -112,23 +112,24 @@ mod impls {
       // Color
       let col_beg = css::LIME;let col_end = css::RED;
       // Dashes
-      let mut dashes = vec![];
-      dashes.push( ( 0. , None            ) );
-      dashes.push( (30.1, Some([30.1,40.])) );
-      dashes.push( (15.1, Some([10.1,10.])) );
-      dashes.push( (12.1, Some([20.1,20.])) );
-      dashes.push( (11.1, Some([30.1,10.])) );
-      dashes.push( (0.  , Some([30.1,10.])) );
-      let dbg = 1;
+      let mut dashes: Vec<(f64,Option<[f64;2]>, u8)> = vec![];
+      // dash     offset, iter            ,dbg
+      dashes.push( ( 0. , None            , 0) );
+      dashes.push( ( 0. , None            , 1) );
+      dashes.push( (30.1, Some([30.1,40.]), 1) );
+      dashes.push( (15.1, Some([10.1,10.]), 1) );
+      dashes.push( (12.1, Some([20.1,20.]), 1) );
+      dashes.push( (11.1, Some([30.1,10.]), 1) );
+      dashes.push( (0.  , Some([30.1,10.]), 1) );
 
       let end = dashes.len();
       for i in 0..end { let f = f64::from(i as u32);
         let cx = 20. + (1. + (f     %      5.) * 2. )*(r0 + w1.max(w2));
         let cy = 20. + (1. +  f.div_euclid(5.) * 2. )*(r0 + w1.max(w2)); // 5 circles in a row
         ddd(scene, (cx,cy),r0, r1beg_rad, arc_len_deg,  JoinWhere::End,delta_transit,
-          col_beg,col_end,  w1,w2, dpi,  precision_deg_per_step,  dashes[i].0,dashes[i].1, dbg,);
+          col_beg,col_end,  w1,w2, dpi,  precision_deg_per_step,  dashes[i].0,dashes[i].1, dashes[i].2,);
         ddd(scene, (cx,cy),r0, r2beg_rad, arc_len_deg,  JoinWhere::Beg,delta_transit,
-          col_beg,col_end,  w1,w2, dpi,  precision_deg_per_step,  dashes[i].0,dashes[i].1, dbg,);
+          col_beg,col_end,  w1,w2, dpi,  precision_deg_per_step,  dashes[i].0,dashes[i].1, dashes[i].2,);
       }
 
       // Draw debug circles showing where each gradient begins/ends
