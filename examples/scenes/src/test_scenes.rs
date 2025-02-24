@@ -423,8 +423,8 @@ mod impls {
 
     if dbg >=1 { // DEBUG copy smaller (including dashes, should perfectly align as dash length/offsets are adjusted per difference in size)
       let r00 = match jn {
-        JoinWhere::Beg	=> r0 - w2px,
-        JoinWhere::End	=> r0 - w1px,};
+        JoinWhere::Beg	=> r0 - (w2px + w2px.max(wavgpx)) / 2.,
+        JoinWhere::End	=> r0 - (w1px + w1px.max(wavgpx)) / 2.,};
       let wpx = match jn {
         JoinWhere::Beg	=> w2px,
         JoinWhere::End	=> w1px,};
