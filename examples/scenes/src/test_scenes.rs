@@ -106,7 +106,7 @@ mod impls {
       // Line width
       let w1:f64 = 20.; let w2:f64 =  4.;
       // Position
-      let cx = 0.; let cy = 100.; let r0 = 95.5; //600 circum len 300 half
+      let cx = 0.; let cy = 400.; let r0 = 395.5; //600 circum len 300 half
       let r1beg:f64 = 0.             	; let r1beg_rad = r1beg.to_radians(); //→
       let r2beg = r1beg + arc_len_deg	; let r2beg_rad = r2beg.to_radians();
       // Color
