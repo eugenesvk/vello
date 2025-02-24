@@ -106,48 +106,34 @@ mod impls {
       let w1:f64 = 20.; let w2:f64 =  4.;
       // Position
       let cx = 900.; let cy = 200.; let r0 = 95.5; //600 circum len 300 half
+      // Color
+      let col_beg = css::LIME;let col_end = css::RED;
+      // Dashes
+      let dash_off_deg = 30.1; let dash_iter_deg = [30.1,40.];
+      let dbg = 1;
 
       // Gradient / size convergence bounds
       let steps_f = arc_len_deg / precision_deg_per_step; //360
       let steps_i   = steps_f as i32;
       let f_delta = 1.; // start changing width for the first/last % only
-      let delta_deg    	= arc_len_deg *       f_delta ; let rad_delta    = delta_deg   .to_radians();
-      let skip_beg_deg 	= arc_len_deg * (1. - f_delta); let skip_beg_rad = skip_beg_deg.to_radians();
-      let steps_delta_f	= steps_f   * f_delta; //36
-      let skip_end     	= steps_delta_f as i32; //36
-      let skip_beg     	= steps_i - skip_end; //324
+      let delta_deg   	= arc_len_deg *       f_delta ; let delta_rad    = delta_deg   .to_radians();
+      let skip_beg_deg	= arc_len_deg * (1. - f_delta); let skip_beg_rad = skip_beg_deg.to_radians();
 
-      // ((w1 + sign1 * w_step * r) * dpi).round() / dpi; //transition shouldn't be pixel-stepped!
-      let gap:f64 = 0.; // doesn't seem to 0.0001 affect anything with corrected ending style to Bevel
       let r1beg:f64 = 0.             	; let r1beg_rad = r1beg.to_radians(); //→
-      let r1end = r1beg + arc_len_deg	;
-      let r2beg = r1end + gap        	; let r2beg_rad = r2beg.to_radians();
-      let r2end = r2beg + arc_len_deg	;
-      let col_beg = css::LIME;
-      let col_end = css::RED;
-      let col_avg = col_beg.lerp(col_end,0.5,Default::default());
+      let r2beg = r1beg + arc_len_deg	; let r2beg_rad = r2beg.to_radians();
 
-      let dash_off_deg = 30.1; let dash_iter_deg = [30.1,40.];
-      let dbg = 1;
-
-      ddd(scene, (cx,cy),r0, r1beg_rad, JoinWhere::End,
-        col_beg,col_end,col_avg,
-        w1,w2, dpi,
-        precision_deg_per_step,
+      ddd(scene, (cx,cy),r0, r1beg_rad, arc_len_deg,  JoinWhere::End,
+        col_beg,col_end,   w1,w2, dpi,   precision_deg_per_step,
         dash_off_deg,dash_iter_deg,
-        rad_delta,
+        delta_rad,
         skip_beg_rad,
-        delta_deg,arc_len_deg, dbg,
-      );
-      ddd(scene, (cx,cy),r0, r2beg_rad, JoinWhere::Beg,
-        col_beg,col_end,col_avg,
-        w1,w2, dpi,
-        precision_deg_per_step,
+        delta_deg, dbg,);
+      ddd(scene, (cx,cy),r0, r2beg_rad, arc_len_deg,  JoinWhere::Beg,
+        col_beg,col_end,   w1,w2, dpi,   precision_deg_per_step,
         dash_off_deg,dash_iter_deg,
-        rad_delta,
+        delta_rad,
         skip_beg_rad,
-        delta_deg,arc_len_deg, dbg,
-      );
+        delta_deg, dbg,);
 
       // Draw debug circles showing where each gradient begins/ends
       // let pstr = get_stroke_end(1.); // starting point bigger than the ending, angle to differentiate two curves
@@ -158,14 +144,13 @@ mod impls {
     }
   }
 
-  pub fn ddd<I>(scene:&mut Scene, center:impl Into<Point>,r0:f64,  arc_beg:f64, jn:JoinWhere,
-    col_beg:Color,col_end:Color,col_avg:Color,
+  pub fn ddd<I>(scene:&mut Scene, center:impl Into<Point>,r0:f64,  arc_beg:f64, arc_len_deg:f64,
+    jn:JoinWhere,
+    col_beg:Color,col_end:Color,
     w1:f64,w2:f64, dpi:f64,
     precision_deg_per_step:f64,
     dash_off_deg:f64,dash_iter_deg:I,
-    rad_delta:f64,
-    skip_beg_rad:f64,delta_deg:f64,
-    arc_len_deg:f64,     dbg:u8,
+    delta_rad:f64, skip_beg_rad:f64,delta_deg:f64,  dbg:u8,
     ) where I:IntoIterator, I::Item:Borrow<f64> {
       let mut is_vis_draw  = false; // whether a visible dash is drawing to clamp its first partial draw to the next. Switches to off when an invisible dash is "drawing"
       let mut dash_partial = 0.; // use as dash offset for the next segment to hide the partially drawn part
@@ -176,6 +161,7 @@ mod impls {
       let w_delta_avg = (w2 - w1).abs() / 2.;
       let w1px = (w1 * dpi).round() / dpi;
       let w2px = (w2 * dpi).round() / dpi;
+      // ((w1 + sign1 * w_step * r) * dpi).round() / dpi; //transition is gradual, so can't be pixel-precise to avoid steps
 
       let precision_rad_per_step = precision_deg_per_step.to_radians(); //0.5° = 0.00873
       let steps_f           	= arc_len_deg / precision_deg_per_step; //180° → 360 steps at 0.5° precision
@@ -188,6 +174,8 @@ mod impls {
 
       let w_step = w_delta_avg / steps_delta_f; //12/2/45 0.13 to reach average
       let w_per_step_i:f64	= w_delta_avg / f64::from(steps_delta_i); //to reach average
+
+      let col_avg = col_beg.lerp(col_end,0.5,Default::default());
 
       let arc_len_rad = arc_len_deg.to_radians();
       let join_beg:f64 = match jn {
@@ -414,8 +402,8 @@ mod impls {
       if let JoinWhere::Beg = jn { // Segment 2: ~join part is 1st (at the start)
         // Draws pos-gradwidth segment separately without the extra iterator, including leftovers from whole steps not covering the full range
         // println!("2nd curve@end: {: >3.0}° + Δ{: >3.0}° ⇒ {: >3.0}° + {: >3.0} skip_beg ╍part={: >3.0}° ({dash_partial: >3.0}px)"
-        //   ,arc_beg.to_degrees(),rad_delta.to_degrees(),(arc_beg + rad_delta).to_degrees(),skip_beg_rad.to_degrees(),(dash_partial/r0).to_degrees());
-        let c = Arc::new((cx,cy), (r0,r0) , arc_beg + rad_delta, skip_beg_rad, 0.);
+        //   ,arc_beg.to_degrees(),delta_rad.to_degrees(),(arc_beg + delta_rad).to_degrees(),skip_beg_rad.to_degrees(),(dash_partial/r0).to_degrees());
+        let c = Arc::new((cx,cy), (r0,r0) , arc_beg + delta_rad, skip_beg_rad, 0.);
         // let stroke_c = get_stroke_end(w2px); // todo↓ make dashes optional
         let stroke_c = get_stroke_end(w2px).with_dashes(dash_partial,&dash_iter); // use remainder from the previous segment so that the total matches the style as though it were drawn in one step
         // scene.stroke(&stroke_c, Affine::IDENTITY, &col_end, None, &c,);
