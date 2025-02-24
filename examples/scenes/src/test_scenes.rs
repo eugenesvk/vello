@@ -294,8 +294,8 @@ mod impls {
         // seg_beg┘     └seg_end
         //         ↑↑  ↑ draw, overlaps with   active
         //           ↑↑  skip, overlaps with inactive
-        // if i == 0 {println!("\n\n—————Σⁱ={steps_delta_xt: >3}——╍╍№{} Σ{dash_iter_len_deg: >4.1}° off{dash_off_deg: >4.1}° {dash_iter_deg:?}°╍╍——beg {r2beg: >4.1}° Δ{delta_covered_deg: >4.1}° + {delta_rem_deg: >4.1}° rem = Δ{delta_deg: >4.1}°————————————————————————————————————————————"
-          // ,dash_iter.len())};
+        if dbg>=2 {if i == 0 {println!("\n\n—————Σⁱ={steps_delta_xt: >3}——╍╍№{} Σ{dash_iter_len_deg: >4.1}° off{dash_off_deg: >4.1}° {dash_iter:?}°╍╍——beg {r2beg: >4.1}° Δ{delta_covered_deg: >4.1}° + {delta_rem_deg: >4.1}° rem = Δ{delta_deg: >4.1}°————————————————————————————————————————————"
+          ,dash_iter.len())}};
         let mut dr = 0; // track dash 🗘
         let mut step_covered = step_width; // track Σ dash_iter_len_rad covering each Δstep
         while step_covered > 0.  {
@@ -329,7 +329,7 @@ mod impls {
               } else   	{scene.stroke(&stroke_c, Affine::IDENTITY, &grad        , None, &c,);}
               carry_over = 0.;
               dbgprint = true;
-              if dbg>=3 && dbgprint {
+              if dbg>=4 && dbgprint {
               println!("{i} drawing Δover {: >2.1} @ {: >3.2} = ({: >2.1}-{: >2.1}-Δ{: >2.1}) → {: >3.2}",carry_over.to_degrees()
                 ,(rad1 - step_width - carry_over).to_degrees(),rad1.to_degrees(),step_width.to_degrees(),carry_over.to_degrees()
                 ,(rad1 - step_width).to_degrees());}
@@ -350,7 +350,7 @@ mod impls {
             } else {is_vis_draw=false;}
             // if rad0       <=       d_end
             // &&    seg_end >= d_beg  { // (alt check) our segment overlaps with this dash
-            if dbg>=1 && (dbgprint || i == 0 || is_last || (78<= i && i <=83)) {println!( //👁👀👓  seg={dash_off_deg: >3.1} % {dash_iter_len_deg: >3.1}
+            if dbg>=2 && (dbgprint || i == 0 || is_last || (78<= i && i <=83)) {println!( //👁👀👓  seg={dash_off_deg: >3.1} % {dash_iter_len_deg: >3.1}
               "{}👀{}{i: >3} {} {j: >2}\
               │ +{: >4.1}={: >4.1}° ↷ {: >4.1}° Δ{: >3.1}° off {: >3.1}° \
               │№{seg_count: >2} {: >4.1}° ↷ {: >4.1}°\
@@ -396,7 +396,7 @@ mod impls {
                 //   ,dash_i.to_degrees(),(dash_i-part_len).to_degrees(),rad1.to_degrees());
               }
             }
-            if dbg>=2 && (dbgprint || i == 0 || is_last || (78<= i && i <=83)) {println!( //👁👀👓  seg={dash_off_deg: >3.1} % {dash_iter_len_deg: >3.1}
+            if dbg>=3 && (dbgprint || i == 0 || is_last || (78<= i && i <=83)) {println!( //👁👀👓  seg={dash_off_deg: >3.1} % {dash_iter_len_deg: >3.1}
               "{}👓{}{i: >3} {} {j: >2}\
               │ +{: >4.1}={: >4.1}° ↷ {: >4.1}° Δ{: >3.1}° off {: >3.1}° \
               │№{seg_count: >2} {: >4.1}° ↷ {: >4.1}°\
