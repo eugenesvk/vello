@@ -121,7 +121,7 @@ mod impls {
       let col_avg = col_beg.lerp(col_end,0.5,Default::default());
 
       let dash_off_deg = 30.1; let dash_iter_deg = [30.1,40.];
-      let dbg = 0;
+      let dbg = 1;
 
       ddd(scene, (cx,cy),r0, r1beg_rad, JoinWhere::End,
         col_beg,col_end,col_avg,
