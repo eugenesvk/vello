@@ -38,6 +38,8 @@ mod impls {
   use std::f64::consts as f64c;
 
   const epsi:f64 = 0.00000000001; // to counter some float precision errors
+  // buggy imprecise, doesn't handle big numbers, but doesn't matter much here
+  pub fn f_round(f:f64, digits:i32) -> f64 {let dig_pow=10_f64.powi(digits); (f * dig_pow).round() / dig_pow}
 
   fn get_stroke    (width:f64) -> Stroke {Stroke::new(width).with_start_cap(Cap::Butt).with_end_cap(Cap::Round).with_join(Join::Bevel)}
   fn get_stroke_end(width:f64) -> Stroke {Stroke::new(width).with_start_cap(Cap::Butt).with_end_cap(Cap::Butt ).with_join(Join::Bevel)}
@@ -140,7 +142,7 @@ mod impls {
 
       // let dash_off_deg = 30.1; let dash_iter_deg = [30.1,40.];
       let dash_off_deg = 0.; let dash_iter_deg = [10.,10.];
-      let dash_iter = dash_iter_deg.iter().map(|w|w*deg_len).collect::<Vec<f64>>();
+      let dash_iter = dash_iter_deg.iter().map(|w|f_round(w*deg_len,6)).collect::<Vec<f64>>();
       let dbg = 0;
 
       ddd(scene, (cx,cy),r0, r1beg_rad, JoinWhere::End,
@@ -191,7 +193,7 @@ mod impls {
     let deg_len  	= 2. * f64c::PI * r0 / 360.0                 ; //2π*100/360 = 1.74
     let rad_len  	= 2. * f64c::PI * r0 / 360.0_f64.to_radians(); //2π*100/6.28 = 100
     let dash_off 	= dash_off_deg * deg_len;
-    let dash_iter	= dash_iter_deg.iter().map(|w|w*deg_len).collect::<Vec<f64>>();
+    let dash_iter	= dash_iter_deg.iter().map(|w|f_round(w*deg_len,6)).collect::<Vec<f64>>();
     let arc_len_rad = arc_len_deg.to_radians();
 
     let (grad_p0,grad_p1, col_stops) = match jn {
@@ -222,7 +224,7 @@ mod impls {
     };
     let grad = Gradient::new_sweep((cx,cy),             arc_beg as f32,(arc_beg+arc_len_rad) as f32).with_stops(col_stops);
     let c    = Arc::new           ((cx,cy), (r00,r00),  arc_beg       ,arc_len_rad, 0.);
-    let stroke_c = get_stroke_end(wpx).with_dashes(dash_off*r00/r0,dash_iter.iter().map(|w| w*r00/r0).collect::<Vec<f64>>());
+    let stroke_c = get_stroke_end(wpx).with_dashes(dash_off*r00/r0,dash_iter.iter().map(|w|f_round(w*r00/r0,6)).collect::<Vec<f64>>());
     scene.stroke(&stroke_c, Affine::IDENTITY, &grad, None, &c,);
   }
   pub fn ddd(scene:&mut Scene, center:impl Into<Point>,r0:f64,  arc_beg:f64, jn:JoinWhere,
