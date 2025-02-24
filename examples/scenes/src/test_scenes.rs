@@ -66,8 +66,7 @@ mod impls {
 
   // TODO
     // make dashes optional
-    // make gradient sweeps for better precision with arcs instead of linear
-      // + for non-stepped lines, can use multiple colors with steps as well
+    // test if step length > dash set length (with very low precision)
     // maybe add a min average gap between two lines so that if first line ends with a partial inactive gap, the 2nd doesn't immediateely start with a visible dash, but + offset (unless it's too big for the 2d line, thus min average? or just min)
     // + convert circle segments to Arcs directly
       // add overlap (except for the last segment) to avoid conflaction artifacts
@@ -75,6 +74,8 @@ mod impls {
     // reject negative numbers on accepted dash iterator
     // ?? convert rads to degree floats to avoid small errors on adding dashes?
     // + calculate the remainder from iterative approach and use it as a (-) offset to the main curve
+    // + make gradient sweeps for better precision with arcs instead of linear
+      // + for non-stepped lines, can use multiple colors with steps as well
   // Kurbo precision bug leading to artifacts comparing to a reference dashed circle (which is incorrect, ↓ block 4 from the bottom has incorrect shape vs other blocks)
     // let dash_off_deg = 0.; let dash_iter_deg = [10.,10.]; ← translates to >10e-6 numbers, while kurbo precision limit is e-6
   // ??? update offset algo to find index to the dash that matches offset ???
@@ -99,26 +100,20 @@ mod impls {
     use PathEl::*;
     move |scene, params| {
       let dpi = 1.5;
-      // TODO: test if step length > dash set length (with very low precision)
       // Size
       let arc_len_deg:f64 = 180.; let precision_deg_per_step = 2.5; //rad 0.00873
+      let delta_transit = 1.0; // start changing width for the first/last % only
       // Line width
       let w1:f64 = 20.; let w2:f64 =  4.;
       // Position
       let cx = 900.; let cy = 200.; let r0 = 95.5; //600 circum len 300 half
+      let r1beg:f64 = 0.             	; let r1beg_rad = r1beg.to_radians(); //→
+      let r2beg = r1beg + arc_len_deg	; let r2beg_rad = r2beg.to_radians();
       // Color
       let col_beg = css::LIME;let col_end = css::RED;
       // Dashes
       let dash_off_deg = 30.1; let dash_iter_deg = [30.1,40.];
       let dbg = 1;
-
-      // Gradient / size convergence bounds
-      let steps_f = arc_len_deg / precision_deg_per_step; //360
-      let steps_i   = steps_f as i32;
-      let delta_transit = 1.0; // start changing width for the first/last % only
-
-      let r1beg:f64 = 0.             	; let r1beg_rad = r1beg.to_radians(); //→
-      let r2beg = r1beg + arc_len_deg	; let r2beg_rad = r2beg.to_radians();
 
       ddd(scene, (cx,cy),r0, r1beg_rad, arc_len_deg,  JoinWhere::End,delta_transit,
         col_beg,col_end,  w1,w2, dpi,  precision_deg_per_step,  dash_off_deg,dash_iter_deg,   dbg,);
