@@ -269,9 +269,6 @@ mod impls {
           JoinWhere::End	=> get_stroke_end(w1px),}
         } else{get_stroke_end(cw)};
 
-          // let c = Arc::new((cx,cy), (r0,r0)   ,  rad0,step_width, 0.);
-          // scene.stroke(&stroke_c, Affine::IDENTITY, &grad, None, &c,);
-
         let seg_off =  dash_off_pre_jn_rad + dash_off_rad         % dash_iter_len_rad;
         let seg_be_ = (dash_off_pre_jn_rad + dash_off_rad + seg0) % dash_iter_len_rad;// cut off arc that fit into the previous dash set, so this is our segment beginning in the coordinate system of a dash set (set's begin = 0)
         let (seg_beg,seg_count) = if (dash_iter_len_rad - seg_be_).abs() < epsi { // segment starts at dash set end's, so shift it to next dash set's begin (float imprecision prevents clean division)
