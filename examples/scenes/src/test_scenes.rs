@@ -173,6 +173,8 @@ mod impls {
 
       let w_step = w_delta_avg / steps_delta_f; //12/2/45 0.13 to reach average
       let w_per_step_i:f64	= w_delta_avg / f64::from(steps_delta_i); //to reach average
+      let px1 = 1./r0; //length of 1px in rad
+      let mut step_gap = if dbg>=1 {0.} else {px1}; //fix conflation artifacts outside of debug by overlapping segments (except the last one)
 
       let col_avg = col_beg.lerp(col_end,0.5,Default::default());
 
@@ -252,6 +254,7 @@ mod impls {
         JoinWhere::End	=> wavg,};
 
       for i in 0..=steps_delta_xt { let r = f64::from(i); let is_last = i == steps_delta_xt;
+        // if is_last {step_gap=0.}; // don't bleed into the the last segment, but then gap between arcs
         // NB! last step needs special handling since it's a fractional one, so not full "precision length"!
         let step_width = if is_last && is_extra_step	{delta_rem_rad
         } else                                      	{precision_rad_per_step};
@@ -327,8 +330,8 @@ mod impls {
             }
             if draw_len > 0.0 { // 1st draw starts @ seg end to attach to the next draw in case of partials
               prev_draw_len += draw_len;
-              let c = if is_vis_draw   {Arc::new((cx,cy), (r0,r0)   ,rad0         ,draw_len, 0.)
-              } else {is_vis_draw=true; Arc::new((cx,cy), (r0,r0)   ,rad1-draw_len,draw_len, 0.)};
+              let c = if is_vis_draw   {Arc::new((cx,cy), (r0,r0)   ,rad0         ,draw_len + step_gap, 0.)
+              } else {is_vis_draw=true; Arc::new((cx,cy), (r0,r0)   ,rad1-draw_len,draw_len + step_gap, 0.)};
               if dbg>=1 {
                 if is_last	{scene.stroke(&stroke_c, Affine::IDENTITY, &css::LIME, None, &c,);
                 } else    	{scene.stroke(&stroke_c, Affine::IDENTITY, &grad     , None, &c,);}
