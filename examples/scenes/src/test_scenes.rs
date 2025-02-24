@@ -136,8 +136,7 @@ mod impls {
       let col_end = css::RED;
       let col_avg = col_beg.lerp(col_end,0.5,Default::default());
 
-      // let dash_off_deg = 30.1; let dash_iter_deg = [30.1,40.];
-      let dash_off_deg = 0.; let dash_iter_deg = [10.,10.];
+      let dash_off_deg = 30.1; let dash_iter_deg = [30.1,40.];
       let dash_iter = dash_iter_deg.iter().map(|w|f_round(w*deg_len,6)).collect::<Vec<f64>>();
       let dbg = 0;
 
