@@ -382,10 +382,11 @@ mod impls {
               if dbg>=1	{scene.stroke(&stroke_c, Affine::IDENTITY, css::MAGENTA , None, &c,);
               } else   	{scene.stroke(&stroke_c, Affine::IDENTITY, &grad        , None, &c,);}
               carry_over = 0.;
-              dbgprint = true; // todo: remove
-              // println!("{i} drawing Δover {: >2.1} @ {: >3.2} = ({: >2.1}-{: >2.1}-Δ{: >2.1}) → {: >3.2}",carry_over.to_degrees()
-                // ,(rad1 - step_width - carry_over).to_degrees(),rad1.to_degrees(),step_width.to_degrees(),carry_over.to_degrees()
-                // ,(rad1 - step_width).to_degrees());
+              dbgprint = true;
+              if dbg>=3 && dbgprint {
+              println!("{i} drawing Δover {: >2.1} @ {: >3.2} = ({: >2.1}-{: >2.1}-Δ{: >2.1}) → {: >3.2}",carry_over.to_degrees()
+                ,(rad1 - step_width - carry_over).to_degrees(),rad1.to_degrees(),step_width.to_degrees(),carry_over.to_degrees()
+                ,(rad1 - step_width).to_degrees());}
             }
             if draw_len > 0.0 { // 1st draw starts @ seg end to attach to the next draw in case of partials
               prev_draw_len += draw_len;
@@ -403,7 +404,7 @@ mod impls {
             } else {is_vis_draw=false;}
             // if rad0       <=       d_end
             // &&    seg_end >= d_beg  { // (alt check) our segment overlaps with this dash
-            if dbg>0 && (dbgprint || i == 0 || is_last || (78<= i && i <=83)) {println!( //👁👀👓  seg={dash_off_deg: >3.1} % {dash_iter_len_deg: >3.1}
+            if dbg>=1 && (dbgprint || i == 0 || is_last || (78<= i && i <=83)) {println!( //👁👀👓  seg={dash_off_deg: >3.1} % {dash_iter_len_deg: >3.1}
               "{}👀{}{i: >3} {} {j: >2}\
               │ +{: >4.1}={: >4.1}° ↷ {: >4.1}° Δ{: >3.1}° off {: >3.1}° \
               │№{seg_count: >2} {: >4.1}° ↷ {: >4.1}°\
@@ -449,7 +450,7 @@ mod impls {
                 //   ,dash_i.to_degrees(),(dash_i-part_len).to_degrees(),rad1.to_degrees());
               }
             }
-            if dbg>1 && (dbgprint || i == 0 || is_last || (78<= i && i <=83)) {println!( //👁👀👓  seg={dash_off_deg: >3.1} % {dash_iter_len_deg: >3.1}
+            if dbg>=2 && (dbgprint || i == 0 || is_last || (78<= i && i <=83)) {println!( //👁👀👓  seg={dash_off_deg: >3.1} % {dash_iter_len_deg: >3.1}
               "{}👓{}{i: >3} {} {j: >2}\
               │ +{: >4.1}={: >4.1}° ↷ {: >4.1}° Δ{: >3.1}° off {: >3.1}° \
               │№{seg_count: >2} {: >4.1}° ↷ {: >4.1}°\
