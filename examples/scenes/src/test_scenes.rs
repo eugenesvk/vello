@@ -324,6 +324,11 @@ mod impls {
             ,     	 JoinWhere::End	=> wavg,}
         } else    	{wavg + sign * r * w_per_step_i};
 
+        let stroke_c = if dbg>=2 {match jn {
+          JoinWhere::Beg	=> get_stroke_end(w2px),
+          JoinWhere::End	=> get_stroke_end(w1px),};
+        } else{get_stroke_end(cw)}
+
           // let c = Arc::new((cx,cy), (r0,r0)   ,  rad0,step_width, 0.);
           // scene.stroke(&stroke_c, Affine::IDENTITY, &grad, None, &c,);
 
