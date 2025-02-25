@@ -289,7 +289,7 @@ mod impls {
         // NB! last step needs special handling since it's a fractional one, so not full "precision length"!
         let step_width = if is_last && is_extra_step	{delta_rem_rad
         } else                                      	{precision_rad_per_step};
-        let seg0 = (r - 1.) * precision_rad_per_step + step_width; // segment beg in our arc coords (arc start = 0), replace last regular width with a custom step_width
+        let seg0 = r * precision_rad_per_step; // segment beg in our arc coords (arc start = 0), last regular starts at the same old width, but itself will have a smaller step_width
         let rad0 = join_beg + seg0;
         let rad1 = rad0 + step_width; // todo debug only
         // let c = Arc::new((cx,cy), (r0,r0) ,  rad0,step_width+gap_correct, 0.); //arc bugs with gaps
