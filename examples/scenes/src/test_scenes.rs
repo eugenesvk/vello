@@ -174,7 +174,7 @@ mod impls {
 
       let w_step = w_delta_avg / steps_delta_f; //12/2/45 0.13 to reach average
       let w_per_step_i:f64	= w_delta_avg / f64::from(steps_delta_i); //to reach average
-      let px1 = 1./r0; //length of 1px in rad
+      let px1 = 1./dpi/r0; //length of 1px (scaled) in rad
       let mut step_gap = if dbg>=1 {0.} else {px1}; //fix conflation artifacts outside of debug by overlapping segments (except the last one)
 
       let col_avg = col_beg.lerp(col_end,0.5,Default::default());
