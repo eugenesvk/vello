@@ -290,8 +290,8 @@ mod impls {
         // NB! last step needs special handling since it's a fractional one, so not full "precision length"!
         let step_width = if is_last && is_extra_step	{delta_rem_rad
         } else                                      	{precision_rad_per_step};
-        let seg0 = r * precision_rad_per_step; // segment beg in our arc coords (arc start = 0), last regular starts at the same old width, but itself will have a smaller step_width
-        let rad0 = join_beg + seg0; //segment beg in abs coords
+        let step_beg_a = r * precision_rad_per_step; // step in arc coords (arc start = 0)
+        let step_end_a = step_beg_a + step_width;
         let rad1 = rad0 + step_width; // segment end in abs coords
         // let c = Arc::new((cx,cy), (r0,r0) ,  rad0,step_width+gap_correct, 0.); //arc bugs with gaps
         // let c = CircleSegment::new((cx,cy), r0,r0   ,  rad0,step_width); // alt fix
@@ -305,13 +305,13 @@ mod impls {
         } else{get_stroke_end(cw)};
 
         let seg_off =  dash_off_pre_jn_rad + dash_off_rad         % dash_iter_len_rad;
-        let seg_be_ = (dash_off_pre_jn_rad + dash_off_rad + seg0) % dash_iter_len_rad;// cut off arc that fit into the previous dash set, so this is our segment beginning in the coordinate system of a dash set (set's begin = 0)
+        let seg_be_ = (dash_off_pre_jn_rad + dash_off_rad + step_beg_a) % dash_iter_len_rad;// cut off arc that fit into the previous dash set, so this is our segment beginning in the coordinate system of a dash set (set's begin = 0)
         let (seg_beg,seg_count) = if (dash_iter_len_rad - seg_be_).abs() < epsi { // segment starts at dash set end's, so shift it to next dash set's begin (float imprecision prevents clean division)
-          (0.     , (dash_off_pre_jn_rad + dash_off_rad + seg0).div_euclid(dash_iter_len_rad) + 1.+1.)
+          (0.     , (dash_off_pre_jn_rad + dash_off_rad + step_beg_a).div_euclid(dash_iter_len_rad) + 1.+1.)
         } else {
-          (seg_be_, (dash_off_pre_jn_rad + dash_off_rad + seg0).div_euclid(dash_iter_len_rad) + 1.   )
+          (seg_be_, (dash_off_pre_jn_rad + dash_off_rad + step_beg_a).div_euclid(dash_iter_len_rad) + 1.   )
         };
-        let seg_count = (dash_off_pre_jn_rad + dash_off_rad + seg0).div_euclid(dash_iter_len_rad) + 1.;
+        let seg_count = (dash_off_pre_jn_rad + dash_off_rad + step_beg_a).div_euclid(dash_iter_len_rad) + 1.;
         let seg_end = seg_beg + step_width;
         let mut d_beg = 0.; // length up to the beginning of this dash = ∑ of all previous dash lens
 
@@ -392,7 +392,7 @@ mod impls {
               │ ╍ {: >4.1}° → {: >4.1}° Δ{: >4.1}°\
               │ 🖉 {: >4.1}° → {: >4.1}° ⇒ {: >3.1}° "
               ,if draw_len>0.{"🖉"}else{" "}, if is_last {"🛑"}else{" "}, if dr > 1 {format!("🗘{dr: >1}")}else{"  ".to_owned()}
-              ,seg0.to_degrees()    ,rad0    .to_degrees(),rad1    .to_degrees(),(rad1    -    rad0).to_degrees(),seg_off.to_degrees()
+              ,step_beg_a.to_degrees()    ,rad0    .to_degrees(),rad1    .to_degrees(),(rad1    -    rad0).to_degrees(),seg_off.to_degrees()
               ,                      seg_beg .to_degrees(),seg_end .to_degrees()
               ,d_beg   .to_degrees(),d_end   .to_degrees(),dash_i.to_degrees()
               ,draw_beg.to_degrees(),draw_end.to_degrees(),draw_len.to_degrees()
@@ -438,7 +438,7 @@ mod impls {
               │ ╍ {: >4.1}° → {: >4.1}° Δ{: >4.1}°\
               │ 🖉 {: >4.1}° → {: >4.1}° ⇒ {: >3.1}° "
              ,if draw_len>0.{"🖉"}else{" "}, if is_last {"🛑"}else{" "}, if dr > 1 {format!("🗘{dr: >1}")}else{"  ".to_owned()}
-              ,seg0.to_degrees()    ,rad0    .to_degrees(),rad1    .to_degrees(),(rad1    -    rad0).to_degrees(),seg_off.to_degrees()
+              ,step_beg_a.to_degrees()    ,rad0    .to_degrees(),rad1    .to_degrees(),(rad1    -    rad0).to_degrees(),seg_off.to_degrees()
               ,                      seg_beg .to_degrees(),seg_end .to_degrees()
               ,d_beg   .to_degrees(),d_end   .to_degrees(),dash_i.to_degrees()
               ,draw_beg.to_degrees(),draw_end.to_degrees(),draw_len.to_degrees()
