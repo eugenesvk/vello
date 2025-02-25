@@ -175,7 +175,7 @@ mod impls {
       let w_step = w_delta_avg / steps_delta_f; //12/2/45 0.13 to reach average
       let w_per_step_i:f64	= w_delta_avg / f64::from(steps_delta_i); //to reach average
       let px1 = 1./dpi/r0; //length of 1px (scaled) in rad
-      let mut step_gap = if dbg>=1 {0.} else {px1}; //fix conflation artifacts outside of debug by overlapping segments (except the last one). <1 sometimes works, but not reliably at different zoom factor
+      let step_gap_def = if dbg>=1 {0.} else {px1}; //fix conflation artifacts outside of debug by overlapping segments (except the last one). <1 sometimes works, but not reliably at different zoom factor
 
       let col_avg = col_beg.lerp(col_end,0.5,Default::default());
 
@@ -364,18 +364,18 @@ mod impls {
             }
             if draw_len > 0.0 { // 1st draw starts @ seg end to attach to the next draw in case of partials
               prev_draw_len += draw_len;
-              if dbg==0 && step_gap > 0. { // gap exists, and not dbg (where occlusion artifacts are helpful to see step borders)
+              let step_gap = if dbg == 0 && step_gap_def != 0. { // gap exists, and not dbg (where occlusion artifacts are helpful to see step borders)
               if is_dash { // Don't bleed the last dash's visible end into the next segment. Deal with gap between arcs by drawing the next arc earlier?
                 if  (i       as usize) == step_ix    	// our pre-calculated indices match this step+dash iteration
-                  &&           dash_ix == dash_vis_ix	{step_gap=0.;}
-              } else if is_last_pre                  	{step_gap=step_gap.min(delta_rem_rad); //don't accidentall bleed into the last step that can be smaller than the gap closer //println!("non-dashed gap shortened {step_ix} {dash_vis_ix}");
-              } else if is_last                      	{step_gap=0.;}} // don't bleed the last step's end //println!("non-dashed step gap removed {step_ix} {dash_vis_ix}");
-              let c = if is_vis_draw   {Arc::new((cx,cy), (r0,r0)   ,rad0         ,draw_len + step_gap, 0.)
-              } else {is_vis_draw=true; Arc::new((cx,cy), (r0,r0)   ,rad1-draw_len,draw_len + step_gap, 0.)};
-              if dbg>=1 {
-                if is_last	{scene.stroke(&stroke_c, Affine::IDENTITY, &css::LIME, None, &c,);
-                } else    	{scene.stroke(&stroke_c, Affine::IDENTITY, &grad     , None, &c,);}
-              } else      	{scene.stroke(&stroke_c, Affine::IDENTITY, &grad     , None, &c,);}
+                  &&           dash_ix == dash_vis_ix	{0.
+                } else { // track endings of regular visible dash ends, don't bleed into invisible dashes
+                  if prev_draw_len <= 0. {test=true;0. // dash will be drawn in this step, so don't extend it
+                  } else {step_gap_def}
+                }
+              } else if is_last_pre	{step_gap_def.min(delta_rem_rad) //don't accidentall bleed into the last step that can be smaller than the gap closer //println!("non-dashed gap shortened {step_ix} {dash_vis_ix}");
+              } else if is_last    	{0. // don't bleed the last step's end //println!("non-dashed step gap removed {step_ix} {dash_vis_ix}");
+              } else {step_gap_def}
+              } else {0.};
               if is_last && draw_len < *dash_i - epsi { // drawn something, but not the full visible dash
                 let part_len = draw_end - d_beg; //how much of an existing dash is covered by all draws, incl. last
                 dash_partial = (d_beg + part_len) * r0; // add all prior dash segments within a set
