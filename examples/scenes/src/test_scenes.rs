@@ -65,7 +65,7 @@ mod impls {
     // Dashes harder/failed approaches: combine vertical line with 1/2 circle; add dashed strokes; split by path and try to manually check which should be drawn;  change stroke width in the last segments if they are covered by the 1/2 circle (not possible???? how to calculate a match? check if we can draw a semicircle and check if overlap); draw previous line;  draw splits with a different width and gradient
 
   // TODO:
-    // don't extend last visible dash not to bleed into the invisible one
+    // add text with parameters in the center
     // test if step length > dash set length (with very low precision)
     // maybe add a min average gap between two lines so that if first line ends with a partial inactive gap, the 2nd doesn't immediateely start with a visible dash, but + offset (unless it's too big for the 2d line, thus min average? or just min)
     // + convert circle segments to Arcs directly
@@ -77,6 +77,7 @@ mod impls {
     // + make gradient sweeps for better precision with arcs instead of linear
       // + for non-stepped lines, can use multiple colors with steps as well
     // + make dashes optional
+    // + don't extend last visible dash not to bleed into the invisible one
   // Kurbo precision bug leading to artifacts comparing to a reference dashed circle (which is incorrect, ↓ block 4 from the bottom has incorrect shape vs other blocks)
     // let dash_off_deg = 0.; let dash_iter_deg = [10.,10.]; ← translates to >10e-6 numbers, while kurbo precision limit is e-6
   // ??? update offset algo to find index to the dash that matches offset ???
