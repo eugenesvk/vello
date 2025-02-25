@@ -383,7 +383,8 @@ mod impls {
                 if  (i       as usize) == step_ix    	// our pre-calculated indices match this step+dash iteration
                   &&           dash_ix == dash_vis_ix	{0.
                 } else { // track endings of regular visible dash ends, don't bleed into invisible dashes
-                  if dash_drawn_full <= step_end_a {0. // dash will be fully drawn in this step, so don't extend it
+                  if   (dash_drawn_full <= step_end_a) // ← strict comparison matches invisible tiny dash ending, so also don't extend the previous one
+                    || (dash_drawn_full -  step_end_a).abs() <= 0.00000001 {0. // dash will be fully drawn in this step, so don't extend it
                   } else {step_gap_def}
                 }
               } else if is_last_pre	{step_gap_def.min(delta_rem_rad) //don't accidentall bleed into the last step that can be smaller than the gap closer //println!("non-dashed gap shortened {step_ix} {dash_vis_ix}");
