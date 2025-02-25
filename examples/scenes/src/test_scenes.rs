@@ -285,6 +285,7 @@ mod impls {
         (step_ix as usize, dash_vis_ix)
       } else {(0usize, 0usize)};
 
+      let mut dash_drawn:f64 = 0.; //Σ length of all vis+invis drawn dashes to get arc coords of the next dash
 
       for i in 0..=steps_delta_xt { let r = f64::from(i); let is_last = i == steps_delta_xt; let is_last_pre = i == steps_delta_xt - 1;
         // NB! last step needs special handling since it's a fractional one, so not full "precision length"!
@@ -350,7 +351,7 @@ mod impls {
             let draw_len = draw_end - draw_beg;
 
             if carry_over > 0. { // draw leftovers from the previous dash
-              prev_draw_len += carry_over;
+              prev_draw_len += carry_over; dash_drawn += carry_over;
               // if is_vis_draw {println!("!!! leftovers from a previous dash should always 1st, but something else drew")}; //todo warn
               is_vis_draw = true; // start drawing @ the end of prev ↓ step
               let c = Arc::new((cx,cy), (r0,r0)   ,c0 - carry_over,carry_over, 0.);
@@ -364,13 +365,13 @@ mod impls {
                 ,(c1 - step_width).to_degrees());}
             }
             if draw_len > 0.0 { // 1st draw starts @ seg end to attach to the next draw in case of partials
-              prev_draw_len += draw_len;
+              prev_draw_len += draw_len; dash_drawn += draw_len;
               let step_gap = if dbg == 0 && step_gap_def != 0. { // gap exists, and not dbg (where occlusion artifacts are helpful to see step borders)
               if is_dash { // Don't bleed the last dash's visible end into the next segment. Deal with gap between arcs by drawing the next arc earlier?
                 if  (i       as usize) == step_ix    	// our pre-calculated indices match this step+dash iteration
                   &&           dash_ix == dash_vis_ix	{0.
                 } else { // track endings of regular visible dash ends, don't bleed into invisible dashes
-                  if prev_draw_len <= 0. {test=true;0. // dash will be drawn in this step, so don't extend it
+                  if dash_drawn < step_end_a {test=true;0. // dash will be drawn in this step, so don't extend it
                   } else {step_gap_def}
                 }
               } else if is_last_pre	{step_gap_def.min(delta_rem_rad) //don't accidentall bleed into the last step that can be smaller than the gap closer //println!("non-dashed gap shortened {step_ix} {dash_vis_ix}");
@@ -403,15 +404,15 @@ mod impls {
             let draw_beg = d_beg.max(seg_beg).min(d_end); // start at dash begin, → to segment begin, but not past dash end
             let draw_end = d_end.min(seg_end).max(d_beg); // start at dash end  , ← to segment end  , but not past dash beg
             let draw_len = draw_end - draw_beg;
-            if draw_len > 0.0 {is_vis_draw = false; prev_draw_len += draw_len;
+            if draw_len > 0.0 {is_vis_draw = false; prev_draw_len += draw_len; dash_drawn += draw_len;
               let space_available = step_width.min(dash_iter_len_rad) - prev_draw_len;
-              if space_available > 0.00000000001 { // this+prev dashes didn't cover the full Δstep¦dash segment width (whichever is smaller, if dash segment fits in Δstep, then ), so should be drawn by the next visible dash
+              if space_available > 0.00000000001 { // this+prev dashes didn't cover the full Δstep¦dash segment width (whichever is smaller, dash segment can fit in Δstep), so should be drawn by the next visible dash
                 carry_over = space_available;
                 if is_last { // no next step, draw in this one
                   is_vis_draw = true;
                   let carry_over_r0 = c0 + prev_draw_len;
                   let carry_over_r1 = (carry_over_r0 + carry_over).min(c1) ;// up to our arc's end, the rest will be picked up by the next arc
-                  let carry_over_delta = carry_over_r1 - carry_over_r0;
+                  let carry_over_delta = carry_over_r1 - carry_over_r0; dash_drawn += carry_over_delta;
                   let c = Arc::new((cx,cy), (r0,r0)   ,carry_over_r0,carry_over_delta, 0.);
                   if dbg>=1	{scene.stroke(&stroke_c, Affine::IDENTITY, css::MAGENTA , None, &c,);
                   } else   	{scene.stroke(&stroke_c, Affine::IDENTITY, &grad        , None, &c,);}
@@ -450,6 +451,7 @@ mod impls {
         }
         }
       }
+      if dbg >=3 {println!("total dashes drawn = {} arc = {arc_len_deg}",dash_drawn.to_degrees());}
 
       if let JoinWhere::Beg = jn { // Segment 2: ~join part is 1st (at the start)
         // Draws pos-gradwidth segment separately without the extra iterator, including leftovers from whole steps not covering the full range
