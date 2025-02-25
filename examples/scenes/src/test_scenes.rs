@@ -286,7 +286,6 @@ mod impls {
 
 
       for i in 0..=steps_delta_xt { let r = f64::from(i); let is_last = i == steps_delta_xt;
-        // if is_last {step_gap=0.}; // don't bleed into the the last segment, but then gap between arcs
         // NB! last step needs special handling since it's a fractional one, so not full "precision length"!
         let step_width = if is_last && is_extra_step	{delta_rem_rad
         } else                                      	{precision_rad_per_step};
@@ -331,6 +330,8 @@ mod impls {
         let mut is_visible = false;
         let mut prev_draw_len:f64 = 0.; // store a sum of previously drawn dashes (vis+invis) so that if this dash doesn't cover the full Δstep or Σdash_len, we can see which part of it was covered before and which should go as Δover to the next step
         // if seg_count == 1. {
+
+        let mut dash_ix: usize = 0;
         for dash_i in &dash_iter_rad {
           is_visible = !is_visible;
           j += 1;
@@ -362,6 +363,7 @@ mod impls {
             }
             if draw_len > 0.0 { // 1st draw starts @ seg end to attach to the next draw in case of partials
               prev_draw_len += draw_len;
+              if dbg == 0 && step_gap > 0. && (i as usize) == step_ix && dash_ix == dash_vis_ix {step_gap=0.}; // don't bleed the last dash's visible end into the next segment. Deal with gap between arcs by drawing the next arc earlier?
               let c = if is_vis_draw   {Arc::new((cx,cy), (r0,r0)   ,rad0         ,draw_len + step_gap, 0.)
               } else {is_vis_draw=true; Arc::new((cx,cy), (r0,r0)   ,rad1-draw_len,draw_len + step_gap, 0.)};
               if dbg>=1 {
@@ -437,6 +439,7 @@ mod impls {
               );}
           }
           d_beg += dash_i;
+          dash_ix += 1;
         }
         }
       }
