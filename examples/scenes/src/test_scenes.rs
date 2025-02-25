@@ -64,8 +64,8 @@ mod impls {
       // within each set, iterate by dash item, and if it's an active/drawn item, determine how much of our step length fits there, and draw it
     // Dashes harder/failed approaches: combine vertical line with 1/2 circle; add dashed strokes; split by path and try to manually check which should be drawn;  change stroke width in the last segments if they are covered by the 1/2 circle (not possible???? how to calculate a match? check if we can draw a semicircle and check if overlap); draw previous line;  draw splits with a different width and gradient
 
-  // TODO
-    // make dashes optional
+  // TODO:
+    // don't extend last visible dash not to bleed into the invisible one
     // test if step length > dash set length (with very low precision)
     // maybe add a min average gap between two lines so that if first line ends with a partial inactive gap, the 2nd doesn't immediateely start with a visible dash, but + offset (unless it's too big for the 2d line, thus min average? or just min)
     // + convert circle segments to Arcs directly
