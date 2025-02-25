@@ -391,6 +391,10 @@ mod impls {
               } else if is_last    	{0. // don't bleed the last step's end //println!("non-dashed step gap removed {step_ix} {dash_vis_ix}");
               } else {step_gap_def}
               } else {0.};
+              let c = if is_vis_draw   {Arc::new((cx,cy), (r0,r0)   ,c0         ,draw_len + step_gap, 0.)
+              } else {is_vis_draw=true; Arc::new((cx,cy), (r0,r0)   ,c1-draw_len,draw_len + step_gap, 0.)};
+              scene.stroke(&stroke_c, Affine::IDENTITY, &grad     , None, &c,);
+              // println!("   → gap={}° {step_gap}", step_gap.to_degrees());
               if is_last && draw_len < *dash_i - epsi { // drawn something, but not the full visible dash
                 let part_len = draw_end - d_beg; //how much of an existing dash is covered by all draws, incl. last
                 dash_partial = (d_beg + part_len) * r0; // add all prior dash segments within a set
