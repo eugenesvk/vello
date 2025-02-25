@@ -357,12 +357,12 @@ mod impls {
               let c = Arc::new((cx,cy), (r0,r0)   ,c0 - carry_over,carry_over, 0.);
               if dbg>=1	{scene.stroke(&stroke_c, Affine::IDENTITY, css::MAGENTA , None, &c,);
               } else   	{scene.stroke(&stroke_c, Affine::IDENTITY, &grad        , None, &c,);}
-              carry_over = 0.;
               dbgprint = true;
               if dbg>=4 && dbgprint {
               println!("{i} drawing Δover {: >2.1} @ {: >3.2} = ({: >2.1}-{: >2.1}-Δ{: >2.1}) → {: >3.2}",carry_over.to_degrees()
                 ,(c1 - step_width - carry_over).to_degrees(),c1.to_degrees(),step_width.to_degrees(),carry_over.to_degrees()
                 ,(c1 - step_width).to_degrees());}
+              carry_over = 0.;
             }
             if draw_len > 0.0 { // 1st draw starts @ seg end to attach to the next draw in case of partials
               prev_draw_len += draw_len; dash_drawn += draw_len;
