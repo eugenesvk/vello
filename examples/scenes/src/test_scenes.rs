@@ -410,13 +410,13 @@ mod impls {
                 carry_over = space_available;
                 if is_last { // no next step, draw in this one
                   is_vis_draw = true;
-                  let carry_over_r0 = c0 + prev_draw_len;
-                  let carry_over_r1 = (carry_over_r0 + carry_over).min(c1) ;// up to our arc's end, the rest will be picked up by the next arc
-                  let carry_over_delta = carry_over_r1 - carry_over_r0; dash_drawn += carry_over_delta;
-                  let c = Arc::new((cx,cy), (r0,r0)   ,carry_over_r0,carry_over_delta, 0.);
-                  if dbg>=0	{scene.stroke(&stroke_c, Affine::IDENTITY, css::MAGENTA , None, &c,);
+                  let over_beg_c = c0 + prev_draw_len;
+                  let over_end_c = (over_beg_c + carry_over).min(c1) ;// up to our arc's end, the rest will be picked up by the next arc
+                  let over_delta = over_end_c - over_beg_c; dash_drawn += over_delta;
+                  let c = Arc::new((cx,cy), (r0,r0)   ,over_beg_c,over_delta, 0.);
+                  if dbg>=0	{scene.stroke(&stroke_c, Affine::IDENTITY, css::CYAN , None, &c,);
                   } else   	{scene.stroke(&stroke_c, Affine::IDENTITY, &grad        , None, &c,);}
-                  dash_partial = carry_over_delta * r0; carry_over = 0.;
+                  dash_partial = over_delta * r0; carry_over = 0.;
                   // println!("last step - drawn next dash since it won't be handled later!");
                 // } else {println!("  Δover {: >4.1}° = step_w {: >4.1}° - {: >4.1}° drawn",carry_over.to_degrees(),step_width.to_degrees(),draw_len.to_degrees());
                 }
