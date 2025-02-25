@@ -291,8 +291,8 @@ mod impls {
         let step_width = if is_last && is_extra_step	{delta_rem_rad
         } else                                      	{precision_rad_per_step};
         let seg0 = r * precision_rad_per_step; // segment beg in our arc coords (arc start = 0), last regular starts at the same old width, but itself will have a smaller step_width
-        let rad0 = join_beg + seg0;
-        let rad1 = rad0 + step_width; // todo debug only
+        let rad0 = join_beg + seg0; //segment beg in abs coords
+        let rad1 = rad0 + step_width; // segment end in abs coords
         // let c = Arc::new((cx,cy), (r0,r0) ,  rad0,step_width+gap_correct, 0.); //arc bugs with gaps
         // let c = CircleSegment::new((cx,cy), r0,r0   ,  rad0,step_width); // alt fix
         //                          center  rout/in    ∠start ∠sweep
