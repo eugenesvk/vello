@@ -253,6 +253,38 @@ mod impls {
         JoinWhere::Beg	=> w2px,
         JoinWhere::End	=> wavg,};
 
+      // Calculate which of the steps will match the last visible dash, and then do NOT extend the last step to cover for occlusion artifacts of other steps
+      let (step_ix, dash_vis_ix) = if !is_dash {
+        let arc_in_dashes = (arc_len_rad + dash_off_rad) % dash_iter_len_rad; // last partial arc's space that would hold a dash (in arc's coordinates)
+        let last_dash_len = if arc_in_dashes > 0. {arc_in_dashes} else {dash_iter_len_rad}; // last full or partial arc's space that would hold a dash
+        let mut dash_ix 	= 0;
+        let mut dash_rem	= dash_iter_rad[dash_ix];
+        let mut is_active = true;
+        while dash_rem < last_dash_len { // Find place in dashes array that covers arc's end
+          dash_ix = (dash_ix + 1) % dash_iter_rad.len();
+          dash_rem += dash_iter_rad[dash_ix];
+          is_active = !is_active;
+        }
+        let dash_vis_ix	= dash_ix - if is_active {0} else {1}; // last visible dash in at the end of the line
+        let mut dash_last_vis_end = dash_iter_rad[dash_vis_ix]; // end of last vis dash = length of all dashes up to and including the last visible one
+        if dash_vis_ix > 0 {for di in 1..dash_vis_ix {dash_last_vis_end += dash_iter_rad[di-1]}};
+        let space_leftover = (last_dash_len - dash_last_vis_end).max(0.);
+        let dash_last_vis_end_arc = arc_len_rad - space_leftover; // same, but in arc's coordinates
+        let space_leftover_arc = dash_last_vis_end_arc - dash_last_vis_end_arc;
+
+        // Get the last step that covers the last visible dash
+        let step_ix = if is_extra_step && space_leftover_arc < delta_rem_rad {f64::from(steps_delta_xt)} else {
+          dash_last_vis_end_arc.div_euclid(precision_rad_per_step) + if dash_last_vis_end_arc % precision_rad_per_step > 0. {1.}else{0.}
+        };
+        if dbg>=2{let _six1 = step_ix + 1.0; let _steps=steps_delta_i; let _dix1 = dash_vis_ix + 1; let _dashes=dash_iter_px.len();
+          println!("step_ix={_six1}¦{_steps}{} dash_vis_ix={_dix1}¦{_dashes} arc_len={}° ╍off={} ╍len={dash_iter_len_deg}° arc%╍={}°=({}+{})%{} ␠leftover={}°"
+          ,if is_extra_step {"+1"}else{""}
+          ,arc_len_rad.to_degrees(), dash_off_rad.to_degrees(), arc_in_dashes.to_degrees(),dash_off_rad.to_degrees(),arc_len_rad.to_degrees(),dash_iter_len_rad.to_degrees()
+          ,space_leftover.to_degrees());}
+        (step_ix as usize, dash_vis_ix)
+      } else {(0usize, 0usize)};
+
+
       for i in 0..=steps_delta_xt { let r = f64::from(i); let is_last = i == steps_delta_xt;
         // if is_last {step_gap=0.}; // don't bleed into the the last segment, but then gap between arcs
         // NB! last step needs special handling since it's a fractional one, so not full "precision length"!
