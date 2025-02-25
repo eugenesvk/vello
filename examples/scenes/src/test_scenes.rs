@@ -297,7 +297,7 @@ mod impls {
         (step_ix as usize, dash_vis_ix)
       } else {(0usize, 0usize)};
 
-      let mut dash_drawn:f64 = 0.; //Σ length of all vis+invis drawn dashes to get arc coords of the next dash
+      let mut dash_drawn_full:f64 = 0.; //Σ length of all vis+invis drawn dashes to get arc coords of the current dash end. Incremented in full dash_i length, even if it's drawn in many steps, so for each dash_i this signals the absolut coordinates of its end
 
       for i in 0..=steps_delta_xt { let r = f64::from(i); let is_last = i == steps_delta_xt; let is_last_pre = i == steps_delta_xt - 1;
         // NB! last step needs special handling since it's a fractional one, so not full "precision length"!
@@ -363,7 +363,7 @@ mod impls {
             let draw_len = draw_end - draw_beg;
 
             if carry_over > 0. { // draw leftovers from the previous dash
-              prev_draw_len += carry_over; dash_drawn += carry_over;
+              prev_draw_len += carry_over;
               // if is_vis_draw {println!("!!! leftovers from a previous dash should always 1st, but something else drew")}; //todo warn
               is_vis_draw = true; // start drawing @ the end of prev ↓ step
               let c = Arc::new((cx,cy), (r0,r0)   ,c0 - carry_over,carry_over, 0.);
@@ -377,13 +377,13 @@ mod impls {
               carry_over = 0.;
             }
             if draw_len > 0.0 { // 1st draw starts @ seg end to attach to the next draw in case of partials
-              prev_draw_len += draw_len; dash_drawn += draw_len;
+              prev_draw_len += draw_len; if dash_drawn_full <= step_beg_a {dash_drawn_full += dash_i;}
               let step_gap = if dbg == 0 && step_gap_def != 0. { // gap exists, and not dbg (where occlusion artifacts are helpful to see step borders)
               if is_dash { // Don't bleed the last dash's visible end into the next segment. Deal with gap between arcs by drawing the next arc earlier?
                 if  (i       as usize) == step_ix    	// our pre-calculated indices match this step+dash iteration
                   &&           dash_ix == dash_vis_ix	{0.
                 } else { // track endings of regular visible dash ends, don't bleed into invisible dashes
-                  if dash_drawn < step_end_a {test=true;0. // dash will be drawn in this step, so don't extend it
+                  if dash_drawn_full <= step_end_a {0. // dash will be fully drawn in this step, so don't extend it
                   } else {step_gap_def}
                 }
               } else if is_last_pre	{step_gap_def.min(delta_rem_rad) //don't accidentall bleed into the last step that can be smaller than the gap closer //println!("non-dashed gap shortened {step_ix} {dash_vis_ix}");
@@ -416,7 +416,8 @@ mod impls {
             let draw_beg = d_beg.max(seg_beg).min(d_end); // start at dash begin, → to segment begin, but not past dash end
             let draw_end = d_end.min(seg_end).max(d_beg); // start at dash end  , ← to segment end  , but not past dash beg
             let draw_len = draw_end - draw_beg;
-            if draw_len > 0.0 {is_vis_draw = false; prev_draw_len += draw_len; dash_drawn += draw_len;
+            if draw_len > 0.0 {is_vis_draw = false; prev_draw_len += draw_len;
+              if is_dash && dash_drawn_full <= step_beg_a {dash_drawn_full += dash_i;}
               let space_available = step_width.min(dash_iter_len_rad) - prev_draw_len;
               if space_available > 0.00000000001 { // this+prev dashes didn't cover the full Δstep¦dash segment width (whichever is smaller, dash segment can fit in Δstep), so should be drawn by the next visible dash
                 carry_over = space_available;
@@ -424,7 +425,7 @@ mod impls {
                   is_vis_draw = true;
                   let over_beg_c = c0 + prev_draw_len;
                   let over_end_c = (over_beg_c + carry_over).min(c1) ;// up to our arc's end, the rest will be picked up by the next arc
-                  let over_delta = over_end_c - over_beg_c; dash_drawn += over_delta;
+                  let over_delta = over_end_c - over_beg_c;
                   let c = Arc::new((cx,cy), (r0,r0)   ,over_beg_c,over_delta, 0.);
                   if dbg>=0	{scene.stroke(&stroke_c, Affine::IDENTITY, css::CYAN , None, &c,);
                   } else   	{scene.stroke(&stroke_c, Affine::IDENTITY, &grad        , None, &c,);}
