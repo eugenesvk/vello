@@ -292,9 +292,10 @@ mod impls {
         } else                                      	{precision_rad_per_step};
         let step_beg_a = r * precision_rad_per_step; // step in arc coords (arc start = 0)
         let step_end_a = step_beg_a + step_width;
-        let rad1 = rad0 + step_width; // segment end in abs coords
-        // let c = Arc::new((cx,cy), (r0,r0) ,  rad0,step_width+gap_correct, 0.); //arc bugs with gaps
-        // let c = CircleSegment::new((cx,cy), r0,r0   ,  rad0,step_width); // alt fix
+        let c0 = join_beg + step_beg_a; //step in abs circle coords
+        let c1 = c0 + step_width;
+        // let c = Arc::new((cx,cy), (r0,r0) ,  c0,step_width+gap_correct, 0.); //arc bugs with gaps
+        // let c = CircleSegment::new((cx,cy), r0,r0   ,  c0,step_width); // alt fix
         //                          center  rout/in    ∠start ∠sweep
         let cw = if is_last	{w_end
         } else             	{w_beg + sign * r * w_per_step_i};
@@ -316,7 +317,7 @@ mod impls {
         let mut d_beg = 0.; // length up to the beginning of this dash = ∑ of all previous dash lens
 
         //     ──────  —————  outer line dash pattern (todo: what if our line is bigger than 1 pattern? like here)
-        //        ┌─────┐     our   line (always starts later due to "rad0 % dash_iter_len_rad")
+        //        ┌─────┐     our   line (always starts later due to "c0 % dash_iter_len_rad")
         // seg_beg┘     └seg_end
         //         ↑↑  ↑ draw, overlaps with   active
         //           ↑↑  skip, overlaps with inactive
@@ -352,15 +353,15 @@ mod impls {
               prev_draw_len += carry_over;
               // if is_vis_draw {println!("!!! leftovers from a previous dash should always 1st, but something else drew")}; //todo warn
               is_vis_draw = true; // start drawing @ the end of prev ↓ step
-              let c = Arc::new((cx,cy), (r0,r0)   ,rad0 - carry_over,carry_over, 0.);
+              let c = Arc::new((cx,cy), (r0,r0)   ,c0 - carry_over,carry_over, 0.);
               if dbg>=1	{scene.stroke(&stroke_c, Affine::IDENTITY, css::MAGENTA , None, &c,);
               } else   	{scene.stroke(&stroke_c, Affine::IDENTITY, &grad        , None, &c,);}
               carry_over = 0.;
               dbgprint = true;
               if dbg>=4 && dbgprint {
               println!("{i} drawing Δover {: >2.1} @ {: >3.2} = ({: >2.1}-{: >2.1}-Δ{: >2.1}) → {: >3.2}",carry_over.to_degrees()
-                ,(rad1 - step_width - carry_over).to_degrees(),rad1.to_degrees(),step_width.to_degrees(),carry_over.to_degrees()
-                ,(rad1 - step_width).to_degrees());}
+                ,(c1 - step_width - carry_over).to_degrees(),c1.to_degrees(),step_width.to_degrees(),carry_over.to_degrees()
+                ,(c1 - step_width).to_degrees());}
             }
             if draw_len > 0.0 { // 1st draw starts @ seg end to attach to the next draw in case of partials
               prev_draw_len += draw_len;
@@ -379,11 +380,11 @@ mod impls {
               if is_last && draw_len < *dash_i - epsi { // drawn something, but not the full visible dash
                 let part_len = draw_end - d_beg; //how much of an existing dash is covered by all draws, incl. last
                 dash_partial = (d_beg + part_len) * r0; // add all prior dash segments within a set
-                // println!("! last +visible +draw ╍w {: >.4}° − {: >.4}° actual = {: >.4}° {: >.4}°part_len partial ({:.1}px) rad1 {:.3}°"
-                //   ,dash_i.to_degrees(),draw_len.to_degrees(), (d_end.min(seg_end) - d_beg).to_degrees(),part_len.to_degrees(), dash_partial,rad1.to_degrees());
+                // println!("! last +visible +draw ╍w {: >.4}° − {: >.4}° actual = {: >.4}° {: >.4}°part_len partial ({:.1}px) c1 {:.3}°"
+                //   ,dash_i.to_degrees(),draw_len.to_degrees(), (d_end.min(seg_end) - d_beg).to_degrees(),part_len.to_degrees(), dash_partial,c1.to_degrees());
               }
             } else {is_vis_draw=false;}
-            // if rad0       <=       d_end
+            // if c0       <=       d_end
             // &&    seg_end >= d_beg  { // (alt check) our segment overlaps with this dash
             if dbg>=2 && (dbgprint || i == 0 || is_last || (78<= i && i <=83)) {println!( //👁👀👓
               "{}👀{}{i: >3} {} {j: >2}\
@@ -392,7 +393,7 @@ mod impls {
               │ ╍ {: >4.1}° → {: >4.1}° Δ{: >4.1}°\
               │ 🖉 {: >4.1}° → {: >4.1}° ⇒ {: >3.1}° "
               ,if draw_len>0.{"🖉"}else{" "}, if is_last {"🛑"}else{" "}, if dr > 1 {format!("🗘{dr: >1}")}else{"  ".to_owned()}
-              ,step_beg_a.to_degrees()    ,rad0    .to_degrees(),rad1    .to_degrees(),(rad1    -    rad0).to_degrees(),seg_off.to_degrees()
+              ,step_beg_a.to_degrees()    ,c0    .to_degrees(),c1    .to_degrees(),(c1    -    c0).to_degrees(),seg_off.to_degrees()
               ,                      seg_beg .to_degrees(),seg_end .to_degrees()
               ,d_beg   .to_degrees(),d_end   .to_degrees(),dash_i.to_degrees()
               ,draw_beg.to_degrees(),draw_end.to_degrees(),draw_len.to_degrees()
@@ -408,8 +409,8 @@ mod impls {
                 carry_over = space_available;
                 if is_last { // no next step, draw in this one
                   is_vis_draw = true;
-                  let carry_over_r0 = rad0 + prev_draw_len;
-                  let carry_over_r1 = (carry_over_r0 + carry_over).min(rad1) ;// up to our arc's end, the rest will be picked up by the next arc
+                  let carry_over_r0 = c0 + prev_draw_len;
+                  let carry_over_r1 = (carry_over_r0 + carry_over).min(c1) ;// up to our arc's end, the rest will be picked up by the next arc
                   let carry_over_delta = carry_over_r1 - carry_over_r0;
                   let c = Arc::new((cx,cy), (r0,r0)   ,carry_over_r0,carry_over_delta, 0.);
                   if dbg>=1	{scene.stroke(&stroke_c, Affine::IDENTITY, css::MAGENTA , None, &c,);
@@ -425,10 +426,10 @@ mod impls {
               if   draw_len > 0. //drawn something… ↙some float rounding error
                 && part_len < *dash_i - 0.00000000001 { //…but not the full invisible dash
                 dash_partial = (d_beg + part_len) * r0; //≝draw_end add all prior dash segments within a set
-                // println!("{}№{seg_count} last -visible +draw ╍beg {: >3.3}° draw_end {: >3.3}°≝partial ({:.1}px) Δ{: >3.3}° Δstep {: >3.3}° drawn │ ╍w {: >.2}° left {: >.2}° rad1 {:.3}°"
+                // println!("{}№{seg_count} last -visible +draw ╍beg {: >3.3}° draw_end {: >3.3}°≝partial ({:.1}px) Δ{: >3.3}° Δstep {: >3.3}° drawn │ ╍w {: >.2}° left {: >.2}° c1 {:.3}°"
                 //   ,if dash_partial > 0. {"✓"}else{"✗"}
                 //   ,d_beg.to_degrees(),draw_end.to_degrees(),dash_partial,part_len.to_degrees(),draw_len.to_degrees()
-                //   ,dash_i.to_degrees(),(dash_i-part_len).to_degrees(),rad1.to_degrees());
+                //   ,dash_i.to_degrees(),(dash_i-part_len).to_degrees(),c1.to_degrees());
               }
             }
             if dbg>=3 && (dbgprint || i == 0 || is_last || (78<= i && i <=83)) {println!( //👁👀👓
@@ -438,7 +439,7 @@ mod impls {
               │ ╍ {: >4.1}° → {: >4.1}° Δ{: >4.1}°\
               │ 🖉 {: >4.1}° → {: >4.1}° ⇒ {: >3.1}° "
              ,if draw_len>0.{"🖉"}else{" "}, if is_last {"🛑"}else{" "}, if dr > 1 {format!("🗘{dr: >1}")}else{"  ".to_owned()}
-              ,step_beg_a.to_degrees()    ,rad0    .to_degrees(),rad1    .to_degrees(),(rad1    -    rad0).to_degrees(),seg_off.to_degrees()
+              ,step_beg_a.to_degrees()    ,c0    .to_degrees(),c1    .to_degrees(),(c1    -    c0).to_degrees(),seg_off.to_degrees()
               ,                      seg_beg .to_degrees(),seg_end .to_degrees()
               ,d_beg   .to_degrees(),d_end   .to_degrees(),dash_i.to_degrees()
               ,draw_beg.to_degrees(),draw_end.to_degrees(),draw_len.to_degrees()
