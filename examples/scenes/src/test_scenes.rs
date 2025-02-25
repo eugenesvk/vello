@@ -98,40 +98,50 @@ mod impls {
     JoinWhere::End	=> write!(f, "——╍╍")}   }
   }
 
+  pub struct VarOpt {dbg:u8,
+    arc_len 	:f64, //°
+    prec_dps	:f64, // precision °/step
+    dash_off	:f64, dash_iter:Option<[f64;2]>}
   pub(super) fn stroke_styles(transform: Affine) -> impl FnMut(&mut Scene, &mut SceneParams<'_>) {
     use PathEl::*;
     move |scene, params| {
       let dpi = 1.5;
       // Size
-      let arc_len_deg:f64 = 180.; let precision_deg_per_step = 2.5; //rad 0.00873
+      // let arc_len_deg:f64 = 180.; let precision_deg_per_step = 2.5; //rad 0.00873
       let delta_transit = 1.0; // start changing width for the first/last % only
       // Line width
       let w1:f64 = 20.; let w2:f64 =  4.;
       // Position
       let cx = 0.; let cy = 400.; let r0 = 395.5; //600 circum len 300 half
       let r1beg:f64 = 0.             	; let r1beg_rad = r1beg.to_radians(); //→
-      let r2beg = r1beg + arc_len_deg	; let r2beg_rad = r2beg.to_radians();
+      // let r2beg = r1beg + arc_len_deg	; let r2beg_rad = r2beg.to_radians();
       // Color
       let col_beg = css::LIME;let col_end = css::RED;
-      // Dashes
-      let mut dashes: Vec<(f64,Option<[f64;2]>, u8)> = vec![];
-      // dash     offset, iter            ,dbg
-      dashes.push( ( 0. , None            , 0) );
-      dashes.push( ( 0. , None            , 1) );
-      dashes.push( (30.1, Some([30.1,40.]), 1) );
-      dashes.push( (15.1, Some([10.1,10.]), 1) );
-      dashes.push( (12.1, Some([20.1,20.]), 1) );
-      dashes.push( (11.1, Some([30.1,10.]), 1) );
-      dashes.push( (0.  , Some([30.1,10.]), 1) );
+      // Opts
+      let opts = [
+        // VarOpt {arc_len:180. , prec_dps: 2.5, dbg:0, dash_off: 0. , dash_iter:None            },
+        // VarOpt {arc_len:180.1, prec_dps: 2.5, dbg:0, dash_off: 0. , dash_iter:None            },
+        VarOpt {arc_len:180. , prec_dps: 2.5, dbg:0, dash_off: 0. , dash_iter:Some([30. ,30. ])},
+        // VarOpt {arc_len:180.1, prec_dps: 2.5, dbg:0, dash_off: 0. , dash_iter:Some([10. ,10. ])},
+        // VarOpt {arc_len:180. , prec_dps: 2.5, dbg:1, dash_off: 0. , dash_iter:None            },
+        // VarOpt {arc_len:180. , prec_dps: 2.5, dbg:1, dash_off: 0. , dash_iter:None            },
+        // VarOpt {arc_len:180. , prec_dps: 2.5, dbg:1, dash_off:30.1, dash_iter:Some([30.1,40.])},
+        // VarOpt {arc_len:180. , prec_dps: 2.5, dbg:1, dash_off:15.1, dash_iter:Some([10.1,10.])},
+        // VarOpt {arc_len:180. , prec_dps: 2.5, dbg:1, dash_off:12.1, dash_iter:Some([20.1,20.])},
+        // VarOpt {arc_len:180. , prec_dps: 2.5, dbg:1, dash_off:11.1, dash_iter:Some([30.1,10.])},
+        // VarOpt {arc_len:180. , prec_dps: 2.5, dbg:1, dash_off:0.  , dash_iter:Some([30.1,10.])},
+        // VarOpt {arc_len:180. , prec_dps: 2.5, dbg:1, dash_off: 0. , dash_iter:Some([60. ,60. ])},
+        // VarOpt {arc_len:180. , prec_dps:60.0, dbg:1, dash_off: 0. , dash_iter:Some([60. ,60. ])},
+      ];
 
-      let end = dashes.len();
+      let end = opts.len();
       for i in 0..end { let f = f64::from(i as u32);
         let cx = 20. + (1. + (f     %      5.) * 2. )*(r0 + w1.max(w2));
         let cy = 20. + (1. +  f.div_euclid(5.) * 2. )*(r0 + w1.max(w2)); // 5 circles in a row
-        ddd(scene, (cx,cy),r0, r1beg_rad, arc_len_deg,  JoinWhere::End,delta_transit,
-          col_beg,col_end,  w1,w2, dpi,  precision_deg_per_step,  dashes[i].0,dashes[i].1, dashes[i].2,);
-        ddd(scene, (cx,cy),r0, r2beg_rad, arc_len_deg,  JoinWhere::Beg,delta_transit,
-          col_beg,col_end,  w1,w2, dpi,  precision_deg_per_step,  dashes[i].0,dashes[i].1, dashes[i].2,);
+        ddd(scene, (cx,cy),r0, r1beg_rad, opts[i].arc_len,  JoinWhere::End,delta_transit,
+          col_beg,col_end,  w1,w2, dpi,  opts[i].prec_dps,  opts[i].dash_off,opts[i].dash_iter, opts[i].dbg,);
+        // ddd(scene, (cx,cy),r0, r1beg_rad + opts[i].arc_len, opts[i].arc_len,  JoinWhere::Beg,delta_transit,
+        //   col_beg,col_end,  w1,w2, dpi,  opts[i].prec_dps,  opts[i].dash_off,opts[i].dash_iter, opts[i].dbg,);
       }
 
       // Draw debug circles showing where each gradient begins/ends
