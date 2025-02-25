@@ -76,6 +76,7 @@ mod impls {
     // + calculate the remainder from iterative approach and use it as a (-) offset to the main curve
     // + make gradient sweeps for better precision with arcs instead of linear
       // + for non-stepped lines, can use multiple colors with steps as well
+    // + make dashes optional
   // Kurbo precision bug leading to artifacts comparing to a reference dashed circle (which is incorrect, ↓ block 4 from the bottom has incorrect shape vs other blocks)
     // let dash_off_deg = 0.; let dash_iter_deg = [10.,10.]; ← translates to >10e-6 numbers, while kurbo precision limit is e-6
   // ??? update offset algo to find index to the dash that matches offset ???
