@@ -387,7 +387,7 @@ mod impls {
             } else {is_vis_draw=false;}
             // if c0       <=       d_end
             // &&    seg_end >= d_beg  { // (alt check) our segment overlaps with this dash
-            if dbg>=2 && (dbgprint || i == 0 || is_last || (78<= i && i <=83)) {println!( //👁👀👓
+            if dbg>=0 && (dbgprint || i == 0 || is_last || (70<= i && i <=71)) {println!( //👁👀👓
               "{}👀{}{i: >3} {} {j: >2}\
               │ +{: >4.1}={: >4.1}° ↷ {: >4.1}° Δ{: >3.1}° off {: >3.1}° \
               │№{seg_count: >2} {: >4.1}° ↷ {: >4.1}°\
@@ -414,7 +414,7 @@ mod impls {
                   let carry_over_r1 = (carry_over_r0 + carry_over).min(c1) ;// up to our arc's end, the rest will be picked up by the next arc
                   let carry_over_delta = carry_over_r1 - carry_over_r0; dash_drawn += carry_over_delta;
                   let c = Arc::new((cx,cy), (r0,r0)   ,carry_over_r0,carry_over_delta, 0.);
-                  if dbg>=1	{scene.stroke(&stroke_c, Affine::IDENTITY, css::MAGENTA , None, &c,);
+                  if dbg>=0	{scene.stroke(&stroke_c, Affine::IDENTITY, css::MAGENTA , None, &c,);
                   } else   	{scene.stroke(&stroke_c, Affine::IDENTITY, &grad        , None, &c,);}
                   dash_partial = carry_over_delta * r0; carry_over = 0.;
                   // println!("last step - drawn next dash since it won't be handled later!");
