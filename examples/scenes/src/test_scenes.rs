@@ -389,7 +389,7 @@ mod impls {
             let mut is_last_dash = false;
             if draw_len > 0.0 { // 1st draw starts @ seg end to attach to the next draw in case of partials
               prev_draw_len += draw_len; if dash_drawn_full <= step_beg_a {dash_drawn_full += dash_i;}
-              let step_gap = if dbg<=1 && step_gap_def != 0. { // gap exists, and not dbg (where occlusion artifacts are helpful to see step borders)
+              let step_gap = if dbg<=1 && step_gap_def != 0. { // gap exists, and not dbg2 (where occlusion artifacts are helpful to see step borders)
               if is_dash { // Don't bleed the last dash's visible end into the next segment. Deal with gap between arcs by drawing the next arc earlier?
                 if  (i       as usize) == step_ix    	// our pre-calculated indices match this step+dash iteration
                   &&           dash_ix == dash_vis_ix	{is_last_dash=true; 0.
