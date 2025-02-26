@@ -404,7 +404,6 @@ mod impls {
             if draw_len > 0.0 {
               prev_draw_len += draw_len; if dash_drawn_full <= step_beg_a {dash_drawn_full += dash_i;}
               if draw_len > epsi { // do actual draw only if len above floating rounding error
-                prev_draw_len += draw_len; if dash_drawn_full <= step_beg_a {dash_drawn_full += dash_i;}
                 let step_gap = if dbg<=1 && step_gap_def != 0. { // gap exists, and not dbg2 (where occlusion artifacts are helpful to see step borders)
                   if is_dash { // Don't bleed the last dash's visible end into the next segment. Deal with gap between arcs by drawing the next arc earlier?
                     if  (i       as usize) == step_ix    	// our pre-calculated indices match this step+dash iteration
