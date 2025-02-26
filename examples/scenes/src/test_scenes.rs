@@ -66,6 +66,7 @@ mod impls {
 
   // TODO:
     // ?? convert to a simpler double-iter algo where step width and dash width cal min intercept and draw if needed in arc's coords until the full arc width is covered instead of tyring to pre-calc # of steps and treat the last one special and do carry overs etc.?
+      // similar to "while step_covered >= -0.1  {", but for arc
     // reject negative numbers on accepted dash iterator
     // ??? maybe add a min average gap between two lines so that if first line ends with a partial inactive gap, the 2nd doesn't immediately start with a visible dash, but + offset (unless it's too big for the 2d line, thus min average? or just min)
     // help: add text with parameters in the center
