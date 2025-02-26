@@ -369,7 +369,7 @@ mod impls {
               prev_draw_len += carry_over;
               // if is_vis_draw {println!("!!! leftovers from a previous dash should always 1st, but something else drew")}; //todo warn
               is_vis_draw = true; // start drawing @ the end of prev ↓ step
-              let c = Arc::new((cx,cy), (r0,r0)   ,c0 - carry_over,carry_over, 0.);
+              let c = Arc::new((cx,cy), (r0,r0)   ,c0 - carry_over,carry_over + step_gap_def, 0.);
               if dbg>=1	{scene.stroke(&stroke_c, Affine::IDENTITY, css::MAGENTA , None, &c,);
               } else   	{scene.stroke(&stroke_c, Affine::IDENTITY, &grad        , None, &c,);}
               dbgprint = true;
@@ -439,7 +439,7 @@ mod impls {
                   let over_beg_c = c0 + prev_draw_len;
                   let over_end_c = (over_beg_c + carry_over).min(c1) ;// up to our arc's end, the rest will be picked up by the next arc
                   let over_delta = over_end_c - over_beg_c;
-                  let c = Arc::new((cx,cy), (r0,r0)   ,over_beg_c,over_delta, 0.);
+                  let c = Arc::new((cx,cy), (r0,r0)   ,over_beg_c,over_delta+step_gap_def, 0.);
                   if dbg>=1	{scene.stroke(&stroke_c, Affine::IDENTITY, css::CYAN , None, &c,);
                   } else   	{scene.stroke(&stroke_c, Affine::IDENTITY, &grad        , None, &c,);}
                   dash_partial = over_delta * r0; carry_over = 0.;
