@@ -66,7 +66,6 @@ mod impls {
 
   // TODO:
     // add text with parameters in the center
-    // make dbg0 all off, dbg1 all off only color markers (and glue in smalle width to make it vis), dbg2 no glue, dbg3 start printing
     // test if step length > dash set length (with very low precision)
     // maybe add a min average gap between two lines so that if first line ends with a partial inactive gap, the 2nd doesn't immediateely start with a visible dash, but + offset (unless it's too big for the 2d line, thus min average? or just min)
     // + convert circle segments to Arcs directly
