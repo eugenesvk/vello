@@ -440,7 +440,7 @@ mod impls {
             let draw_beg = d_beg.max(seg_beg).min(d_end); // start at dash begin, → to segment begin, but not past dash end
             let draw_end = d_end.min(seg_end).max(d_beg); // start at dash end  , ← to segment end  , but not past dash beg
             let draw_len = draw_end - draw_beg;
-            if draw_len > 0.0 {is_vis_draw = false; prev_draw_len += draw_len;
+            if draw_len > 0.00000001 {is_vis_draw = false; prev_draw_len += draw_len;
               if is_dash && dash_drawn_full <= step_beg_a {dash_drawn_full += dash_i;}
               let space_available = step_width.min(dash_iter_len_rad) - prev_draw_len;
               if space_available > 0.00000000001 { // this+prev dashes didn't cover the full Δstep¦dash segment width (whichever is smaller, dash segment can fit in Δstep), so should be drawn by the next visible dash
