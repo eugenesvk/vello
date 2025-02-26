@@ -453,16 +453,32 @@ mod impls {
               if space_available > 0.00000000001 { // this+prev dashes didn't cover the full Δstep¦dash segment width (whichever is smaller, dash segment can fit in Δstep), so should be drawn by the next visible dash
                 carry_over.len = space_available; carry_over.s_ix = i; carry_over.d_ix = j;
                 if dbg>=5 {println!("{i} ╍{j}  +Δover {: >4.1}° = step_w {: >4.1}°|{: >4.1}° - {: >4.1}° drawn_prev ({: >4.1}° cur {})",carry_over.len.to_degrees(),step_width.to_degrees(),dash_i.to_degrees(),prev_draw_len.to_degrees(),draw_len.to_degrees(),draw_len);}
-                if is_last { // no next step, draw in this one
+                if is_last && j < dash_iter_rad.len() { // no next step, but there is space for a next visible dashdraw in this one
                   is_vis_draw = true;
+                  let dash_i_next = dash_iter_rad[j % dash_iter_rad.len()]; //j is 1-based
                   let over_beg_c = c0 + prev_draw_len;
-                  let over_end_c = (over_beg_c + carry_over.len).min(c1) ;// up to our arc's end, the rest will be picked up by the next arc
+                  let over_end_c = (over_beg_c + carry_over.len).min(c1).min(dash_drawn_full+dash_i_next) ;// up to next visible dash end or our arc's end (the rest will be picked up by the next arc)
                   let over_delta = over_end_c - over_beg_c;
                   let c = Arc::new((cx,cy), (r0,r0)   ,over_beg_c,over_delta+step_gap_def, 0.);
                   if dbg>=1	{scene.stroke(&stroke_c, Affine::IDENTITY, css::CYAN , None, &c,);
                   } else   	{scene.stroke(&stroke_c, Affine::IDENTITY, &grad     , None, &c,);}
-                  dash_partial = over_delta * r0; carry_over = CarryOver::default();
+                  dash_partial = over_delta * r0;
                   // println!("last step - drawn next dash since it won't be handled later!");
+                  if dbg>=5 {println!("{i} ╍{j} {} ╍{} draw Δover now! {: >2.1} \
+                    @ {: >3.2} = (c0={: >2.1}+Δ{: >2.1}=prev_draw_len)\
+                    → {: >3.2} ({: >3.2}+{: >3.2}c_ovr= {: >3.2}°\
+                    |{: >3.2}°c1\
+                    |{: >3.2}° (pre_drawn {: >3.2}+{: >3.2} dash_next) \
+                    (step {: >3.2})",carry_over.s_ix,carry_over.d_ix
+                    ,over_delta.to_degrees()
+                    ,over_beg_c.to_degrees(),c0.to_degrees(),prev_draw_len.to_degrees()
+                    ,over_end_c.to_degrees()
+                    ,over_beg_c.to_degrees(),carry_over.len.to_degrees(),(over_beg_c+carry_over.len).to_degrees()
+                    ,c1.to_degrees()
+                    ,(dash_drawn_full+dash_i_next).to_degrees(),dash_drawn_full.to_degrees(),dash_i_next.to_degrees()
+                    ,step_width.to_degrees()
+                    );}
+                  carry_over = CarryOver::default();
                 // } else {println!("  Δover {: >4.1}° = step_w {: >4.1}° - {: >4.1}° drawn",carry_over.to_degrees(),step_width.to_degrees(),draw_len.to_degrees());
                 }
               }
