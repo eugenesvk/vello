@@ -400,27 +400,30 @@ mod impls {
             let mut is_last_dash = false;
             if draw_len > 0.0 { // 1st draw starts @ seg end to attach to the next draw in case of partials
               prev_draw_len += draw_len; if dash_drawn_full <= step_beg_a {dash_drawn_full += dash_i;}
-              let step_gap = if dbg<=1 && step_gap_def != 0. { // gap exists, and not dbg2 (where occlusion artifacts are helpful to see step borders)
-                if is_dash { // Don't bleed the last dash's visible end into the next segment. Deal with gap between arcs by drawing the next arc earlier?
-                  if  (i       as usize) == step_ix    	// our pre-calculated indices match this step+dash iteration
-                    &&           dash_ix == dash_vis_ix	{is_last_dash=true; 0.
-                  } else { // track endings of regular visible dash ends, don't bleed into invisible dashes
-                    if   (dash_drawn_full <= step_end_a) // ← strict comparison matches invisible tiny dash ending, so also don't extend the previous one
-                      || (dash_drawn_full -  step_end_a).abs() <= epsi {is_last_dash=true; 0. // dash will be fully drawn in this step, so don't extend it
-                    } else {step_gap_def}
-                  }
-                } else if is_last_pre	{step_gap_def.min(delta_rem_rad) //don't accidentall bleed into the last step that can be smaller than the gap closer //println!("non-dashed gap shortened {step_ix} {dash_vis_ix}");
-                } else if is_last    	{0. // don't bleed the last step's end //println!("non-dashed step gap removed {step_ix} {dash_vis_ix}");
-                } else {step_gap_def}
-              } else   {0.};
-              let c = if is_vis_draw   {Arc::new((cx,cy), (r0,r0)   ,c0                                   ,draw_len + step_gap, 0.)
-              } else {is_vis_draw=true; Arc::new((cx,cy), (r0,r0)   ,c0 + step_width.min(*dash_i)-draw_len,draw_len + step_gap, 0.)};
-              if is_last_dash { // ↑ start drawing 1st from the end of the segment, which ↑ is a min of step width or dash item width
+              if draw_len > epsi { // do actual draw only if len above floating rounding error
+                prev_draw_len += draw_len; if dash_drawn_full <= step_beg_a {dash_drawn_full += dash_i;}
+                let step_gap = if dbg<=1 && step_gap_def != 0. { // gap exists, and not dbg2 (where occlusion artifacts are helpful to see step borders)
+                  if is_dash { // Don't bleed the last dash's visible end into the next segment. Deal with gap between arcs by drawing the next arc earlier?
+                    if  (i       as usize) == step_ix    	// our pre-calculated indices match this step+dash iteration
+                      &&           dash_ix == dash_vis_ix	{is_last_dash=true; 0.
+                    } else { // track endings of regular visible dash ends, don't bleed into invisible dashes
+                      if   (dash_drawn_full <= step_end_a) // ← strict comparison matches invisible tiny dash ending, so also don't extend the previous one
+                        || (dash_drawn_full -  step_end_a).abs() <= epsi {is_last_dash=true; 0. // dash will be fully drawn in this step, so don't extend it
+                      } else {step_gap_def}
+                    }
+                  } else if is_last_pre	{step_gap_def.min(delta_rem_rad) //don't accidentall bleed into the last step that can be smaller than the gap closer //println!("non-dashed gap shortened {step_ix} {dash_vis_ix}");
+                  } else if is_last    	{0. // don't bleed the last step's end //println!("non-dashed step gap removed {step_ix} {dash_vis_ix}");
+                  } else {step_gap_def}
+                } else   {0.};
+                let c = if is_vis_draw   {Arc::new((cx,cy), (r0,r0)   ,c0                                   ,draw_len + step_gap, 0.)
+                } else {is_vis_draw=true; Arc::new((cx,cy), (r0,r0)   ,c0 + step_width.min(*dash_i)-draw_len,draw_len + step_gap, 0.)};
+                if is_last_dash { // ↑ start drawing 1st from the end of the segment, which ↑ is a min of step width or dash item width
                 if       dbg>=2	{scene.stroke(&get_stroke_end(cw*1.5), Affine::IDENTITY, &css::BLUE  , None, &c,);
                 }else if dbg==1	{scene.stroke(&stroke_c              , Affine::IDENTITY, &css::ORANGE, None, &c,);
                 }else if dbg==0	{scene.stroke(&stroke_c              , Affine::IDENTITY, &grad       , None, &c,);}
-              } else           	{scene.stroke(&stroke_c              , Affine::IDENTITY, &grad       , None, &c,);};
-              // println!("   → gap={}° {step_gap}", step_gap.to_degrees());
+                } else         	{scene.stroke(&stroke_c              , Affine::IDENTITY, &grad       , None, &c,);};
+                // println!("   → gap={}° {step_gap}", step_gap.to_degrees());
+              } //↓ offset should be tracked even if tiny "draw" len?
               if is_last && draw_len < *dash_i - epsi { // drawn something, but not the full visible dash
                 let part_len = draw_end - d_beg; //how much of an existing dash is covered by all draws, incl. last
                 dash_partial = (d_beg + part_len) * r0; // add all prior dash segments within a set
