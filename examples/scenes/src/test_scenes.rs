@@ -385,9 +385,9 @@ mod impls {
               } else   	{scene.stroke(&stroke_c, Affine::IDENTITY, &grad        , None, &c,);}
               dbgprint = true;
               if dbg>=5 && dbgprint {
-              println!("{i} ╍{j} draw Δover {: >2.1} @ {: >3.2} = ({: >2.1}-{: >2.1}-Δ{: >2.1}) → {: >3.2}",carry_over.to_degrees()
-                ,(c1 - step_width - carry_over).to_degrees(),c1.to_degrees(),step_width.to_degrees(),carry_over.to_degrees()
-                ,(c1 - step_width).to_degrees());}
+              println!("{i} ╍{j} draw Δover {: >2.1} @ {: >3.2} = (c0={: >2.1}-Δ{: >2.1}) → c0={: >3.2} (step {: >3.2})",carry_over.to_degrees()
+                ,(c0 - carry_over).to_degrees(),c0.to_degrees(),carry_over.to_degrees()
+                ,c0.to_degrees(), step_width.to_degrees());}
               carry_over = 0.;
             }
             let mut is_last_dash = false;
