@@ -406,9 +406,9 @@ mod impls {
                 } else if is_last    	{0. // don't bleed the last step's end //println!("non-dashed step gap removed {step_ix} {dash_vis_ix}");
                 } else {step_gap_def}
               } else   {0.};
-              let c = if is_vis_draw   {Arc::new((cx,cy), (r0,r0)   ,c0         ,draw_len + step_gap, 0.)
-              } else {is_vis_draw=true; Arc::new((cx,cy), (r0,r0)   ,c1-draw_len,draw_len + step_gap, 0.)};
-              if is_last_dash {
+              let c = if is_vis_draw   {Arc::new((cx,cy), (r0,r0)   ,c0                                   ,draw_len + step_gap, 0.)
+              } else {is_vis_draw=true; Arc::new((cx,cy), (r0,r0)   ,c0 + step_width.min(*dash_i)-draw_len,draw_len + step_gap, 0.)};
+              if is_last_dash { // ↑ start drawing 1st from the end of the segment, which ↑ is a min of step width or dash item width
                 if       dbg>=2	{scene.stroke(&get_stroke_end(cw*1.5), Affine::IDENTITY, &css::BLUE  , None, &c,);
                 }else if dbg==1	{scene.stroke(&stroke_c              , Affine::IDENTITY, &css::ORANGE, None, &c,);
                 }else if dbg==0	{scene.stroke(&stroke_c              , Affine::IDENTITY, &grad       , None, &c,);}
