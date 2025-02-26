@@ -127,6 +127,8 @@ mod impls {
         // Low precision, but step < dash
         VarOpt {arc_len:180.  , prec_dps: 22.5, dbg:0, dash_off: 0. , dash_iter:Some([45. ,45. ])},
         VarOpt {arc_len:180.1 , prec_dps: 22.5, dbg:0, dash_off: 0. , dash_iter:Some([45. ,45. ])},
+        VarOpt {arc_len:188.9 , prec_dps: 99. , dbg:0, dash_off: 0. , dash_iter:Some([80. ,10. ])},
+        VarOpt {arc_len:191.  , prec_dps: 99. , dbg:0, dash_off: 0. , dash_iter:Some([80. ,10. ])},
         // Low precision, and step > dash
         VarOpt {arc_len:180.  , prec_dps: 99. , dbg:0, dash_off: 0. , dash_iter:Some([45. ,45. ])},
         VarOpt {arc_len:180.1 , prec_dps: 99. , dbg:0, dash_off: 0. , dash_iter:Some([45. ,45. ])},
