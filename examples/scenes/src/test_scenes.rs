@@ -488,7 +488,7 @@ mod impls {
         }
         }
       }
-      if dbg>=4 {println!("total dashes drawn = {} / {dash_iter_len_deg} = {} + {}; arc = {arc_len_deg}",dash_drawn_full.to_degrees(), arc_len_deg.div_euclid(dash_iter_len_deg), arc_len_deg % dash_iter_len_deg);}
+      if dbg>=4 {println!("total dashes drawn = {: >4.3} / {dash_iter_len_deg: >4.3} = {} + {: >4.3}; arc = {arc_len_deg: >4.3}",dash_drawn_full.to_degrees(), arc_len_deg.div_euclid(dash_iter_len_deg), arc_len_deg % dash_iter_len_deg);}
 
       if let JoinWhere::Beg = jn { // Segment 2: ~join part is 1st (at the start)
         // Draws pos-gradwidth segment separately without the extra iterator, including leftovers from whole steps not covering the full range
