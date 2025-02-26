@@ -398,10 +398,10 @@ mod impls {
               let c = if is_vis_draw   {Arc::new((cx,cy), (r0,r0)   ,c0         ,draw_len + step_gap, 0.)
               } else {is_vis_draw=true; Arc::new((cx,cy), (r0,r0)   ,c1-draw_len,draw_len + step_gap, 0.)};
               if is_last_dash {
-                if       dbg>=1	{scene.stroke(&stroke_c              , Affine::IDENTITY, &css::ORANGE     , None, &c,);
-                }else if dbg>=2	{scene.stroke(&get_stroke_end(cw*1.2), Affine::IDENTITY, &css::ORANGE     , None, &c,);
-                }else          	{scene.stroke(&stroke_c              , Affine::IDENTITY, &grad            , None, &c,);}
-              } else           	{scene.stroke(&stroke_c              , Affine::IDENTITY, &grad            , None, &c,);};
+                if       dbg>=1	{scene.stroke(&stroke_c             , Affine::IDENTITY, &css::ORANGE, None, &c,);
+                }else if dbg>=2	{scene.stroke(&get_stroke_end(cw*2.), Affine::IDENTITY, &css::BLUE  , None, &c,);
+                }else          	{scene.stroke(&stroke_c             , Affine::IDENTITY, &grad       , None, &c,);}
+              } else           	{scene.stroke(&stroke_c             , Affine::IDENTITY, &grad       , None, &c,);};
               // println!("   → gap={}° {step_gap}", step_gap.to_degrees());
               if is_last && draw_len < *dash_i - epsi { // drawn something, but not the full visible dash
                 let part_len = draw_end - d_beg; //how much of an existing dash is covered by all draws, incl. last
@@ -441,7 +441,7 @@ mod impls {
                   let over_delta = over_end_c - over_beg_c;
                   let c = Arc::new((cx,cy), (r0,r0)   ,over_beg_c,over_delta+step_gap_def, 0.);
                   if dbg>=1	{scene.stroke(&stroke_c, Affine::IDENTITY, css::CYAN , None, &c,);
-                  } else   	{scene.stroke(&stroke_c, Affine::IDENTITY, &grad        , None, &c,);}
+                  } else   	{scene.stroke(&stroke_c, Affine::IDENTITY, &grad     , None, &c,);}
                   dash_partial = over_delta * r0; carry_over = 0.;
                   // println!("last step - drawn next dash since it won't be handled later!");
                 // } else {println!("  Δover {: >4.1}° = step_w {: >4.1}° - {: >4.1}° drawn",carry_over.to_degrees(),step_width.to_degrees(),draw_len.to_degrees());
