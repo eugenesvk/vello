@@ -299,7 +299,7 @@ mod impls {
         let step_ix = if is_extra_step && space_leftover_arc < delta_rem_rad {f64::from(steps_delta_xt)} else {
           dash_last_vis_end_arc.div_euclid(precision_rad_per_step) + if dash_last_vis_end_arc % precision_rad_per_step > 0. {1.}else{0.}
         };
-        if dbg>=3{let _six1 = step_ix + 1.0; let _steps=steps_delta_i; let _dix1 = dash_vis_ix + 1; let _dashes=dash_iter_px.len();
+        if dbg>=4{let _six1 = step_ix + 1.0; let _steps=steps_delta_i; let _dix1 = dash_vis_ix + 1; let _dashes=dash_iter_px.len();
           println!("step_ix={_six1}¦{_steps}{} dash_vis_ix={_dix1}¦{_dashes} arc_len={}° ╍off={} ╍len={dash_iter_len_deg}° arc%╍={}°=({}+{})%{} ␠leftover={}°"
           ,if is_extra_step {"+1"}else{""}
           ,arc_len_rad.to_degrees(), dash_off_rad.to_degrees(), arc_in_dashes.to_degrees(),dash_off_rad.to_degrees(),arc_len_rad.to_degrees(),dash_iter_len_rad.to_degrees()
