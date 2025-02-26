@@ -100,7 +100,7 @@ mod impls {
 
   #[derive(Default,Debug)]
   pub struct CarryOver {len:f64, // len arc to carry over
-    d_ix	:i32, // accrued at this dash index, only carry over to the next dash or next step
+    d_ix	:usize, // accrued at this dash index, only carry over to the next dash or next step
     s_ix	:i32, // …               step      , …
   }
   pub struct VarOpt {dbg:u8,
@@ -360,7 +360,7 @@ mod impls {
         while step_covered >= -0.000001  {
           dr += 1;
           step_covered -= dash_iter_len_rad;
-        let mut j = 0;
+        let mut j:usize = 0;
         let mut is_visible = false;
         let mut prev_draw_len:f64 = 0.; // store a sum of previously drawn dashes (vis+invis) so that if this dash doesn't cover the full Δstep or Σdash_len, we can see which part of it was covered before and which should go as Δover to the next step
         // if seg_count == 1. {
