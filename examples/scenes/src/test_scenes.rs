@@ -277,7 +277,7 @@ mod impls {
         JoinWhere::End	=> wavg,};
 
       // Calculate which of the steps will match the last visible dash, and then do NOT extend the last step to cover for occlusion artifacts of other steps
-      let (step_ix, dash_vis_ix) = if !is_dash {
+      let (step_ix, dash_vis_ix) = if is_dash {
         let arc_in_dashes = (arc_len_rad + dash_off_rad) % dash_iter_len_rad; // last partial arc's space that would hold a dash (in arc's coordinates)
         let last_dash_len = if arc_in_dashes > 0. {arc_in_dashes} else {dash_iter_len_rad}; // last full or partial arc's space that would hold a dash
         let mut dash_ix 	= 0;
