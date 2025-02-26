@@ -119,6 +119,13 @@ mod impls {
       // Color
       let col_beg = css::LIME;let col_end = css::RED;
       // Opts
+      // dbg:	col  gap	dash_end_w.	print	print+	.
+      // 0   	        	           	     	      	.
+      // 1   	+       	           	     	      	.
+      // 2   	+    +  	+          	     	      	.
+      // 3   	+    +  	+          	     	      	.
+      // 4   	+    +  	+          	+    	      	.
+      // 5   	+    +  	+          	+    	+     	.
       let opts = [
         // VarOpt {arc_len:180. , prec_dps: 2.5, dbg:0, dash_off: 0. , dash_iter:None            },
         // VarOpt {arc_len:180.1, prec_dps: 2.5, dbg:0, dash_off: 0. , dash_iter:None            },
