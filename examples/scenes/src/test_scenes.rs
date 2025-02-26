@@ -385,7 +385,7 @@ mod impls {
               } else   	{scene.stroke(&stroke_c, Affine::IDENTITY, &grad        , None, &c,);}
               dbgprint = true;
               if dbg>=5 && dbgprint {
-              println!("{i} drawing Δover {: >2.1} @ {: >3.2} = ({: >2.1}-{: >2.1}-Δ{: >2.1}) → {: >3.2}",carry_over.to_degrees()
+              println!("{i} ╍{j} draw Δover {: >2.1} @ {: >3.2} = ({: >2.1}-{: >2.1}-Δ{: >2.1}) → {: >3.2}",carry_over.to_degrees()
                 ,(c1 - step_width - carry_over).to_degrees(),c1.to_degrees(),step_width.to_degrees(),carry_over.to_degrees()
                 ,(c1 - step_width).to_degrees());}
               carry_over = 0.;
