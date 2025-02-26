@@ -351,7 +351,7 @@ mod impls {
           ,dash_iter_px.len(), arc_beg.to_degrees())}};
         let mut dr = 0; // track dash 🗘
         let mut step_covered = step_width; // track Σ dash_iter_len_rad covering each Δstep
-        while step_covered > 0.  {
+        while step_covered >= -0.000001  {
           dr += 1;
           step_covered -= dash_iter_len_rad;
         let mut j = 0;
