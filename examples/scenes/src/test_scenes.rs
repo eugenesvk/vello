@@ -187,7 +187,7 @@ mod impls {
       let w_step = w_delta_avg / steps_delta_f; //12/2/45 0.13 to reach average
       let w_per_step_i:f64	= w_delta_avg / f64::from(steps_delta_i); //to reach average
       let px1 = 1./dpi/r0; //length of 1px (scaled) in rad
-      let step_gap_def = if dbg>=1 {0.} else {px1}; //fix conflation artifacts outside of debug by overlapping segments (except the last one). <1 sometimes works, but not reliably at different zoom factor
+      let step_gap_def = if dbg>=2 {0.} else {px1}; //fix conflation artifacts outside of debug by overlapping segments (except the last one). <1 sometimes works, but not reliably at different zoom factor
 
       let col_avg = col_beg.lerp(col_end,0.5,Default::default());
 
@@ -289,7 +289,7 @@ mod impls {
         let step_ix = if is_extra_step && space_leftover_arc < delta_rem_rad {f64::from(steps_delta_xt)} else {
           dash_last_vis_end_arc.div_euclid(precision_rad_per_step) + if dash_last_vis_end_arc % precision_rad_per_step > 0. {1.}else{0.}
         };
-        if dbg>=2{let _six1 = step_ix + 1.0; let _steps=steps_delta_i; let _dix1 = dash_vis_ix + 1; let _dashes=dash_iter_px.len();
+        if dbg>=3{let _six1 = step_ix + 1.0; let _steps=steps_delta_i; let _dix1 = dash_vis_ix + 1; let _dashes=dash_iter_px.len();
           println!("step_ix={_six1}¦{_steps}{} dash_vis_ix={_dix1}¦{_dashes} arc_len={}° ╍off={} ╍len={dash_iter_len_deg}° arc%╍={}°=({}+{})%{} ␠leftover={}°"
           ,if is_extra_step {"+1"}else{""}
           ,arc_len_rad.to_degrees(), dash_off_rad.to_degrees(), arc_in_dashes.to_degrees(),dash_off_rad.to_degrees(),arc_len_rad.to_degrees(),dash_iter_len_rad.to_degrees()
@@ -313,7 +313,7 @@ mod impls {
         let cw = if is_last	{w_end
         } else             	{w_beg + sign * r * w_per_step_i};
 
-        let stroke_c = if dbg>=2 {match jn {
+        let stroke_c = if dbg>=3 {match jn {
           JoinWhere::Beg	=> get_stroke_end(w2px),
           JoinWhere::End	=> get_stroke_end(w1px),}
         } else{get_stroke_end(cw)};
@@ -334,7 +334,7 @@ mod impls {
         // seg_beg┘     └seg_end
         //         ↑↑  ↑ draw, overlaps with   active
         //           ↑↑  skip, overlaps with inactive
-        if dbg>=2 {if i == 0 {println!("\n\n—————Σⁱ={steps_delta_xt: >3}——╍╍№{} Σ{dash_iter_len_deg: >4.1}° off{dash_off_deg: >4.1}° {dash_iter_px:?}°╍╍——beg {: >4.1}° Δ{delta_covered_deg: >4.1}° + {delta_rem_deg: >4.1}° rem = Δ{delta_deg: >4.1}°———————————————————————————————————"
+        if dbg>=4 {if i == 0 {println!("\n\n—————Σⁱ={steps_delta_xt: >3}——╍╍№{} Σ{dash_iter_len_deg: >4.1}° off{dash_off_deg: >4.1}° {dash_iter_px:?}°╍╍——beg {: >4.1}° Δ{delta_covered_deg: >4.1}° + {delta_rem_deg: >4.1}° rem = Δ{delta_deg: >4.1}°———————————————————————————————————"
           ,dash_iter_px.len(), arc_beg.to_degrees())}};
         let mut dr = 0; // track dash 🗘
         let mut step_covered = step_width; // track Σ dash_iter_len_rad covering each Δstep
@@ -370,7 +370,7 @@ mod impls {
               if dbg>=1	{scene.stroke(&stroke_c, Affine::IDENTITY, css::MAGENTA , None, &c,);
               } else   	{scene.stroke(&stroke_c, Affine::IDENTITY, &grad        , None, &c,);}
               dbgprint = true;
-              if dbg>=4 && dbgprint {
+              if dbg>=5 && dbgprint {
               println!("{i} drawing Δover {: >2.1} @ {: >3.2} = ({: >2.1}-{: >2.1}-Δ{: >2.1}) → {: >3.2}",carry_over.to_degrees()
                 ,(c1 - step_width - carry_over).to_degrees(),c1.to_degrees(),step_width.to_degrees(),carry_over.to_degrees()
                 ,(c1 - step_width).to_degrees());}
@@ -394,11 +394,10 @@ mod impls {
               } else {0.};
               let c = if is_vis_draw   {Arc::new((cx,cy), (r0,r0)   ,c0         ,draw_len + step_gap, 0.)
               } else {is_vis_draw=true; Arc::new((cx,cy), (r0,r0)   ,c1-draw_len,draw_len + step_gap, 0.)};
-              if dbg>=1 && is_last_dash {
-                scene.stroke(&get_stroke_end(cw*1.2), Affine::IDENTITY, &css::ORANGE     , None, &c,);
-              } else {
-                scene.stroke(&stroke_c, Affine::IDENTITY, &grad     , None, &c,);
-              };
+              if is_last_dash {
+                if      dbg>=1	{scene.stroke(&stroke_c              , Affine::IDENTITY, &css::ORANGE     , None, &c,);
+                else if dbg>=2	{scene.stroke(&get_stroke_end(cw*1.2), Affine::IDENTITY, &css::ORANGE     , None, &c,);}
+              } else          	{scene.stroke(&stroke_c              , Affine::IDENTITY, &grad            , None, &c,);};
               // println!("   → gap={}° {step_gap}", step_gap.to_degrees());
               if is_last && draw_len < *dash_i - epsi { // drawn something, but not the full visible dash
                 let part_len = draw_end - d_beg; //how much of an existing dash is covered by all draws, incl. last
@@ -409,7 +408,7 @@ mod impls {
             } else {is_vis_draw=false;}
             // if c0       <=       d_end
             // &&    seg_end >= d_beg  { // (alt check) our segment overlaps with this dash
-            if dbg>=3 && (dbgprint || i == 0 || is_last || (70<= i && i <=71)) {println!( //👁👀👓
+            if dbg>=4 && (dbgprint || i == 0 || is_last || (70<= i && i <=71)) {println!( //👁👀👓
               "{}👀{}{i: >3} {} {j: >2}\
               │ +{: >4.1}={: >4.1}° ↷ {: >4.1}° Δ{: >3.1}° off {: >3.1}° \
               │№{seg_count: >2} {: >4.1}° ↷ {: >4.1}°\
@@ -456,7 +455,7 @@ mod impls {
                 //   ,dash_i.to_degrees(),(dash_i-part_len).to_degrees(),c1.to_degrees());
               }
             }
-            if dbg>=3 && (dbgprint || i == 0 || is_last || (78<= i && i <=83)) {println!( //👁👀👓
+            if dbg>=5 && (dbgprint || i == 0 || is_last || (78<= i && i <=83)) {println!( //👁👀👓
               "{}👓{}{i: >3} {} {j: >2}\
               │ +{: >4.1}={: >4.1}° ↷ {: >4.1}° Δ{: >3.1}° off {: >3.1}° \
               │№{seg_count: >2} {: >4.1}° ↷ {: >4.1}°\
