@@ -405,10 +405,10 @@ mod impls {
               let c = if is_vis_draw   {Arc::new((cx,cy), (r0,r0)   ,c0         ,draw_len + step_gap, 0.)
               } else {is_vis_draw=true; Arc::new((cx,cy), (r0,r0)   ,c1-draw_len,draw_len + step_gap, 0.)};
               if is_last_dash {
-                if       dbg>=1	{scene.stroke(&stroke_c             , Affine::IDENTITY, &css::ORANGE, None, &c,);
-                }else if dbg>=2	{scene.stroke(&get_stroke_end(cw*2.), Affine::IDENTITY, &css::BLUE  , None, &c,);
-                }else          	{scene.stroke(&stroke_c             , Affine::IDENTITY, &grad       , None, &c,);}
-              } else           	{scene.stroke(&stroke_c             , Affine::IDENTITY, &grad       , None, &c,);};
+                if       dbg>=2	{scene.stroke(&get_stroke_end(cw*1.5), Affine::IDENTITY, &css::BLUE  , None, &c,);
+                }else if dbg==1	{scene.stroke(&stroke_c              , Affine::IDENTITY, &css::ORANGE, None, &c,);
+                }else if dbg==0	{scene.stroke(&stroke_c              , Affine::IDENTITY, &grad       , None, &c,);}
+              } else           	{scene.stroke(&stroke_c              , Affine::IDENTITY, &grad       , None, &c,);};
               // println!("   → gap={}° {step_gap}", step_gap.to_degrees());
               if is_last && draw_len < *dash_i - epsi { // drawn something, but not the full visible dash
                 let part_len = draw_end - d_beg; //how much of an existing dash is covered by all draws, incl. last
