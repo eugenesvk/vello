@@ -434,7 +434,7 @@ mod impls {
             } else {is_vis_draw=false;}
             // if c0       <=       d_end
             // &&    seg_end >= d_beg  { // (alt check) our segment overlaps with this dash
-            if dbg>=4 && (dbgprint || i == 0 || is_last || (70<= i && i <=71)) {println!( //👁👀👓
+            if dbg>=5 && (dbgprint || i == 0 || is_last || (70<= i && i <=71)) {println!( //👁👀👓
               "{}👀{}{i: >3} {} {j: >2}\
               │ +{: >4.1}={: >4.1}° ↷ {: >4.1}° Δ{: >3.1}° off {: >3.1}° \
               │№{seg_count: >2} {: >4.1}° ↷ {: >4.1}°\
