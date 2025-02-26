@@ -133,7 +133,8 @@ mod impls {
       let opts = [
         // VarOpt {arc_len:180. , prec_dps: 2.5, dbg:0, dash_off: 0. , dash_iter:None            },
         // VarOpt {arc_len:180.1, prec_dps: 2.5, dbg:0, dash_off: 0. , dash_iter:None            },
-        VarOpt {arc_len:180. , prec_dps: 60., dbg:5, dash_off: 0. , dash_iter:Some([30. ,30. ])},
+        // VarOpt {arc_len:180. , prec_dps: 60., dbg:5, dash_off: 0. , dash_iter:Some([30. ,30. ])},
+        VarOpt {arc_len:180. , prec_dps: 22.5, dbg:5, dash_off: 0. , dash_iter:Some([45. ,45. ])},
         // VarOpt {arc_len:180. , prec_dps: 2.5, dbg:0, dash_off: 0. , dash_iter:Some([30. ,30. ])},
         // VarOpt {arc_len:180. , prec_dps: 2.5, dbg:1, dash_off: 0. , dash_iter:Some([30. ,30. ])},
         // VarOpt {arc_len:180. , prec_dps: 2.5, dbg:2, dash_off: 0. , dash_iter:Some([30. ,30. ])},
