@@ -445,6 +445,7 @@ mod impls {
               let space_available = step_width.min(dash_iter_len_rad) - prev_draw_len;
               if space_available > 0.00000000001 { // this+prev dashes didn't cover the full Δstep¦dash segment width (whichever is smaller, dash segment can fit in Δstep), so should be drawn by the next visible dash
                 carry_over = space_available;
+                if dbg>=5 {println!("{i} ╍{j}  +Δover {: >4.1}° = step_w {: >4.1}°|{: >4.1}° - {: >4.1}° drawn_prev ({: >4.1}° cur {})",carry_over.to_degrees(),step_width.to_degrees(),dash_i.to_degrees(),prev_draw_len.to_degrees(),draw_len.to_degrees(),draw_len);}
                 if is_last { // no next step, draw in this one
                   is_vis_draw = true;
                   let over_beg_c = c0 + prev_draw_len;
