@@ -398,7 +398,7 @@ mod impls {
               carry_over = CarryOver::default();
             }
             let mut is_last_dash = false;
-            if draw_len > 0.0 { // 1st draw starts @ seg end to attach to the next draw in case of partials
+            if draw_len > 0.0 {
               prev_draw_len += draw_len; if dash_drawn_full <= step_beg_a {dash_drawn_full += dash_i;}
               if draw_len > epsi { // do actual draw only if len above floating rounding error
                 prev_draw_len += draw_len; if dash_drawn_full <= step_beg_a {dash_drawn_full += dash_i;}
@@ -415,8 +415,9 @@ mod impls {
                   } else if is_last    	{0. // don't bleed the last step's end //println!("non-dashed step gap removed {step_ix} {dash_vis_ix}");
                   } else {step_gap_def}
                 } else   {0.};
-                let c = if is_vis_draw   {Arc::new((cx,cy), (r0,r0)   ,c0                                   ,draw_len + step_gap, 0.)
-                } else {is_vis_draw=true; Arc::new((cx,cy), (r0,r0)   ,c0 + step_width.min(*dash_i)-draw_len,draw_len + step_gap, 0.)};
+                let beg1st = if is_vis_draw {0. // 1st draw starts @ seg end to attach to the next draw in case of partials
+                } else {is_vis_draw=true; step_width.min(*dash_i + dash_iter_len_rad*f64::from(dr-1)) - draw_len};
+                let c = Arc::new((cx,cy), (r0,r0)   ,c0 + beg1st,draw_len + step_gap, 0.);
                 if is_last_dash { // ↑ start drawing 1st from the end of the segment, which ↑ is a min of step width or dash item width
                 if       dbg>=2	{scene.stroke(&get_stroke_end(cw*1.5), Affine::IDENTITY, &css::BLUE  , None, &c,);
                 }else if dbg==1	{scene.stroke(&stroke_c              , Affine::IDENTITY, &css::ORANGE, None, &c,);
