@@ -436,11 +436,11 @@ mod impls {
               │№{seg_count: >2} {: >4.1}° ↷ {: >4.1}°\
               │ ╍ {: >4.1}° → {: >4.1}° Δ{: >4.1}°\
               │ 🖉 {: >4.1}° → {: >4.1}° ⇒ {: >3.1}°{}"
-              ,if draw_len>0.{"🖉"}else{" "}, if is_last {"🛑"}else{" "}, if dr > 1 {format!("🗘{dr: >1}")}else{"  ".to_owned()}
+              ,if draw_len>epsi{"🖉"}else{" "}, if is_last {"🛑"}else{" "}, if dr > 1 {format!("🗘{dr: >1}")}else{"  ".to_owned()}
               ,step_beg_a.to_degrees()    ,c0    .to_degrees(),c1    .to_degrees(),(c1    -    c0).to_degrees(),seg_off.to_degrees()
               ,                      seg_beg .to_degrees(),seg_end .to_degrees()
               ,d_beg   .to_degrees(),d_end   .to_degrees(),dash_i.to_degrees()
-              ,draw_beg.to_degrees(),draw_end.to_degrees(),draw_len.to_degrees(), if draw_len>0. && draw_len<0.00001{"❗>0"}else{""}
+              ,draw_beg.to_degrees(),draw_end.to_degrees(),draw_len.to_degrees(), if draw_len>0. && draw_len<epsi{"❗>0"}else{""}
               );}
           } else { //println!("   inactive ({: >4.1}°)",dash_i.to_degrees());
             let d_end = d_beg + dash_i;
