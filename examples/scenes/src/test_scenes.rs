@@ -150,8 +150,8 @@ mod impls {
 
       let end = opts.len();
       for i in 0..end { let f = f64::from(i as u32);
-        let cx = 20. + (1. + (f     %      5.) * 2. )*(r0 + w1.max(w2));
-        let cy = 20. + (1. +  f.div_euclid(5.) * 2. )*(r0 + w1.max(w2)); // 5 circles in a row
+        let cx = 20. + (1. + (f     %      4.) * 2. )*(r0 + w1.max(w2));
+        let cy = 20. + (1. +  f.div_euclid(4.) * 2. )*(r0 + w1.max(w2)); // 5 circles in a row
         ddd(scene, (cx,cy),r0, r1beg_rad, opts[i].arc_len,  JoinWhere::End,delta_transit,
           col_beg,col_end,  w1,w2, dpi,  opts[i].prec_dps,  opts[i].dash_off,opts[i].dash_iter, opts[i].dbg,);
         // ddd(scene, (cx,cy),r0, r1beg_rad + opts[i].arc_len, opts[i].arc_len,  JoinWhere::Beg,delta_transit,
