@@ -348,7 +348,7 @@ mod impls {
         // seg_beg┘     └seg_end
         //         ↑↑  ↑ draw, overlaps with   active
         //           ↑↑  skip, overlaps with inactive
-        if dbg>=4 {if i == 0 {println!("\n\n—————Σⁱ={steps_delta_xt: >3}——╍╍№{} Σ{dash_iter_len_deg: >4.1}° off{dash_off_deg: >4.1}° {dash_iter_px:?}°╍╍——beg {: >4.1}° Δ{delta_covered_deg: >4.1}° + {delta_rem_deg: >4.1}° rem = Δ{delta_deg: >4.1}°———————————————————————————————————"
+        if dbg>=4 {if i == 0 {println!("\n\n——————i————╍№⊂{}———Σⁱ={steps_delta_xt: >3}——Σ╍{dash_iter_len_deg: >4.1}° off{dash_off_deg: >4.1}° {dash_iter_px:?}°╍╍——beg {: >4.1}° Δ{delta_covered_deg: >4.1}° + {delta_rem_deg: >4.1}° rem = Δ{delta_deg: >4.1}°—————————————————————"
           ,dash_iter_px.len(), arc_beg.to_degrees())}};
         let mut dr = 0; // track dash 🗘
         let mut step_covered = step_width; // track Σ dash_iter_len_rad covering each Δstep
