@@ -494,7 +494,7 @@ mod impls {
                 //   ,dash_i.to_degrees(),(dash_i-part_len).to_degrees(),c1.to_degrees());
               }
             }
-            if dbg>=5 && (dbgprint || i == 0 || is_last || (78<= i && i <=83)) {println!( //👁👀👓
+            if dbg>=6 && (dbgprint || i == 0 || is_last || (0<= i && i <=83)) {println!( //👁👀👓
               "{}👓{}{i: >3} {} {j: >2}\
               │ +{: >4.1}={: >4.1}° ↷ {: >4.1}° Δ{: >3.1}° off {: >3.1}° \
               │№{seg_count: >2} {: >4.1}° ↷ {: >4.1}°\
