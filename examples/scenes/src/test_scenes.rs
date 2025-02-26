@@ -38,7 +38,7 @@ mod impls {
   use std::borrow::Borrow;
   use std::f64::consts as f64c;
 
-  const epsi:f64 = 0.00000000001; // to counter some float precision errors
+  const epsi:f64 = 0.00000001; // to counter some float precision errors
   // buggy imprecise, doesn't handle big numbers, but doesn't matter much here
   pub fn f_round(f:f64, digits:i32) -> f64 {let dig_pow=10_f64.powi(digits); (f * dig_pow).round() / dig_pow}
 
