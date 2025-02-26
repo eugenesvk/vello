@@ -98,6 +98,11 @@ mod impls {
     JoinWhere::End	=> write!(f, "——╍╍")}   }
   }
 
+  #[derive(Default,Debug)]
+  pub struct CarryOver {len:f64, // len arc to carry over
+    d_ix	:i32, // accrued at this dash index, only carry over to the next dash or next step
+    s_ix	:i32, // …               step      , …
+  }
   pub struct VarOpt {dbg:u8,
     arc_len 	:f64, //°
     prec_dps	:f64, // precision °/step
@@ -177,7 +182,7 @@ mod impls {
     ) where I:IntoIterator, I::Item:Borrow<f64> {
       let mut is_vis_draw  = false; // whether a visible dash is drawing to clamp its first partial draw to the next. Switches to off when an invisible dash is "drawing"
       let mut dash_partial = 0.; // use as dash offset for the next segment to hide the partially drawn part
-      let mut carry_over:f64 = 0.; // if Δstep covers 2 dash segments, the 1st one will store the remainer it didn't cover here for the 2nd to pick it up
+      let mut carry_over = CarryOver::default(); // if Δstep covers 2 dash segments, the 1st one will store the remainer it didn't cover here for the 2nd to pick it up.len
 
       let delta_deg   	= arc_len_deg *       delta_transit ; let delta_rad    = delta_deg   .to_radians();
       let skip_beg_deg	= arc_len_deg * (1. - delta_transit); let skip_beg_rad = skip_beg_deg.to_radians();
@@ -376,19 +381,21 @@ mod impls {
             let draw_end = d_end.min(seg_end).max(d_beg); // start at dash end  , ← to segment end  , but not past dash beg
             let draw_len = draw_end - draw_beg;
 
-            if carry_over > 0. { // draw leftovers from the previous dash
-              prev_draw_len += carry_over;
+            if carry_over.len > 0.
+              &&(i > carry_over.s_ix
+              || j > carry_over.d_ix ) { // draw leftovers from the previous dash, but only on next step/dash
+              prev_draw_len += carry_over.len;
               // if is_vis_draw {println!("!!! leftovers from a previous dash should always 1st, but something else drew")}; //todo warn
               is_vis_draw = true; // start drawing @ the end of prev ↓ step
-              let c = Arc::new((cx,cy), (r0,r0)   ,c0 - carry_over,carry_over + step_gap_def, 0.);
+              let c = Arc::new((cx,cy), (r0,r0)   ,c0 - carry_over.len,carry_over.len + step_gap_def, 0.);
               if dbg>=1	{scene.stroke(&stroke_c, Affine::IDENTITY, css::MAGENTA , None, &c,);
               } else   	{scene.stroke(&stroke_c, Affine::IDENTITY, &grad        , None, &c,);}
               dbgprint = true;
               if dbg>=5 && dbgprint {
-              println!("{i} ╍{j} draw Δover {: >2.1} @ {: >3.2} = (c0={: >2.1}-Δ{: >2.1}) → c0={: >3.2} (step {: >3.2})",carry_over.to_degrees()
-                ,(c0 - carry_over).to_degrees(),c0.to_degrees(),carry_over.to_degrees()
+              println!("{i} ╍{j} {} ╍{} draw Δover {: >2.1} @ {: >3.2} = (c0={: >2.1}-Δ{: >2.1}) → c0={: >3.2} (step {: >3.2})",carry_over.s_ix,carry_over.d_ix,carry_over.len.to_degrees()
+                ,(c0 - carry_over.len).to_degrees(),c0.to_degrees(),carry_over.len.to_degrees()
                 ,c0.to_degrees(), step_width.to_degrees());}
-              carry_over = 0.;
+              carry_over = CarryOver::default();
             }
             let mut is_last_dash = false;
             if draw_len > 0.0 { // 1st draw starts @ seg end to attach to the next draw in case of partials
@@ -444,17 +451,17 @@ mod impls {
               if is_dash && dash_drawn_full <= step_beg_a {dash_drawn_full += dash_i;}
               let space_available = step_width.min(dash_iter_len_rad) - prev_draw_len;
               if space_available > 0.00000000001 { // this+prev dashes didn't cover the full Δstep¦dash segment width (whichever is smaller, dash segment can fit in Δstep), so should be drawn by the next visible dash
-                carry_over = space_available;
-                if dbg>=5 {println!("{i} ╍{j}  +Δover {: >4.1}° = step_w {: >4.1}°|{: >4.1}° - {: >4.1}° drawn_prev ({: >4.1}° cur {})",carry_over.to_degrees(),step_width.to_degrees(),dash_i.to_degrees(),prev_draw_len.to_degrees(),draw_len.to_degrees(),draw_len);}
+                carry_over.len = space_available; carry_over.s_ix = i; carry_over.d_ix = j;
+                if dbg>=5 {println!("{i} ╍{j}  +Δover {: >4.1}° = step_w {: >4.1}°|{: >4.1}° - {: >4.1}° drawn_prev ({: >4.1}° cur {})",carry_over.len.to_degrees(),step_width.to_degrees(),dash_i.to_degrees(),prev_draw_len.to_degrees(),draw_len.to_degrees(),draw_len);}
                 if is_last { // no next step, draw in this one
                   is_vis_draw = true;
                   let over_beg_c = c0 + prev_draw_len;
-                  let over_end_c = (over_beg_c + carry_over).min(c1) ;// up to our arc's end, the rest will be picked up by the next arc
+                  let over_end_c = (over_beg_c + carry_over.len).min(c1) ;// up to our arc's end, the rest will be picked up by the next arc
                   let over_delta = over_end_c - over_beg_c;
                   let c = Arc::new((cx,cy), (r0,r0)   ,over_beg_c,over_delta+step_gap_def, 0.);
                   if dbg>=1	{scene.stroke(&stroke_c, Affine::IDENTITY, css::CYAN , None, &c,);
                   } else   	{scene.stroke(&stroke_c, Affine::IDENTITY, &grad     , None, &c,);}
-                  dash_partial = over_delta * r0; carry_over = 0.;
+                  dash_partial = over_delta * r0; carry_over = CarryOver::default();
                   // println!("last step - drawn next dash since it won't be handled later!");
                 // } else {println!("  Δover {: >4.1}° = step_w {: >4.1}° - {: >4.1}° drawn",carry_over.to_degrees(),step_width.to_degrees(),draw_len.to_degrees());
                 }
