@@ -359,13 +359,11 @@ mod impls {
         if dbg>=4 {if i == 0 {println!("\n\n——————i————╍№⊂{}———Σⁱ={steps_delta_xt: >3}——Σ╍{dash_iter_len_deg: >4.1}° off{dash_off_deg: >4.1}° {dash_iter_px:?}°╍╍——beg {: >4.1}° Δ{delta_covered_deg: >4.1}° + {delta_rem_deg: >4.1}° rem = Δ{delta_deg: >4.1}°—————————————————————"
           ,dash_iter_px.len(), arc_beg.to_degrees())}};
         let mut dr = 0; // track dash 🗘
-        let mut step_covered = step_width; // track Σ dash_iter_len_rad covering each Δstep
-        while step_covered >= -0.000001  {
+        let mut prev_draw_len:f64 = 0.; // track Σ drawn in+/vis dashes covering each Δstep: if this dash doesn't cover the full Δstep or Σdash_len, we know the covered part → left goes as Δover to the next step
+        while (step_width - prev_draw_len) > epsi  {
           dr += 1;
-          step_covered -= dash_iter_len_rad;
         let mut j:usize = 0;
         let mut is_visible = false;
-        let mut prev_draw_len:f64 = 0.; // store a sum of previously drawn dashes (vis+invis) so that if this dash doesn't cover the full Δstep or Σdash_len, we can see which part of it was covered before and which should go as Δover to the next step
         // if seg_count == 1. {
 
         let mut dash_ix: usize = 0;
@@ -470,6 +468,7 @@ mod impls {
                   if dbg>=1	{scene.stroke(&stroke_c, Affine::IDENTITY, css::CYAN , None, &c,);
                   } else   	{scene.stroke(&stroke_c, Affine::IDENTITY, &grad     , None, &c,);}
                   dash_partial = over_delta * r0;
+                  prev_draw_len += over_delta;
                   // println!("last step - drawn next dash since it won't be handled later!");
                   if dbg>=5 {println!("{i} ╍{j} {} ╍{} draw Δover now! {: >2.1} \
                     @ {: >3.2} = (c0={: >2.1}+Δ{: >2.1}=prev_draw_len)\
