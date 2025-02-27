@@ -362,6 +362,7 @@ mod impls {
         let mut prev_draw_len:f64 = 0.; // track Σ drawn in+/vis dashes covering each Δstep: if this dash doesn't cover the full Δstep or Σdash_len, we know the covered part → left goes as Δover to the next step
         while (step_width - prev_draw_len) > epsi  {
           dr += 1;
+          if dbg>=8 {println!("LOOP {dr} {:.2}° of {:.2}°, left Δ{}°	", prev_draw_len.to_degrees(), step_width.to_degrees(), (step_width - prev_draw_len).to_degrees())}
         let mut j:usize = 0;
         let mut is_visible = false;
         // if seg_count == 1. {
@@ -386,6 +387,7 @@ mod impls {
               &&(i > carry_over.s_ix
               || j > carry_over.d_ix ) { // draw leftovers from the previous dash, but only on next step/dash
               prev_draw_len += carry_over.len;
+              if dbg>=8 {println!("covered {:.1}° ⇒ {:.1}° left {:.1}° (carry_over)", carry_over.len.to_degrees(),prev_draw_len.to_degrees(), (step_width-prev_draw_len).to_degrees());}
               // if is_vis_draw {println!("!!! leftovers from a previous dash should always 1st, but something else drew")}; //todo warn
               is_vis_draw = true; // start drawing @ the end of prev ↓ step
               let c = Arc::new((cx,cy), (r0,r0)   ,c0 - carry_over.len,carry_over.len + step_gap_def, 0.);
@@ -401,6 +403,7 @@ mod impls {
             let mut is_last_dash = false;
             if draw_len > 0.0 {
               prev_draw_len += draw_len; if dash_drawn_full <= step_beg_a {dash_drawn_full += dash_i;}
+              if dbg>=8 {println!("covered {:.1}° ⇒ {:.1}° left {:.1}° (draw_len vis)", draw_len.to_degrees(),prev_draw_len.to_degrees(), (step_width-prev_draw_len).to_degrees());}
               if draw_len > epsi { // do actual draw only if len above floating rounding error
                 let step_gap = if dbg<=1 && step_gap_def != 0. { // gap exists, and not dbg2 (where occlusion artifacts are helpful to see step borders)
                   if is_dash { // Don't bleed the last dash's visible end into the next segment. Deal with gap between arcs by drawing the next arc earlier?
@@ -453,6 +456,7 @@ mod impls {
             let draw_len = draw_end - draw_beg;
             if draw_len > 0. {is_vis_draw = false; prev_draw_len += draw_len;}
             if draw_len > epsi {
+              if dbg>=8 {println!("covered {:.1}° ⇒ {:.1}° left {:.1}° (draw_len invis)", draw_len.to_degrees(),prev_draw_len.to_degrees(), (step_width-prev_draw_len).to_degrees());}
               if is_dash && dash_drawn_full <= step_beg_a {dash_drawn_full += dash_i;}
               let space_available = step_width.min(dash_iter_len_rad) - prev_draw_len;
               if space_available > 0.00000000001 { // this+prev dashes didn't cover the full Δstep¦dash segment width (whichever is smaller, dash segment can fit in Δstep), so should be drawn by the next visible dash
@@ -469,6 +473,7 @@ mod impls {
                   } else   	{scene.stroke(&stroke_c, Affine::IDENTITY, &grad     , None, &c,);}
                   dash_partial = over_delta * r0;
                   prev_draw_len += over_delta;
+                  if dbg>=8 {println!("covered {:.1}° ⇒ {:.1}° left {:.1}° (Δover @ invis last)", over_delta.to_degrees(),prev_draw_len.to_degrees(), (step_width-prev_draw_len).to_degrees());}
                   // println!("last step - drawn next dash since it won't be handled later!");
                   if dbg>=5 {println!("{i} ╍{j} {} ╍{} draw Δover now! {: >2.1} \
                     @ {: >3.2} = (c0={: >2.1}+Δ{: >2.1}=prev_draw_len)\
