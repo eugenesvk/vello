@@ -125,13 +125,18 @@ mod impls {
         // VarOpt {arc_len:180.1, prec_dps: 2.5, dbg:0, dash_off: 0. , dash_iter:None            },
         // VarOpt {arc_len:180. , prec_dps: 60., dbg:5, dash_off: 0. , dash_iter:Some([30. ,30. ])},
         // Low precision, but step < dash
-        VarOpt {arc_len:180.  , prec_dps: 22.5, dbg:0, dash_off: 0. , dash_iter:Some([45. ,45. ])},
-        VarOpt {arc_len:180.1 , prec_dps: 22.5, dbg:0, dash_off: 0. , dash_iter:Some([45. ,45. ])},
-        VarOpt {arc_len:188.9 , prec_dps: 99. , dbg:0, dash_off: 0. , dash_iter:Some([80. ,10. ])},
-        VarOpt {arc_len:191.  , prec_dps: 99. , dbg:0, dash_off: 0. , dash_iter:Some([80. ,10. ])},
+        // VarOpt {arc_len:180.  , prec_dps: 22.5, dbg:0, dash_off: 0. , dash_iter:Some([45. ,45. ])},
+        // VarOpt {arc_len:180.1 , prec_dps: 22.5, dbg:0, dash_off: 0. , dash_iter:Some([45. ,45. ])},
+        // VarOpt {arc_len:188.9 , prec_dps: 99. , dbg:0, dash_off: 0. , dash_iter:Some([80. ,10. ])},
+        // VarOpt {arc_len:191.  , prec_dps: 99. , dbg:0, dash_off: 0. , dash_iter:Some([80. ,10. ])},
         // Low precision, and step > dash
-        VarOpt {arc_len:180.  , prec_dps: 99. , dbg:0, dash_off: 0. , dash_iter:Some([45. ,45. ])},
-        VarOpt {arc_len:180.1 , prec_dps: 99. , dbg:0, dash_off: 0. , dash_iter:Some([45. ,45. ])},
+        // VarOpt {arc_len:180.  , prec_dps: 99. , dbg:0, dash_off: 0. , dash_iter:Some([45. ,45. ])},
+        // VarOpt {arc_len:180.1 , prec_dps: 99. , dbg:0, dash_off: 0. , dash_iter:Some([45. ,45. ])},
+        // Misc bug fixes
+        VarOpt {arc_len:183.1 , prec_dps: 99. , dbg:0, dash_off: 88.1 , dash_iter:Some([89. ,1. ])}, //✗starts late
+        // VarOpt {arc_len:183.1 , prec_dps: 99. , dbg:0, dash_off: 0. , dash_iter:Some([89. ,1. ])}, //✓✗last 3rd visible section
+        // VarOpt {arc_len:184.1 , prec_dps: 99. , dbg:0, dash_off: 0. , dash_iter:Some([89. ,1. ])}, //✓
+        // Sort
         // VarOpt {arc_len:180. , prec_dps: 2.5, dbg:0, dash_off: 0. , dash_iter:Some([30. ,30. ])},
         // VarOpt {arc_len:180. , prec_dps: 2.5, dbg:1, dash_off: 0. , dash_iter:Some([30. ,30. ])},
         // VarOpt {arc_len:180. , prec_dps: 2.5, dbg:2, dash_off: 0. , dash_iter:Some([30. ,30. ])},
@@ -153,7 +158,7 @@ mod impls {
       ];
 
       let end = opts.len();
-      let dbgs = [0,1,2,3];
+      let dbgs = [6];
       let el_row = 4.;
       let mut f = -1.;
       for    i      in 0..end {
